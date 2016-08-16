@@ -1,24 +1,34 @@
 package cz.cvut.kbss.study.security.model;
 
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.security.SecurityConstants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
 
-    private static final String DEFAULT_ROLE = "ROLE_USER";
+    private static final Map<String, String> ROLE_MAPPING = initRoleMapping();
 
     private User user;
 
-    protected final Set<GrantedAuthority> authorities;
+    private final Set<GrantedAuthority> authorities;
+
+    private static Map<String, String> initRoleMapping() {
+        final Map<String, String> result = new HashMap<>();
+        result.put(Vocabulary.s_c_administrator, SecurityConstants.ROLE_ADMIN);
+        result.put(Vocabulary.s_c_doctor, SecurityConstants.ROLE_USER);
+        return result;
+    }
 
     public UserDetails(User user) {
         Objects.requireNonNull(user);
         this.user = user;
         this.authorities = new HashSet<>();
-        addDefaultRole();
+        resolveRoles();
     }
 
     public UserDetails(User user, Collection<GrantedAuthority> authorities) {
@@ -26,12 +36,15 @@ public class UserDetails implements org.springframework.security.core.userdetail
         Objects.requireNonNull(authorities);
         this.user = user;
         this.authorities = new HashSet<>();
-        addDefaultRole();
+        resolveRoles();
         this.authorities.addAll(authorities);
     }
 
-    private void addDefaultRole() {
-        authorities.add(new SimpleGrantedAuthority(DEFAULT_ROLE));
+    private void resolveRoles() {
+        authorities.addAll(ROLE_MAPPING.entrySet().stream().filter(e -> user.getTypes().contains(e.getKey()))
+                                       .map(e -> new SimpleGrantedAuthority(e.getValue()))
+                                       .collect(Collectors.toList()));
+        authorities.add(new SimpleGrantedAuthority(SecurityConstants.ROLE_USER));
     }
 
     public void eraseCredentials() {

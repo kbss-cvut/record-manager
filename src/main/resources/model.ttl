@@ -186,6 +186,14 @@
 #################################################################
 
 
+###  http://vfn.cz/ontologies/fertililty-saving-study/administrator
+
+<http://vfn.cz/ontologies/fertililty-saving-study/administrator> rdf:type owl:Class ;
+                                                                 
+                                                                 rdfs:label "Administrator"@en .
+
+
+
 ###  http://vfn.cz/ontologies/fertililty-saving-study/answer
 
 <http://vfn.cz/ontologies/fertililty-saving-study/answer> rdf:type owl:Class ;
@@ -199,6 +207,14 @@
 <http://vfn.cz/ontologies/fertililty-saving-study/clinic> rdf:type owl:Class ;
                                                           
                                                           rdfs:label "Clinic"@en .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/doctor
+
+<http://vfn.cz/ontologies/fertililty-saving-study/doctor> rdf:type owl:Class ;
+                                                          
+                                                          rdfs:label "Doctor"@en .
 
 
 

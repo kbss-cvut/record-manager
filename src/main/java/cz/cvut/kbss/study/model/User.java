@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @OWLClass(iri = Vocabulary.s_c_user)
@@ -42,6 +43,11 @@ public class User implements HasDerivableUri, Serializable {
 
     @Types
     private Set<String> types;
+
+    public User() {
+        this.types = new HashSet<>();
+        types.add(Vocabulary.s_c_doctor);
+    }
 
     @Override
     public URI getUri() {
