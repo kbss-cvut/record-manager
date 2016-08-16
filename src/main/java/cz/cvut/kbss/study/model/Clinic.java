@@ -1,5 +1,7 @@
 package cz.cvut.kbss.study.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import cz.cvut.kbss.jopa.CommonVocabulary;
 import cz.cvut.kbss.jopa.model.annotations.*;
 import cz.cvut.kbss.study.model.util.HasOwlKey;
@@ -7,6 +9,8 @@ import cz.cvut.kbss.study.model.util.HasOwlKey;
 import java.util.Date;
 import java.util.Set;
 
+@JsonIdentityInfo(property = "referenceId", generator = ObjectIdGenerators.PropertyGenerator.class)
+@OWLClass(iri = Vocabulary.s_c_clinic)
 public class Clinic extends AbstractEntity implements HasOwlKey {
 
     @ParticipationConstraints(nonEmpty = true)
@@ -26,6 +30,9 @@ public class Clinic extends AbstractEntity implements HasOwlKey {
     @Inferred
     @OWLObjectProperty(iri = Vocabulary.s_p_has_member, readOnly = true)
     private Set<User> members;
+
+    @Transient
+    private Integer referenceId;
 
     @Override
     public String getKey() {
@@ -70,6 +77,14 @@ public class Clinic extends AbstractEntity implements HasOwlKey {
 
     public void setMembers(Set<User> members) {
         this.members = members;
+    }
+
+    public Integer getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(Integer referenceId) {
+        this.referenceId = referenceId;
     }
 
     @Override

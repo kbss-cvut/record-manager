@@ -2,9 +2,11 @@ package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Clinic;
+import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.service.ClinicService;
+import cz.cvut.kbss.study.service.PatientRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ public class ClinicController extends BaseController {
 
     @Autowired
     private ClinicService clinicService;
+
+    @Autowired
+    private PatientRecordService recordService;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Clinic> getAllClinics() {
@@ -41,6 +46,12 @@ public class ClinicController extends BaseController {
             throw NotFoundException.create("Clinic", key);
         }
         return result;
+    }
+
+    @RequestMapping(value = "/{key}/patients", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<PatientRecord> getTreatedPatientRecords(@PathVariable("key") String key) {
+        final Clinic clinic = findInternal(key);
+        return recordService.findByClinic(clinic);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

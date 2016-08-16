@@ -28,6 +28,12 @@
 
 
 
+###  http://purl.org/dc/terms/modified
+
+<http://purl.org/dc/terms/modified> rdf:type owl:ObjectProperty .
+
+
+
 ###  http://vfn.cz/ontologies/fertililty-saving-study/has-answer
 
 <http://vfn.cz/ontologies/fertililty-saving-study/has-answer> rdf:type owl:ObjectProperty ;
@@ -41,6 +47,14 @@
 <http://vfn.cz/ontologies/fertililty-saving-study/has-author> rdf:type owl:ObjectProperty ;
                                                               
                                                               rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-last-editor
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-last-editor> rdf:type owl:ObjectProperty ;
+                                                                   
+                                                                   rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
 
 
 
@@ -95,6 +109,14 @@
 ###  http://vfn.cz/ontologies/fertililty-saving-study/relates-to
 
 <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> rdf:type owl:ObjectProperty .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/was-treated-at
+
+<http://vfn.cz/ontologies/fertililty-saving-study/was-treated-at> rdf:type owl:ObjectProperty ;
+                                                                  
+                                                                  rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
 
 
 
