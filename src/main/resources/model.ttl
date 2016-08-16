@@ -1,0 +1,185 @@
+@prefix : <http://vfn.cz/ontologies/fertililty-saving-study#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://vfn.cz/ontologies/fertililty-saving-study> .
+
+<http://vfn.cz/ontologies/fertililty-saving-study> rdf:type owl:Ontology .
+
+
+#################################################################
+#
+#    Object Properties
+#
+#################################################################
+
+
+###  http://onto.fel.cvut.cz/ontologies/form/has-answer-origin
+
+<http://onto.fel.cvut.cz/ontologies/form/has-answer-origin> rdf:type owl:ObjectProperty .
+
+
+
+###  http://onto.fel.cvut.cz/ontologies/form/has-question-origin
+
+<http://onto.fel.cvut.cz/ontologies/form/has-question-origin> rdf:type owl:ObjectProperty .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-answer
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-answer> rdf:type owl:ObjectProperty ;
+                                                              
+                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-author
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-author> rdf:type owl:ObjectProperty ;
+                                                              
+                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-object-value
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-object-value> rdf:type owl:ObjectProperty .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-part
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-part> rdf:type owl:ObjectProperty ;
+                                                            
+                                                            rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-question
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-question> rdf:type owl:ObjectProperty ;
+                                                                
+                                                                rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-related-question
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-related-question> rdf:type owl:ObjectProperty ;
+                                                                        
+                                                                        rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/has-part> .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/relates-to
+
+<http://vfn.cz/ontologies/fertililty-saving-study/relates-to> rdf:type owl:ObjectProperty .
+
+
+
+
+
+#################################################################
+#
+#    Data properties
+#
+#################################################################
+
+
+###  http://purl.org/dc/terms/created
+
+<http://purl.org/dc/terms/created> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-data-value
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-data-value> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/key
+
+<http://vfn.cz/ontologies/fertililty-saving-study/key> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/password
+
+<http://vfn.cz/ontologies/fertililty-saving-study/password> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://xmlns.com/foaf/0.1/accountName
+
+<http://xmlns.com/foaf/0.1/accountName> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://xmlns.com/foaf/0.1/firstName
+
+<http://xmlns.com/foaf/0.1/firstName> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://xmlns.com/foaf/0.1/lastName
+
+<http://xmlns.com/foaf/0.1/lastName> rdf:type owl:DatatypeProperty .
+
+
+
+
+
+#################################################################
+#
+#    Classes
+#
+#################################################################
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/answer
+
+<http://vfn.cz/ontologies/fertililty-saving-study/answer> rdf:type owl:Class ;
+                                                          
+                                                          rdfs:label "Answer"@en .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/clinic
+
+<http://vfn.cz/ontologies/fertililty-saving-study/clinic> rdf:type owl:Class ;
+                                                          
+                                                          rdfs:label "Clinic"@en .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/patient-record
+
+<http://vfn.cz/ontologies/fertililty-saving-study/patient-record> rdf:type owl:Class ;
+                                                                  
+                                                                  rdfs:label "PatientRecord"@en .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/question
+
+<http://vfn.cz/ontologies/fertililty-saving-study/question> rdf:type owl:Class ;
+                                                            
+                                                            rdfs:label "Question"@en .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/user
+
+<http://vfn.cz/ontologies/fertililty-saving-study/user> rdf:type owl:Class ;
+                                                        
+                                                        rdfs:label "User"@en .
+
+
+
+
+###  Generated by the OWL API (version 3.5.1) http://owlapi.sourceforge.net
+
