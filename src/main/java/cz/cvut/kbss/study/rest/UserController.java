@@ -37,7 +37,7 @@ public class UserController extends BaseController {
         return getByUsername(username);
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> create(@RequestBody User user) {
         userService.persist(user);

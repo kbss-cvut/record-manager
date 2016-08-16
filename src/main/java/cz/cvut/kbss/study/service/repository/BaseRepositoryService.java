@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class BaseRepositoryService<T> implements BaseService<T> {
@@ -16,8 +17,8 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
     protected abstract GenericDao<T> getPrimaryDao();
 
     @Override
-    public Collection<T> findAll() {
-        final Collection<T> result = getPrimaryDao().findAll();
+    public List<T> findAll() {
+        final List<T> result = getPrimaryDao().findAll();
         result.forEach(this::postLoad);
         return result;
     }

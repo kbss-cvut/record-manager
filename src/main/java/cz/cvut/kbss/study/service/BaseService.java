@@ -2,10 +2,11 @@ package cz.cvut.kbss.study.service;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 public interface BaseService<T> {
 
-    Collection<T> findAll();
+    List<T> findAll();
 
     T find(URI uri);
 

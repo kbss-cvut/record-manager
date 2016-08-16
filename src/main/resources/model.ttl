@@ -44,6 +44,16 @@
 
 
 
+###  http://vfn.cz/ontologies/fertililty-saving-study/has-member
+
+<http://vfn.cz/ontologies/fertililty-saving-study/has-member> rdf:type owl:ObjectProperty ;
+                                                              
+                                                              owl:inverseOf <http://vfn.cz/ontologies/fertililty-saving-study/is-member-of> ;
+                                                              
+                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+
+
+
 ###  http://vfn.cz/ontologies/fertililty-saving-study/has-object-value
 
 <http://vfn.cz/ontologies/fertililty-saving-study/has-object-value> rdf:type owl:ObjectProperty .
@@ -71,6 +81,14 @@
 <http://vfn.cz/ontologies/fertililty-saving-study/has-related-question> rdf:type owl:ObjectProperty ;
                                                                         
                                                                         rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/has-part> .
+
+
+
+###  http://vfn.cz/ontologies/fertililty-saving-study/is-member-of
+
+<http://vfn.cz/ontologies/fertililty-saving-study/is-member-of> rdf:type owl:ObjectProperty ;
+                                                                
+                                                                rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
 
 
 
@@ -128,6 +146,12 @@
 ###  http://xmlns.com/foaf/0.1/lastName
 
 <http://xmlns.com/foaf/0.1/lastName> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://xmlns.com/foaf/0.1/mbox
+
+<http://xmlns.com/foaf/0.1/mbox> rdf:type owl:DatatypeProperty .
 
 
 

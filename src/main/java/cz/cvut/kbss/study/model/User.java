@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Date;
 import java.util.Set;
 
 @OWLClass(iri = Vocabulary.s_c_user)
@@ -29,6 +30,15 @@ public class User implements HasDerivableUri, Serializable {
 
     @OWLDataProperty(iri = Vocabulary.s_p_password)
     private String password;
+
+    @OWLDataProperty(iri = Vocabulary.s_p_mbox)
+    private String emailAddress;
+
+    @OWLDataProperty(iri = Vocabulary.s_p_created)
+    private Date dateCreated;
+
+    @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
+    private Clinic clinic;
 
     @Types
     private Set<String> types;
@@ -72,6 +82,33 @@ public class User implements HasDerivableUri, Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    /**
+     * Gets date when this user's account was created.
+     */
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Clinic getClinic() {
+        return clinic;
+    }
+
+    public void setClinic(Clinic clinic) {
+        this.clinic = clinic;
     }
 
     public Set<String> getTypes() {
@@ -131,5 +168,10 @@ public class User implements HasDerivableUri, Serializable {
     @Override
     public int hashCode() {
         return uri != null ? uri.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return firstName + ' ' + lastName + '<' + uri + '>';
     }
 }

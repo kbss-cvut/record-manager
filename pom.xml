@@ -8,6 +8,7 @@
     <artifactId>study-manager</artifactId>
     <version>0.0.1</version>
     <name>Fertility Study Manager</name>
+    <packaging>war</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -271,7 +272,7 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <version>2.4</version>
                         <configuration>
-                            <warName>inbas-reporting-tool</warName>
+                            <warName>fertility-saving-study</warName>
                             <failOnMissingWebXml>false</failOnMissingWebXml>
                             <webResources>
                                 <resource>
