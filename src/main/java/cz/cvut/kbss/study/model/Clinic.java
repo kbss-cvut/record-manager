@@ -2,7 +2,6 @@ package cz.cvut.kbss.study.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import cz.cvut.kbss.jopa.CommonVocabulary;
 import cz.cvut.kbss.jopa.model.annotations.*;
 import cz.cvut.kbss.study.model.util.HasOwlKey;
 
@@ -18,7 +17,7 @@ public class Clinic extends AbstractEntity implements HasOwlKey {
     private String key;
 
     @ParticipationConstraints(nonEmpty = true)
-    @OWLAnnotationProperty(iri = CommonVocabulary.RDFS_LABEL)
+    @OWLAnnotationProperty(iri = Vocabulary.s_p_label)
     private String name;
 
     @OWLDataProperty(iri = Vocabulary.s_p_mbox)

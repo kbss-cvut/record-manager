@@ -13,6 +13,9 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
     @OWLDataProperty(iri = Vocabulary.s_p_key)
     private String key;
 
+    @OWLAnnotationProperty(iri = Vocabulary.s_p_label)
+    private String localName;
+
     @ParticipationConstraints(nonEmpty = true)
     @OWLObjectProperty(iri = Vocabulary.s_p_has_author, fetch = FetchType.EAGER)
     private User author;
@@ -41,6 +44,14 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
     @Override
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getLocalName() {
+        return localName;
+    }
+
+    public void setLocalName(String localName) {
+        this.localName = localName;
     }
 
     public User getAuthor() {
@@ -94,6 +105,7 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
     @Override
     public String toString() {
         return "PatientRecord{" +
+                "localName=" + localName +
                 "dateCreated=" + dateCreated +
                 ", clinic=" + clinic +
                 "} " + super.toString();

@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
+import cz.cvut.kbss.study.model.Clinic;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
@@ -23,6 +24,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ClinicController clinicController;
 
     @RequestMapping(method = RequestMethod.GET, value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getByUsername(@PathVariable("username") String username) {
@@ -51,12 +55,20 @@ public class UserController extends BaseController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize(
+            "hasRole('" + SecurityConstants.ROLE_ADMIN + "') " +
+                    "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfClinic(#clinicKey)")
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<User> getUsers() {
-        final List<User> users = userService.findAll();
+    public List<User> getUsers(@RequestParam(value = "clinic", required = false) String clinicKey) {
+        final List<User> users = clinicKey != null ? getByClinic(clinicKey) : userService.findAll();
         users.forEach(User::erasePassword);
         return users;
+    }
+
+    private List<User> getByClinic(String clinicKey) {
+        assert clinicKey != null;
+        final Clinic clinic = clinicController.findByKey(clinicKey);
+        return userService.findByClinic(clinic);
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")

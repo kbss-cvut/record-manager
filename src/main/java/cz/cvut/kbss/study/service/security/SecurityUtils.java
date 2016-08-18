@@ -34,4 +34,15 @@ public class SecurityUtils {
             return null;
         }
     }
+
+    /**
+     * Checks whether the current user is a member of a clinic with the specified key.
+     *
+     * @param clinicKey Clinic identifier
+     * @return Membership status of the current user
+     */
+    public boolean isMemberOfClinic(String clinicKey) {
+        final User user = getCurrentUser();
+        return user.getClinic() != null && user.getClinic().getKey().equals(clinicKey);
+    }
 }
