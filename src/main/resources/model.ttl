@@ -141,12 +141,6 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/is-complete
-
-<http://vfn.cz/ontologies/fertililty-saving-study/is-complete> rdf:type owl:DatatypeProperty .
-
-
-
 ###  http://vfn.cz/ontologies/fertililty-saving-study/key
 
 <http://vfn.cz/ontologies/fertililty-saving-study/key> rdf:type owl:DatatypeProperty .

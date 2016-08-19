@@ -27,6 +27,9 @@ public class QuestionSaver {
     }
 
     public void persistIfNecessary(Question root, EntityManager em) {
+        if (root == null) {
+            return;
+        }
         if (visited.contains(root.getUri())) {
             return;
         }
