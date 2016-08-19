@@ -71,7 +71,7 @@ public class UserController extends BaseController {
         return userService.findByClinic(clinic);
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == principal.name")
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
     @RequestMapping(value = "/{username}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUser(@PathVariable("username") String username, @RequestBody User user) {
