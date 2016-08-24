@@ -42,7 +42,7 @@ public class FormGenDao {
         if (em.find(User.class, record.getAuthor().getUri()) == null) {
             em.persist(record.getAuthor());
         }
-        if (em.find(Clinic.class, record.getClinic().getUri()) == null) {
+        if (record.getClinic() != null && em.find(Clinic.class, record.getClinic().getUri()) == null) {
             em.persist(record.getClinic());
         }
     }

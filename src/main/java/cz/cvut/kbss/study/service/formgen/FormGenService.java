@@ -1,10 +1,12 @@
 package cz.cvut.kbss.study.service.formgen;
 
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.formgen.FormGenDao;
 import cz.cvut.kbss.study.rest.dto.RawJson;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.service.data.DataLoader;
+import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.ConfigParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class FormGenService {
@@ -36,6 +35,9 @@ public class FormGenService {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private SecurityUtils securityUtils;
+
     /**
      * Gets a form from a remote generator service.
      *
@@ -44,6 +46,10 @@ public class FormGenService {
      */
     public RawJson generateForm(PatientRecord record) {
         Objects.requireNonNull(record);
+        final User author = securityUtils.getCurrentUser();
+        record.setAuthor(author);
+        record.setDateCreated(new Date());
+        record.setClinic(author.getClinic());
         final URI context = formGenDao.persist(record);
         return loadFormStructure(context);
     }
