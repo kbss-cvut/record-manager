@@ -272,7 +272,7 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <version>2.4</version>
                         <configuration>
-                            <warName>fertility-saving-study</warName>
+                            <warName>study-manager</warName>
                             <failOnMissingWebXml>false</failOnMissingWebXml>
                             <webResources>
                                 <resource>
