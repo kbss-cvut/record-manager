@@ -16,7 +16,7 @@ public final class Constants {
     /**
      * Base URI for temporary contexts used by the form generation.
      */
-    public static final String FORM_GEN_CONTEXT_BASE = "http://www.inbas.cz/ontologies/reporting-tool/formGen";
+    public static final String FORM_GEN_CONTEXT_BASE = "http://vfn.cz/ontologies/study-manager/formGen";
 
     /**
      * UTF-8 encoding identifier.
