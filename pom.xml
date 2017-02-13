@@ -179,6 +179,9 @@
                         <version>2.4</version>
                         <configuration>
                             <failOnMissingWebXml>false</failOnMissingWebXml>
+                            <warSourceExcludes>
+                                node_modules/**
+                            </warSourceExcludes>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -279,6 +282,9 @@
                                     <directory>profiles/production</directory>
                                 </resource>
                             </webResources>
+                            <warSourceExcludes>
+                                node_modules/**
+                            </warSourceExcludes>
                             <packagingExcludes>
                                 **/js/actions/,**/js/components/,**/js/constants/,**/js/stores/,**/js/utils/,**/js/model/,
                                 **/js/validation/, **/js/i18n/,
