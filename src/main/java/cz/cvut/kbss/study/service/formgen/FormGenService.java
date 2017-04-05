@@ -24,7 +24,9 @@ public class FormGenService {
 
     // FormGen repository URL
     private static final String REPOSITORY_URL_PARAM = "repositoryUrl";
+    private static final String FORMGEN_REPOSITORY_URL_PARAM = "formGenRepositoryUrl";
     private static final String RECORD_GRAPH_ID_PARAM = "recordGraphId";
+
 
     @Autowired
     private FormGenDao formGenDao;
@@ -56,7 +58,8 @@ public class FormGenService {
 
     private RawJson loadFormStructure(URI context) {
         final String serviceUrl = environment.getProperty(ConfigParam.FORM_GEN_SERVICE_URL.toString(), "");
-        final String repoUrl = environment.getProperty(ConfigParam.FORM_GEN_REPOSITORY_URL.toString(), "");
+        final String repoUrl = environment.getProperty(ConfigParam.REPOSITORY_URL.toString(), "");
+        final String formGenRepoUrl = environment.getProperty(ConfigParam.FORM_GEN_REPOSITORY_URL.toString(), "");
         if (serviceUrl.isEmpty() || repoUrl.isEmpty()) {
             LOG.error("Form generator service URL or repository URL is missing. Service URL: {}, repository URL: {}.",
                     serviceUrl, repoUrl);
@@ -65,6 +68,7 @@ public class FormGenService {
         final Map<String, String> params = new HashMap<>();
         params.put(RECORD_GRAPH_ID_PARAM, RestUtils.encodeUrl(context.toString()));
         params.put(REPOSITORY_URL_PARAM, RestUtils.encodeUrl(repoUrl));
+        params.put(FORMGEN_REPOSITORY_URL_PARAM, RestUtils.encodeUrl(formGenRepoUrl));
         return new RawJson(dataLoader.loadData(serviceUrl, params));
     }
 
