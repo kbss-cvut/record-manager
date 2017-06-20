@@ -27,23 +27,23 @@ public class FormGenDao {
         Objects.requireNonNull(record);
         final EntityManager em = emf.createEntityManager();
         try {
+            em.getTransaction().begin();
             final Descriptor descriptor = new EntityDescriptor(generateContextUri());
-            persistRelatedFieldsIfNecessary(record, em);    // Author and clinic can be in the default context
+            persistRelatedFieldsIfNecessary(record, em, descriptor);
             em.persist(record, descriptor);
             final QuestionSaver questionSaver = new QuestionSaver(descriptor);
             questionSaver.persistIfNecessary(record.getQuestion(), em);
+            em.getTransaction().commit();
             return descriptor.getContext();
         } finally {
             em.close();
         }
     }
 
-    private void persistRelatedFieldsIfNecessary(PatientRecord record, EntityManager em) {
-        if (em.find(User.class, record.getAuthor().getUri()) == null) {
-            em.persist(record.getAuthor());
-        }
-        if (record.getClinic() != null && em.find(Clinic.class, record.getClinic().getUri()) == null) {
-            em.persist(record.getClinic());
+    private void persistRelatedFieldsIfNecessary(PatientRecord record, EntityManager em, Descriptor descriptor) {
+        em.persist(record.getAuthor(), descriptor);
+        if (record.getClinic() != null) {
+            em.persist(record.getClinic(), descriptor);
         }
     }
 
