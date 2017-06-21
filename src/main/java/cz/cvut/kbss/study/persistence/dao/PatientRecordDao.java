@@ -26,14 +26,6 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         questionSaver.persistIfNecessary(entity.getQuestion(), em);
     }
 
-    @Override
-    protected void update(PatientRecord entity, EntityManager em) {
-        assert entity != null;
-        super.update(entity, em);
-        final QuestionSaver questionSaver = new QuestionSaver();
-        questionSaver.persistIfNecessary(entity.getQuestion(), em);
-    }
-
     /**
      * Gets records of patients treated at the specified clinic.
      *
