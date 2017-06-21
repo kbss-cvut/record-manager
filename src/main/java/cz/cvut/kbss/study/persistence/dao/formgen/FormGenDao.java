@@ -7,6 +7,7 @@ import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.util.Constants;
+import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,7 @@ public class FormGenDao {
 
     public URI persist(PatientRecord record) {
         Objects.requireNonNull(record);
+        initRequiredFieldsIfNecessary(record);
         final EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
@@ -35,6 +37,12 @@ public class FormGenDao {
             return descriptor.getContext();
         } finally {
             em.close();
+        }
+    }
+
+    private void initRequiredFieldsIfNecessary(PatientRecord record) {
+        if (record.getKey() == null) {  // Happens for unpersisted records
+            record.setKey(IdentificationUtils.generateKey());
         }
     }
 
