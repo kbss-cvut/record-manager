@@ -34,9 +34,9 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-answer
+###  http://onto.fel.cvut.cz/ontologies/documentation/has_answer
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-answer> rdf:type owl:ObjectProperty ;
+<http://onto.fel.cvut.cz/ontologies/documentation/has_answer> rdf:type owl:ObjectProperty ;
                                                               
                                                               rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
 
@@ -68,9 +68,9 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-object-value
+###  http://onto.fel.cvut.cz/ontologies/documentation/has_object_value
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-object-value> rdf:type owl:ObjectProperty .
+<http://onto.fel.cvut.cz/ontologies/documentation/has_object_value> rdf:type owl:ObjectProperty .
 
 
 
@@ -90,9 +90,9 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-related-question
+###  http://onto.fel.cvut.cz/ontologies/documentation/has_related_question
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-related-question> rdf:type owl:ObjectProperty ;
+<http://onto.fel.cvut.cz/ontologies/documentation/has_related_question> rdf:type owl:ObjectProperty ;
                                                                         
                                                                         rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/has-part> .
 
@@ -135,9 +135,9 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-data-value
+###  http://onto.fel.cvut.cz/ontologies/documentation/has_data_value
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-data-value> rdf:type owl:DatatypeProperty .
+<http://onto.fel.cvut.cz/ontologies/documentation/has_data_value> rdf:type owl:DatatypeProperty .
 
 
 
@@ -194,9 +194,9 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/answer
+###  http://onto.fel.cvut.cz/ontologies/documentation/answer
 
-<http://vfn.cz/ontologies/fertililty-saving-study/answer> rdf:type owl:Class ;
+<http://onto.fel.cvut.cz/ontologies/documentation/answer> rdf:type owl:Class ;
                                                           
                                                           rdfs:label "Answer"@en .
 
@@ -226,9 +226,9 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/question
+###  http://onto.fel.cvut.cz/ontologies/documentation/question
 
-<http://vfn.cz/ontologies/fertililty-saving-study/question> rdf:type owl:Class ;
+<http://onto.fel.cvut.cz/ontologies/documentation/question> rdf:type owl:Class ;
                                                             
                                                             rdfs:label "Question"@en .
 
