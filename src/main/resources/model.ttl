@@ -1,12 +1,12 @@
-@prefix : <http://vfn.cz/ontologies/fertililty-saving-study#> .
+@prefix : <http://vfn.cz/ontologies/study-manager#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@base <http://vfn.cz/ontologies/fertililty-saving-study> .
+@base <http://vfn.cz/ontologies/study-manager> .
 
-<http://vfn.cz/ontologies/fertililty-saving-study> rdf:type owl:Ontology .
+<http://vfn.cz/ontologies/study-manager> rdf:type owl:Ontology .
 
 
 #################################################################
@@ -38,33 +38,33 @@
 
 <http://onto.fel.cvut.cz/ontologies/documentation/has_answer> rdf:type owl:ObjectProperty ;
                                                               
-                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-author
+###  http://vfn.cz/ontologies/study-manager/has-author
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-author> rdf:type owl:ObjectProperty ;
+<http://vfn.cz/ontologies/study-manager/has-author> rdf:type owl:ObjectProperty ;
                                                               
-                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-last-editor
+###  http://vfn.cz/ontologies/study-manager/has-last-editor
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-last-editor> rdf:type owl:ObjectProperty ;
+<http://vfn.cz/ontologies/study-manager/has-last-editor> rdf:type owl:ObjectProperty ;
                                                                    
-                                                                   rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+                                                                   rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-member
+###  http://vfn.cz/ontologies/study-manager/has-member
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-member> rdf:type owl:ObjectProperty ;
+<http://vfn.cz/ontologies/study-manager/has-member> rdf:type owl:ObjectProperty ;
                                                               
-                                                              owl:inverseOf <http://vfn.cz/ontologies/fertililty-saving-study/is-member-of> ;
+                                                              owl:inverseOf <http://vfn.cz/ontologies/study-manager/is-member-of> ;
                                                               
-                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
 
@@ -74,19 +74,19 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-part
+###  http://vfn.cz/ontologies/study-manager/has-part
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-part> rdf:type owl:ObjectProperty ;
+<http://vfn.cz/ontologies/study-manager/has-part> rdf:type owl:ObjectProperty ;
                                                             
-                                                            rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+                                                            rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/has-question
+###  http://vfn.cz/ontologies/study-manager/has-question
 
-<http://vfn.cz/ontologies/fertililty-saving-study/has-question> rdf:type owl:ObjectProperty ;
+<http://vfn.cz/ontologies/study-manager/has-question> rdf:type owl:ObjectProperty ;
                                                                 
-                                                                rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+                                                                rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
 
@@ -94,29 +94,29 @@
 
 <http://onto.fel.cvut.cz/ontologies/documentation/has_related_question> rdf:type owl:ObjectProperty ;
                                                                         
-                                                                        rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/has-part> .
+                                                                        rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/has-part> .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/is-member-of
+###  http://vfn.cz/ontologies/study-manager/is-member-of
 
-<http://vfn.cz/ontologies/fertililty-saving-study/is-member-of> rdf:type owl:ObjectProperty ;
+<http://vfn.cz/ontologies/study-manager/is-member-of> rdf:type owl:ObjectProperty ;
                                                                 
-                                                                rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+                                                                rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/relates-to
+###  http://vfn.cz/ontologies/study-manager/relates-to
 
-<http://vfn.cz/ontologies/fertililty-saving-study/relates-to> rdf:type owl:ObjectProperty .
+<http://vfn.cz/ontologies/study-manager/relates-to> rdf:type owl:ObjectProperty .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/was-treated-at
+###  http://vfn.cz/ontologies/study-manager/was-treated-at
 
-<http://vfn.cz/ontologies/fertililty-saving-study/was-treated-at> rdf:type owl:ObjectProperty ;
+<http://vfn.cz/ontologies/study-manager/was-treated-at> rdf:type owl:ObjectProperty ;
                                                                   
-                                                                  rdfs:subPropertyOf <http://vfn.cz/ontologies/fertililty-saving-study/relates-to> .
+                                                                  rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
 
@@ -141,15 +141,15 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/key
+###  http://vfn.cz/ontologies/study-manager/key
 
-<http://vfn.cz/ontologies/fertililty-saving-study/key> rdf:type owl:DatatypeProperty .
+<http://vfn.cz/ontologies/study-manager/key> rdf:type owl:DatatypeProperty .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/password
+###  http://vfn.cz/ontologies/study-manager/password
 
-<http://vfn.cz/ontologies/fertililty-saving-study/password> rdf:type owl:DatatypeProperty .
+<http://vfn.cz/ontologies/study-manager/password> rdf:type owl:DatatypeProperty .
 
 
 
@@ -186,9 +186,9 @@
 #################################################################
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/administrator
+###  http://vfn.cz/ontologies/study-manager/administrator
 
-<http://vfn.cz/ontologies/fertililty-saving-study/administrator> rdf:type owl:Class ;
+<http://vfn.cz/ontologies/study-manager/administrator> rdf:type owl:Class ;
                                                                  
                                                                  rdfs:label "Administrator"@en .
 
@@ -202,25 +202,25 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/clinic
+###  http://vfn.cz/ontologies/study-manager/clinic
 
-<http://vfn.cz/ontologies/fertililty-saving-study/clinic> rdf:type owl:Class ;
+<http://vfn.cz/ontologies/study-manager/clinic> rdf:type owl:Class ;
                                                           
                                                           rdfs:label "Clinic"@en .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/doctor
+###  http://vfn.cz/ontologies/study-manager/doctor
 
-<http://vfn.cz/ontologies/fertililty-saving-study/doctor> rdf:type owl:Class ;
+<http://vfn.cz/ontologies/study-manager/doctor> rdf:type owl:Class ;
                                                           
                                                           rdfs:label "Doctor"@en .
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/patient-record
+###  http://vfn.cz/ontologies/study-manager/patient-record
 
-<http://vfn.cz/ontologies/fertililty-saving-study/patient-record> rdf:type owl:Class ;
+<http://vfn.cz/ontologies/study-manager/patient-record> rdf:type owl:Class ;
                                                                   
                                                                   rdfs:label "PatientRecord"@en .
 
@@ -234,9 +234,9 @@
 
 
 
-###  http://vfn.cz/ontologies/fertililty-saving-study/user
+###  http://vfn.cz/ontologies/study-manager/user
 
-<http://vfn.cz/ontologies/fertililty-saving-study/user> rdf:type owl:Class ;
+<http://vfn.cz/ontologies/study-manager/user> rdf:type owl:Class ;
                                                         
                                                         rdfs:label "User"@en .
 
