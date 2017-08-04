@@ -6,7 +6,7 @@ public final class Constants {
         throw new AssertionError();
     }
 
-    public static final String BASE_URI = "http://vfn.cz/ontologies/fertililty-saving-study/";
+    public static final String BASE_URI = "http://vfn.cz/ontologies/study-manager/";
 
     /**
      * Language used by the persistence unit.
