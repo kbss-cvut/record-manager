@@ -1,12 +1,12 @@
 package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.model.Clinic;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
-import cz.cvut.kbss.study.service.ClinicService;
+import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,50 +20,50 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/clinics")
-public class ClinicController extends BaseController {
+@RequestMapping("/institutions")
+public class InstitutionController extends BaseController {
 
     @Autowired
-    private ClinicService clinicService;
+    private InstitutionService institutionService;
 
     @Autowired
     private PatientRecordService recordService;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Clinic> getAllClinics() {
-        final List<Clinic> clinics = clinicService.findAll();
-        Collections.sort(clinics, (a, b) -> a.getName().compareTo(b.getName()));
-        return clinics;
+    public List<Institution> getAllInstitutions() {
+        final List<Institution> institutions = institutionService.findAll();
+        Collections.sort(institutions, (a, b) -> a.getName().compareTo(b.getName()));
+        return institutions;
     }
 
     @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Clinic findByKey(@PathVariable("key") String key) {
+    public Institution findByKey(@PathVariable("key") String key) {
         return findInternal(key);
     }
 
-    private Clinic findInternal(String key) {
-        final Clinic result = clinicService.findByKey(key);
+    private Institution findInternal(String key) {
+        final Institution result = institutionService.findByKey(key);
         if (result == null) {
-            throw NotFoundException.create("Clinic", key);
+            throw NotFoundException.create("Institution", key);
         }
         return result;
     }
 
     @RequestMapping(value = "/{key}/patients", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecord> getTreatedPatientRecords(@PathVariable("key") String key) {
-        final Clinic clinic = findInternal(key);
-        return recordService.findByClinic(clinic);
+        final Institution institution = findInternal(key);
+        return recordService.findByInstitution(institution);
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createClinic(@RequestBody Clinic clinic) {
-        clinicService.persist(clinic);
+    public ResponseEntity<Void> createInstitution(@RequestBody Institution institution) {
+        institutionService.persist(institution);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Clinic {} successfully created.", clinic);
+            LOG.trace("Institution {} successfully created.", institution);
         }
-        final String key = clinic.getKey();
+        final String key = institution.getKey();
         final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/{key}", key);
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
@@ -71,26 +71,26 @@ public class ClinicController extends BaseController {
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @RequestMapping(value = "/{key}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateClinic(@PathVariable("key") String key, @RequestBody Clinic clinic) {
-        if (!key.equals(clinic.getKey())) {
-            throw new BadRequestException("The passed clinic's key is different from the specified one.");
+    public void updateInstitution(@PathVariable("key") String key, @RequestBody Institution institution) {
+        if (!key.equals(institution.getKey())) {
+            throw new BadRequestException("The passed institution's key is different from the specified one.");
         }
-        final Clinic original = findInternal(key);
+        final Institution original = findInternal(key);
         assert original != null;
-        clinicService.update(clinic);
+        institutionService.update(institution);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Clinic {} successfully updated.", clinic);
+            LOG.trace("Institution {} successfully updated.", institution);
         }
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @RequestMapping(value = "/{key}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteClinic(@PathVariable("key") String key) {
-        final Clinic toRemove = findInternal(key);
-        clinicService.remove(toRemove);
+    public void deleteInstitution(@PathVariable("key") String key) {
+        final Institution toRemove = findInternal(key);
+        institutionService.remove(toRemove);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Clinic {} successfully removed.", toRemove);
+            LOG.trace("Institution {} successfully removed.", toRemove);
         }
     }
 }

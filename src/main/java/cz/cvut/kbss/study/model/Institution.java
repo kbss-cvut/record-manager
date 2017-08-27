@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.Set;
 
 @JsonIdentityInfo(property = "referenceId", generator = ObjectIdGenerators.PropertyGenerator.class)
-@OWLClass(iri = Vocabulary.s_c_clinic)
-public class Clinic extends AbstractEntity implements HasOwlKey {
+@OWLClass(iri = Vocabulary.s_c_institution)
+public class Institution extends AbstractEntity implements HasOwlKey {
 
     @ParticipationConstraints(nonEmpty = true)
     @OWLDataProperty(iri = Vocabulary.s_p_key)
@@ -60,7 +60,7 @@ public class Clinic extends AbstractEntity implements HasOwlKey {
     }
 
     /**
-     * Gets date when this clinic's account was created.
+     * Gets date when this institution's account was created.
      */
     public Date getDateCreated() {
         return dateCreated;
@@ -88,7 +88,7 @@ public class Clinic extends AbstractEntity implements HasOwlKey {
 
     @Override
     public String toString() {
-        return "Clinic{" +
+        return "Institution{" +
                 "name='" + name + '\'' +
                 "} " + super.toString();
     }

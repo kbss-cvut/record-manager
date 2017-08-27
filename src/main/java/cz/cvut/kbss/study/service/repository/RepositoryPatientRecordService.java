@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.service.repository;
 
-import cz.cvut.kbss.study.model.Clinic;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
@@ -30,8 +30,8 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     }
 
     @Override
-    public List<PatientRecord> findByClinic(Clinic clinic) {
-        return recordDao.findByClinic(clinic);
+    public List<PatientRecord> findByInstitution(Institution institution) {
+        return recordDao.findByInstitution(institution);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         final User author = securityUtils.getCurrentUser();
         instance.setAuthor(author);
         instance.setDateCreated(new Date());
-        instance.setClinic(author.getClinic());
+        instance.setInstitution(author.getInstitution());
         instance.setKey(IdentificationUtils.generateKey());
     }
 

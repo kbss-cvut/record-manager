@@ -1,7 +1,7 @@
 package cz.cvut.kbss.study.persistence.dao;
 
 import cz.cvut.kbss.jopa.model.EntityManager;
-import cz.cvut.kbss.study.model.Clinic;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
@@ -27,19 +27,19 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     }
 
     /**
-     * Gets records of patients treated at the specified clinic.
+     * Gets records of patients treated at the specified institution.
      *
-     * @param clinic The clinic to filter by
+     * @param institution The institution to filter by
      * @return Records of matching patients
      */
-    public List<PatientRecord> findByClinic(Clinic clinic) {
-        Objects.requireNonNull(clinic);
+    public List<PatientRecord> findByInstitution(Institution institution) {
+        Objects.requireNonNull(institution);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?treatedAt ?clinic . }", PatientRecord.class)
+            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?treatedAt ?institution . }", PatientRecord.class)
                      .setParameter("type", typeUri)
                      .setParameter("treatedAt", URI.create(Vocabulary.s_p_was_treated_at))
-                     .setParameter("clinic", clinic.getUri()).getResultList();
+                     .setParameter("institution", institution.getUri()).getResultList();
         } finally {
             em.close();
         }

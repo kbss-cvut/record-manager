@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.service;
 
-import cz.cvut.kbss.study.model.Clinic;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 
 import java.util.List;
@@ -16,10 +16,10 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
     PatientRecord findByKey(String key);
 
     /**
-     * Gets records of patients treated at the specified clinic.
+     * Gets records of patients treated at the specified institution.
      *
-     * @param clinic The clinic to filter by
+     * @param institution The institution to filter by
      * @return Records of matching patients
      */
-    List<PatientRecord> findByClinic(Clinic clinic);
+    List<PatientRecord> findByInstitution(Institution institution);
 }

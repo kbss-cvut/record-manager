@@ -1,11 +1,11 @@
 package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.model.Clinic;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
-import cz.cvut.kbss.study.service.ClinicService;
+import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -24,19 +24,19 @@ public class PatientRecordController extends BaseController {
     private PatientRecordService recordService;
 
     @Autowired
-    private ClinicService clinicService;
+    private InstitutionService institutionService;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PatientRecord> getRecords(@RequestParam(value = "clinic", required = false) String clinicKey) {
-        return clinicKey != null ? findByClinic(clinicKey) : recordService.findAll();
+    public List<PatientRecord> getRecords(@RequestParam(value = "institution", required = false) String institutionKey) {
+        return institutionKey != null ? findByInstitution(institutionKey) : recordService.findAll();
     }
 
-    private List<PatientRecord> findByClinic(String clinicKey) {
-        final Clinic clinic = clinicService.findByKey(clinicKey);
-        if (clinic == null) {
-            throw NotFoundException.create("Clinic", clinicKey);
+    private List<PatientRecord> findByInstitution(String institutionKey) {
+        final Institution institution = institutionService.findByKey(institutionKey);
+        if (institution == null) {
+            throw NotFoundException.create("Institution", institutionKey);
         }
-        return recordService.findByClinic(clinic);
+        return recordService.findByInstitution(institution);
     }
 
     @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

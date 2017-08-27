@@ -31,7 +31,7 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
     private User lastModifiedBy;
 
     @OWLObjectProperty(iri = Vocabulary.s_p_was_treated_at, fetch = FetchType.EAGER)
-    private Clinic clinic;
+    private Institution institution;
 
     @OWLObjectProperty(iri = Vocabulary.s_p_has_question, cascade = {CascadeType.MERGE,
             CascadeType.REMOVE}, fetch = FetchType.EAGER)
@@ -87,12 +87,12 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public Clinic getClinic() {
-        return clinic;
+    public Institution getInstitution() {
+        return institution;
     }
 
-    public void setClinic(Clinic clinic) {
-        this.clinic = clinic;
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
     }
 
     public Question getQuestion() {
@@ -108,7 +108,7 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
         return "PatientRecord{" +
                 "localName=" + localName +
                 "dateCreated=" + dateCreated +
-                ", clinic=" + clinic +
+                ", institution=" + institution +
                 "} " + super.toString();
     }
 }

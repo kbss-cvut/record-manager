@@ -202,11 +202,11 @@
 
 
 
-###  http://vfn.cz/ontologies/study-manager/clinic
+###  http://vfn.cz/ontologies/study-manager/institution
 
-<http://vfn.cz/ontologies/study-manager/clinic> rdf:type owl:Class ;
+<http://vfn.cz/ontologies/study-manager/institution> rdf:type owl:Class ;
                                                           
-                                                          rdfs:label "Clinic"@en .
+                                                          rdfs:label "Institution"@en .
 
 
 

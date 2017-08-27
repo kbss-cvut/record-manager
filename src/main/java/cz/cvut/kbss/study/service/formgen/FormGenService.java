@@ -51,7 +51,7 @@ public class FormGenService {
         final User author = securityUtils.getCurrentUser();
         record.setAuthor(author);
         record.setDateCreated(new Date());
-        record.setClinic(author.getClinic());
+        record.setInstitution(author.getInstitution());
         final URI context = formGenDao.persist(record);
         return loadFormStructure(context);
     }

@@ -1,7 +1,7 @@
 package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.study.exception.UsernameExistsException;
-import cz.cvut.kbss.study.model.Clinic;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
@@ -29,9 +29,9 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     }
 
     @Override
-    public List<User> findByClinic(Clinic clinic) {
-        Objects.requireNonNull(clinic);
-        return userDao.findByClinic(clinic);
+    public List<User> findByInstitution(Institution institution) {
+        Objects.requireNonNull(institution);
+        return userDao.findByInstitution(institution);
     }
 
     @Override

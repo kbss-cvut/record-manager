@@ -1,7 +1,7 @@
 package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.model.Clinic;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
@@ -26,7 +26,7 @@ public class UserController extends BaseController {
     private UserService userService;
 
     @Autowired
-    private ClinicController clinicController;
+    private InstitutionController institutionController;
 
     @RequestMapping(method = RequestMethod.GET, value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getByUsername(@PathVariable("username") String username) {
@@ -57,18 +57,18 @@ public class UserController extends BaseController {
 
     @PreAuthorize(
             "hasRole('" + SecurityConstants.ROLE_ADMIN + "') " +
-                    "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfClinic(#clinicKey)")
+                    "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<User> getUsers(@RequestParam(value = "clinic", required = false) String clinicKey) {
-        final List<User> users = clinicKey != null ? getByClinic(clinicKey) : userService.findAll();
+    public List<User> getUsers(@RequestParam(value = "institution", required = false) String institutionKey) {
+        final List<User> users = institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
         users.forEach(User::erasePassword);
         return users;
     }
 
-    private List<User> getByClinic(String clinicKey) {
-        assert clinicKey != null;
-        final Clinic clinic = clinicController.findByKey(clinicKey);
-        return userService.findByClinic(clinic);
+    private List<User> getByInstitution(String institutionKey) {
+        assert institutionKey != null;
+        final Institution institution = institutionController.findByKey(institutionKey);
+        return userService.findByInstitution(institution);
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")

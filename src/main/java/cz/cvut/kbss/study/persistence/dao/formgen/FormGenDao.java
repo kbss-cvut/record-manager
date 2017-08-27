@@ -48,8 +48,8 @@ public class FormGenDao {
 
     private void persistRelatedFieldsIfNecessary(PatientRecord record, EntityManager em, Descriptor descriptor) {
         em.persist(record.getAuthor(), descriptor);
-        if (record.getClinic() != null) {
-            em.persist(record.getClinic(), descriptor);
+        if (record.getInstitution() != null) {
+            em.persist(record.getInstitution(), descriptor);
         }
     }
 

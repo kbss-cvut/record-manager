@@ -39,7 +39,7 @@ public class User implements HasDerivableUri, Serializable {
     private Date dateCreated;
 
     @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
-    private Clinic clinic;
+    private Institution institution;
 
     @Types
     private Set<String> types;
@@ -109,12 +109,12 @@ public class User implements HasDerivableUri, Serializable {
         this.dateCreated = dateCreated;
     }
 
-    public Clinic getClinic() {
-        return clinic;
+    public Institution getInstitution() {
+        return institution;
     }
 
-    public void setClinic(Clinic clinic) {
-        this.clinic = clinic;
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
     }
 
     public Set<String> getTypes() {

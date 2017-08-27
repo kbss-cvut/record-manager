@@ -36,13 +36,13 @@ public class SecurityUtils {
     }
 
     /**
-     * Checks whether the current user is a member of a clinic with the specified key.
+     * Checks whether the current user is a member of a institution with the specified key.
      *
-     * @param clinicKey Clinic identifier
+     * @param institutionKey Institution identifier
      * @return Membership status of the current user
      */
-    public boolean isMemberOfClinic(String clinicKey) {
+    public boolean isMemberOfInstitution(String institutionKey) {
         final User user = getCurrentUser();
-        return user.getClinic() != null && user.getClinic().getKey().equals(clinicKey);
+        return user.getInstitution() != null && user.getInstitution().getKey().equals(institutionKey);
     }
 }
