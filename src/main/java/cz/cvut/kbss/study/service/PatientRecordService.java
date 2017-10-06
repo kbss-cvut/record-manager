@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.service;
 
+import cz.cvut.kbss.study.dto.PatientRecordSummaryDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 
@@ -22,4 +23,13 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @return Records of matching patients
      */
     List<PatientRecord> findByInstitution(Institution institution);
+
+    /**
+     * Gets record summaries of patients treated at the specified institution.
+     *
+     * @param institution The institution to filter by
+     * @return Record summaries of matching patients
+     */
+    List<PatientRecordSummaryDto> getRecordSummaries(Institution institution);
+
 }
