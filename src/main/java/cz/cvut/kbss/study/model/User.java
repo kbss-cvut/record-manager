@@ -3,6 +3,11 @@ package cz.cvut.kbss.study.model;
 import cz.cvut.kbss.jopa.model.annotations.*;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serializable;
@@ -13,6 +18,8 @@ import java.util.Set;
 
 @OWLClass(iri = Vocabulary.s_c_user)
 public class User implements HasDerivableUri, Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(User.class);
 
     @Id
     private URI uri;
@@ -157,7 +164,11 @@ public class User implements HasDerivableUri, Serializable {
         if (lastName == null || lastName.isEmpty()) {
             throw new IllegalStateException("Cannot generate Person URI without last name.");
         }
-        this.uri = URI.create(Constants.BASE_URI + firstName + "-" + lastName);
+        try {
+            this.uri = URI.create(Constants.BASE_URI + URLEncoder.encode(firstName + "-" + lastName, StandardCharsets.UTF_8.toString()));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Cannot generate Person URI due to unsupported encoding.", e);
+        }
     }
 
     @Override
