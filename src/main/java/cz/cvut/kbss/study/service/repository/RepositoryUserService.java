@@ -43,6 +43,9 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
     @Override
     protected void preUpdate(User instance) {
+        if (! findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {
+            throw new UsernameExistsException("Username " + instance.getUsername() + " already exists.");
+        }
         final User orig = userDao.find(instance.getUri());
         if (orig == null) {
             throw new IllegalArgumentException("Cannot update user URI.");
