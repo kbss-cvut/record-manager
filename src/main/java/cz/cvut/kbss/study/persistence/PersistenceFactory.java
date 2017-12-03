@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.*;
+import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_PASSWORD;
+import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_USERNAME;
 import static cz.cvut.kbss.study.util.ConfigParam.DRIVER;
 import static cz.cvut.kbss.study.util.ConfigParam.REPOSITORY_URL;
 
