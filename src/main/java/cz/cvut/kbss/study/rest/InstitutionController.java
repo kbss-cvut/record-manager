@@ -29,6 +29,7 @@ public class InstitutionController extends BaseController {
     @Autowired
     private PatientRecordService recordService;
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Institution> getAllInstitutions() {
         final List<Institution> institutions = institutionService.findAll();
@@ -36,6 +37,8 @@ public class InstitutionController extends BaseController {
         return institutions;
     }
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') " +
+     "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfInstitution(#key)")
     @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Institution findByKey(@PathVariable("key") String key) {
         return findInternal(key);
