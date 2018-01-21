@@ -28,6 +28,8 @@ public class UserController extends BaseController {
     @Autowired
     private InstitutionController institutionController;
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name or " +
+            "hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.areFromSameInstitution(#username)")
     @RequestMapping(method = RequestMethod.GET, value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getByUsername(@PathVariable("username") String username) {
         final User user = userService.findByUsername(username);
