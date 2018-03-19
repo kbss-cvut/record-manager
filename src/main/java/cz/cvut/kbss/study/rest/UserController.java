@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
@@ -13,10 +14,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -96,6 +102,22 @@ public class UserController extends BaseController {
         userService.remove(toRemove);
         if (LOG.isTraceEnabled()) {
             LOG.trace("User {} successfully removed.", toRemove);
+        }
+    }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
+    @RequestMapping(value = "/{username}/password-change", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePassword(Authentication authentication, @PathVariable("username") String username, @RequestBody Map<String, String> password) {
+        final User original = getByUsername(username);
+        assert original != null;
+        if (authentication.getName().equals(username) && !original.getPassword().equals(password.get("currentPassword"))) {
+            throw new ValidationException("The passed user's current password is different from the specified one.");
+        }
+        original.setPassword(password.get("newPassword"));
+        userService.update(original);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("{}'s password successfully changed.", username);
         }
     }
 }
