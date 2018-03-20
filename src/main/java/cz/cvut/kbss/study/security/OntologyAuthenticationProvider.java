@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class OntologyAuthenticationProvider implements AuthenticationProvider {
@@ -23,6 +24,9 @@ public class OntologyAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -33,7 +37,7 @@ public class OntologyAuthenticationProvider implements AuthenticationProvider {
 
         final UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(username);
         final String password = (String) authentication.getCredentials();
-        if (!userDetails.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Provided credentials don't match.");
         }
         userDetails.eraseCredentials(); // Don't pass credentials around in the user details object

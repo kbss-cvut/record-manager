@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -33,6 +34,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private InstitutionController institutionController;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name or " +
             "hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.areFromSameInstitution(#username)")
@@ -111,7 +115,7 @@ public class UserController extends BaseController {
     public void updatePassword(Authentication authentication, @PathVariable("username") String username, @RequestBody Map<String, String> password) {
         final User original = getByUsername(username);
         assert original != null;
-        if (authentication.getName().equals(username) && !original.getPassword().equals(password.get("currentPassword"))) {
+        if (authentication.getName().equals(username) && !passwordEncoder.matches(password.get("currentPassword"), original.getPassword())) {
             throw new ValidationException("The passed user's current password is different from the specified one.");
         }
         original.setPassword(password.get("newPassword"));
