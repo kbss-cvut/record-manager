@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.study.exception.UsernameExistsException;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
@@ -20,8 +21,9 @@ import java.util.Objects;
 public class RepositoryUserService extends BaseRepositoryService<User> implements UserService {
 
     @Autowired
-    @Autowired
     private SecurityUtils securityUtils;
+
+    @Autowired
     private UserDao userDao;
 
     @Autowired
@@ -49,7 +51,6 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             throw new UsernameExistsException("Username " + instance.getUsername() + " already exists.");
         }
         try {
-            instance.encodePassword(passwordEncoder);
             instance.validateUsername();
         } catch (IllegalStateException e) {
             throw new ValidationException(e.getMessage());
@@ -76,7 +77,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void preRemove(User instance) {
         if (!patientRecordDao.findByAuthor(instance).isEmpty()) {
-            throw new ValidationException("User with patient records cannot be deleted.");
+            throw new ValidationException("User with patient records cannot be deleted");
         }
     }
 }
