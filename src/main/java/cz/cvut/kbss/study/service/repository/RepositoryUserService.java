@@ -52,6 +52,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
         try {
             instance.encodePassword(passwordEncoder);
+            instance.validateUsername();
         } catch (IllegalStateException e) {
             throw new ValidationException(e.getMessage());
         }
