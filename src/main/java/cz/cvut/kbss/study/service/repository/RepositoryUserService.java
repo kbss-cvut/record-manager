@@ -5,6 +5,7 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
+import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
@@ -22,6 +23,9 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Autowired
     private SecurityUtils securityUtils;
     private UserDao userDao;
+
+    @Autowired
+    private PatientRecordDao patientRecordDao;
 
     @Override
     protected GenericDao<User> getPrimaryDao() {
@@ -66,6 +70,13 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         final User orig = userDao.find(instance.getUri());
         if (orig == null) {
             throw new IllegalArgumentException("Cannot update user URI.");
+        }
+    }
+
+    @Override
+    protected void preRemove(User instance) {
+        if (!patientRecordDao.findByAuthor(instance).isEmpty()) {
+            throw new ValidationException("User with patient records cannot be deleted.");
         }
     }
 }

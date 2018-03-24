@@ -5,6 +5,7 @@ import cz.cvut.kbss.jopa.model.query.Query;
 import cz.cvut.kbss.study.dto.PatientRecordSummaryDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import java.util.stream.Collectors;
@@ -48,6 +49,24 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         }
     }
 
+    /**
+     * Gets records of patients created by specified author.
+     *
+     * @param author The author to filter by
+     * @return Records of matching patients
+     */
+    public List<PatientRecord> findByAuthor(User author) {
+        Objects.requireNonNull(author);
+        final EntityManager em = entityManager();
+        try {
+            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?createdBy ?author . }", PatientRecord.class)
+                    .setParameter("type", typeUri)
+                    .setParameter("createdBy", URI.create(Vocabulary.s_p_has_author))
+                    .setParameter("author", author.getUri()).getResultList();
+        } finally {
+            em.close();
+        }
+    }
 
     /**
      * Gets record summaries of patients treated at the specified institution.
