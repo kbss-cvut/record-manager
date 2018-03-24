@@ -1,10 +1,12 @@
 package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.study.exception.UsernameExistsException;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
+import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
@@ -19,9 +21,13 @@ import java.util.Objects;
 public class RepositoryUserService extends BaseRepositoryService<User> implements UserService {
 
     @Autowired
-    @Autowired
     private SecurityUtils securityUtils;
+
+    @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private PatientRecordDao patientRecordDao;
 
     @Override
     protected GenericDao<User> getPrimaryDao() {
@@ -45,7 +51,6 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             throw new UsernameExistsException("Username " + instance.getUsername() + " already exists.");
         }
         try {
-            instance.encodePassword(passwordEncoder);
             instance.validateUsername();
         } catch (IllegalStateException e) {
             throw new ValidationException(e.getMessage());
@@ -66,6 +71,13 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         final User orig = userDao.find(instance.getUri());
         if (orig == null) {
             throw new IllegalArgumentException("Cannot update user URI.");
+        }
+    }
+
+    @Override
+    protected void preRemove(User instance) {
+        if (!patientRecordDao.findByAuthor(instance).isEmpty()) {
+            throw new ValidationException("User with patient records cannot be deleted");
         }
     }
 }
