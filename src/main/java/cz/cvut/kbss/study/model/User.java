@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.model;
 
 import cz.cvut.kbss.jopa.model.annotations.*;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
 import java.io.UnsupportedEncodingException;
@@ -15,6 +16,8 @@ import java.net.URI;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @OWLClass(iri = Vocabulary.s_c_user)
 public class User implements HasDerivableUri, Serializable {
@@ -151,6 +154,14 @@ public class User implements HasDerivableUri, Serializable {
      */
     public void erasePassword() {
         this.password = null;
+    }
+
+    public void validateUsername() {
+        Pattern p = Pattern.compile("[^A-Za-z0-9]");
+        Matcher m = p.matcher(this.username);
+        if (m.find()) {
+            throw new ValidationException("Username cannot contain special characters");
+        }
     }
 
     @Override

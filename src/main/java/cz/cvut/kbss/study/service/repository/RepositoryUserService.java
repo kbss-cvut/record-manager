@@ -44,6 +44,12 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         if (findByUsername(instance.getUsername()) != null) {
             throw new UsernameExistsException("Username " + instance.getUsername() + " already exists.");
         }
+        try {
+            instance.encodePassword(passwordEncoder);
+            instance.validateUsername();
+        } catch (IllegalStateException e) {
+            throw new ValidationException(e.getMessage());
+        }
     }
 
     @Override
