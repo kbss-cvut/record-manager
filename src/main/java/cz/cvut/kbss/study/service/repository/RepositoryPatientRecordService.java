@@ -36,6 +36,11 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     }
 
     @Override
+    public List<PatientRecord> findByAuthor(User user) {
+        return recordDao.findByAuthor(user);
+    }
+
+    @Override
     public List<PatientRecordSummaryDto> getRecordSummaries(Institution institution) {
         return recordDao.getRecordSummaries(institution);
     }

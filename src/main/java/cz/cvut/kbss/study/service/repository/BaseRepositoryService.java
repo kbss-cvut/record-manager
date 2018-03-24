@@ -56,6 +56,8 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
 
     @Override
     public void remove(T instance) {
+        Objects.requireNonNull(instance);
+        preRemove(instance);
         getPrimaryDao().remove(instance);
     }
 
@@ -100,6 +102,17 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
      * @param instance The loaded instance, possibly {@code null}
      */
     protected void postLoad(T instance) {
+        // Do nothing, intended for overriding
+    }
+
+    /**
+     * Hook for additional business logic to be performed before an instance is removed.
+     * <p>
+     * Does nothing by default and is intended to be overridden.
+     *
+     * @param instance The loaded instance, possibly {@code null}
+     */
+    protected void preRemove(T instance) {
         // Do nothing, intended for overriding
     }
 }
