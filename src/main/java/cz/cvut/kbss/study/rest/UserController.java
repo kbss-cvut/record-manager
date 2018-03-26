@@ -73,7 +73,6 @@ public class UserController extends BaseController {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> getUsers(@RequestParam(value = "institution", required = false) String institutionKey) {
         final List<User> users = institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
-        users.forEach(User::erasePassword);
         return users;
     }
 

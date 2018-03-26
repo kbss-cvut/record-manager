@@ -10,6 +10,7 @@ import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,6 +77,9 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         final User orig = userDao.find(instance.getUri());
         if (orig == null) {
             throw new IllegalArgumentException("Cannot update user URI.");
+        }
+        if (StringUtils.isBlank(instance.getPassword())) {
+            instance.setPassword(orig.getPassword());
         }
         if (!orig.getPassword().equals(instance.getPassword())) {
             instance.encodePassword(passwordEncoder);
