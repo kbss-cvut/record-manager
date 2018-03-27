@@ -65,7 +65,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void prePersist(User instance) {
         if (findByUsername(instance.getUsername()) != null) {
-            throw new UsernameExistsException("Username " + instance.getUsername() + " already exists.");
+            throw new UsernameExistsException("User with specified username already exists.");
         }
         try {
             instance.encodePassword(passwordEncoder);
@@ -84,7 +84,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             throw new UnauthorizedException("Cannot update user.");
         }
         if (!findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {
-            throw new UsernameExistsException("Username " + instance.getUsername() + " already exists.");
+            throw new UsernameExistsException("User with specified username already exists.");
         }
         final User orig = userDao.find(instance.getUri());
         if (orig == null) {
@@ -101,7 +101,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void preRemove(User instance) {
         if (!patientRecordDao.findByAuthor(instance).isEmpty()) {
-            throw new ValidationException("User with patient records cannot be deleted");
+            throw new ValidationException("User with patient records cannot be deleted.");
         }
     }
 }
