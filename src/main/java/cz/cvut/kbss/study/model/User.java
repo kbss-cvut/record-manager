@@ -44,6 +44,7 @@ public class User implements HasDerivableUri, Serializable {
     @OWLDataProperty(iri = Vocabulary.s_p_password)
     private String password;
 
+    @ParticipationConstraints(nonEmpty = true)
     @OWLDataProperty(iri = Vocabulary.s_p_mbox)
     private String emailAddress;
 
