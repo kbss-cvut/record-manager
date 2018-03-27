@@ -16,4 +16,6 @@ public interface UserService extends BaseService<User> {
      * @return Records of matching users
      */
     List<User> findByInstitution(Institution institution);
+
+    String generateUsername(String usernamePrefix);
 }

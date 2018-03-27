@@ -123,4 +123,10 @@ public class UserController extends BaseController {
             LOG.trace("{}'s password successfully changed.", username);
         }
     }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @RequestMapping(value = "/generate-username/{usernamePrefix}", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public String generateUsername(@PathVariable(value = "usernamePrefix") String usernamePrefix) {
+        return userService.generateUsername(usernamePrefix);
+    }
 }

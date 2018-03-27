@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,6 +49,17 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     public List<User> findByInstitution(Institution institution) {
         Objects.requireNonNull(institution);
         return userDao.findByInstitution(institution);
+    }
+
+    @Override
+    public String generateUsername(String usernamePrefix) {
+        return usernamePrefix + (userDao.findAll().stream()
+                .filter(u -> u.getUsername().startsWith(usernamePrefix))
+                .map(u -> u.getUsername().replaceFirst(usernamePrefix, ""))
+                .filter(s -> StringUtils.isNotBlank(s) && StringUtils.isNumeric(s))
+                .map(s -> Integer.parseInt(s))
+                .max(Comparator.naturalOrder())
+                .orElse(1) + 1);
     }
 
     @Override
