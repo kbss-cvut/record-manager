@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import cz.cvut.kbss.jopa.model.annotations.*;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
@@ -39,9 +40,11 @@ public class User implements HasDerivableUri, Serializable {
     @OWLDataProperty(iri = Vocabulary.s_p_accountName)
     private String username;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OWLDataProperty(iri = Vocabulary.s_p_password)
     private String password;
 
+    @ParticipationConstraints(nonEmpty = true)
     @OWLDataProperty(iri = Vocabulary.s_p_mbox)
     private String emailAddress;
 

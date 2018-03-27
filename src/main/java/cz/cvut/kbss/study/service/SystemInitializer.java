@@ -29,6 +29,7 @@ public class SystemInitializer {
             final User admin = new User();
             admin.setFirstName("Admin");
             admin.setLastName("Administratorowitch");
+            admin.setEmailAddress("admin@admin.org");
             admin.setUsername(ADMIN_USERNAME);
             admin.setPassword("5y5t3mAdm1n.");
             admin.getTypes().add(Vocabulary.s_c_administrator);

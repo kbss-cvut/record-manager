@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
@@ -13,10 +14,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -27,6 +34,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private InstitutionController institutionController;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name or " +
             "hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.areFromSameInstitution(#username)")
@@ -63,7 +73,6 @@ public class UserController extends BaseController {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> getUsers(@RequestParam(value = "institution", required = false) String institutionKey) {
         final List<User> users = institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
-        users.forEach(User::erasePassword);
         return users;
     }
 
@@ -97,5 +106,27 @@ public class UserController extends BaseController {
         if (LOG.isTraceEnabled()) {
             LOG.trace("User {} successfully removed.", toRemove);
         }
+    }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
+    @RequestMapping(value = "/{username}/password-change", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePassword(Authentication authentication, @PathVariable("username") String username, @RequestBody Map<String, String> password) {
+        final User original = getByUsername(username);
+        assert original != null;
+        if (authentication.getName().equals(username) && !passwordEncoder.matches(password.get("currentPassword"), original.getPassword())) {
+            throw new ValidationException("The passed user's current password is different from the specified one.");
+        }
+        original.setPassword(password.get("newPassword"));
+        userService.update(original);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("{}'s password successfully changed.", username);
+        }
+    }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @RequestMapping(value = "/generate-username/{usernamePrefix}", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public String generateUsername(@PathVariable(value = "usernamePrefix") String usernamePrefix) {
+        return userService.generateUsername(usernamePrefix);
     }
 }
