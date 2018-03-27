@@ -15,13 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -120,7 +117,7 @@ public class UserController extends BaseController {
         original.setPassword(password.get("newPassword"));
         userService.update(original);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("{}'s password successfully changed.", username);
+            LOG.trace("User's password successfully changed.", username);
         }
     }
 

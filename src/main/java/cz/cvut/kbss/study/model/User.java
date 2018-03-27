@@ -163,7 +163,7 @@ public class User implements HasDerivableUri, Serializable {
         Pattern p = Pattern.compile("[^A-Za-z0-9]");
         Matcher m = p.matcher(this.username);
         if (m.find()) {
-            throw new ValidationException("Username cannot contain special characters");
+            throw new ValidationException("Username cannot contain special characters.");
         }
     }
 
