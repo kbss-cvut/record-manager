@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
 @RequestMapping("/institutions")
 public class InstitutionController extends BaseController {
 

@@ -9,6 +9,8 @@ public interface UserService extends BaseService<User> {
 
     User findByUsername(String username);
 
+    User findByEmail(String email);
+
     /**
      * Gets users associated with the specified institution.
      *
@@ -18,4 +20,6 @@ public interface UserService extends BaseService<User> {
     List<User> findByInstitution(Institution institution);
 
     String generateUsername(String usernamePrefix);
+
+    void resetPassword(User user, String emailAddress);
 }

@@ -35,6 +35,22 @@ public class UserDao extends DerivableUriDao<User> {
         }
     }
 
+    public User findByEmail(String email) {
+        Objects.requireNonNull(email);
+        final EntityManager em = entityManager();
+        try {
+            return em.createNativeQuery(
+                    "SELECT ?x WHERE { ?x ?hasEmail ?emailAddress . }", User.class)
+                    .setParameter("hasEmail", URI.create(Vocabulary.s_p_mbox))
+                    .setParameter("emailAddress", email, Constants.PU_LANGUAGE)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
     /**
      * Gets all users associated with the specified institution.
      *

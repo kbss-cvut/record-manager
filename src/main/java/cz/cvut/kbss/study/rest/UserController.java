@@ -46,6 +46,7 @@ public class UserController extends BaseController {
         return user;
     }
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
     @RequestMapping(method = RequestMethod.GET, value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getCurrent(Principal principal) {
         final String username = principal.getName();
@@ -118,6 +119,23 @@ public class UserController extends BaseController {
         userService.update(original);
         if (LOG.isTraceEnabled()) {
             LOG.trace("User's password successfully changed.", username);
+        }
+    }
+
+    private User getByEmail(String email) {
+        assert email != null;
+        return userService.findByEmail(email);
+    }
+
+    @RequestMapping(value = "/forgotten-password", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void forgottenPassword(@RequestBody String emailAddress) {
+        final User original = getByEmail(emailAddress);
+        if(original != null) {
+            userService.resetPassword(original, emailAddress);
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("New password successfully sent.", emailAddress);
+            }
         }
     }
 

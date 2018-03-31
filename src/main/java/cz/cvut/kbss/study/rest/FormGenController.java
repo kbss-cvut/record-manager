@@ -2,12 +2,15 @@ package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.rest.dto.RawJson;
+import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.formgen.FormGenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
 @RequestMapping("/formGen")
 public class FormGenController extends BaseController {
 

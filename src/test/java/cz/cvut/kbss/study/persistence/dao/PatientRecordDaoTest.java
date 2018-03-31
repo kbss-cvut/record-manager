@@ -25,8 +25,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     private InstitutionDao institutionDao;
 
     public static final String USERNAME = "robert@plant.org";
+    public static final String EMAIL = "robert@plant.org";
     public static final String PASSWORD = "plant48";
-
 
     @Test
     @Ignore
@@ -76,6 +76,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         person.setLastName("Plant");
         person.setUsername(USERNAME);
         person.setPassword(PASSWORD);
+        person.setEmailAddress(EMAIL);
         return person;
     }
 
