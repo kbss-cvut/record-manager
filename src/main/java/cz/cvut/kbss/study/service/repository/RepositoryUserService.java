@@ -52,6 +52,11 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     }
 
     @Override
+    public User findByEmail(String email) {
+        return userDao.findByEmail(email);
+    }
+
+    @Override
     public String generateUsername(String usernamePrefix) {
         return usernamePrefix + (userDao.findAll().stream()
                 .filter(u -> u.getUsername().startsWith(usernamePrefix))
@@ -60,6 +65,13 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
                 .map(s -> Integer.parseInt(s))
                 .max(Comparator.naturalOrder())
                 .orElse(0) + 1);
+    }
+
+    @Override
+    public void resetPassword(User user) {
+        Objects.requireNonNull(user);
+        user.encodePassword(passwordEncoder);
+        userDao.update(user);
     }
 
     @Override
