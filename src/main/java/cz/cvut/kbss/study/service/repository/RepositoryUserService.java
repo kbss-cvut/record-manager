@@ -72,6 +72,17 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     }
 
     @Override
+    public void changePassword(User user, String newPassword, String currentPassword) {
+        final User currentUser = securityUtils.getCurrentUser();
+        if (currentUser.getUsername().equals(user.getUsername()) && !passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new ValidationException("The passed user's current password is different from the specified one.");
+        }
+        user.setPassword(newPassword);
+        user.encodePassword(passwordEncoder);
+        userDao.update(user);
+    }
+
+    @Override
     public void resetPassword(User user, String emailAddress) {
         Objects.requireNonNull(user);
         String newPassword = GeneratePassword.generatePassword();
@@ -113,9 +124,6 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
         if (StringUtils.isBlank(instance.getPassword())) {
             instance.setPassword(orig.getPassword());
-        }
-        if (!orig.getPassword().equals(instance.getPassword())) {
-            instance.encodePassword(passwordEncoder);
         }
     }
 
