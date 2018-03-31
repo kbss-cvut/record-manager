@@ -59,7 +59,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
                 .filter(s -> StringUtils.isNotBlank(s) && StringUtils.isNumeric(s))
                 .map(s -> Integer.parseInt(s))
                 .max(Comparator.naturalOrder())
-                .orElse(1) + 1);
+                .orElse(0) + 1);
     }
 
     @Override
