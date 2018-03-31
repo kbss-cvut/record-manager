@@ -29,7 +29,6 @@ public class Email {
         Properties properties = System.getProperties();
         // Setup mail server
         properties.setProperty("mail.smtp.host", HOST);
-        properties.setProperty("mail.smtp.port", "25");
         // Get the default Session object.
         return Session.getDefaultInstance(properties);
     }

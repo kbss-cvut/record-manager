@@ -21,7 +21,5 @@ public interface UserService extends BaseService<User> {
 
     String generateUsername(String usernamePrefix);
 
-    void resetPassword(User user);
-
-
+    void resetPassword(User user, String emailAddress);
 }

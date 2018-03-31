@@ -10,6 +10,10 @@ import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
+import cz.cvut.kbss.study.util.Email;
+import cz.cvut.kbss.study.util.GeneratePassword;
+import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
+import cz.cvut.kbss.study.util.etemplates.ForgottenPassword;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,10 +72,15 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     }
 
     @Override
-    public void resetPassword(User user) {
+    public void resetPassword(User user, String emailAddress) {
         Objects.requireNonNull(user);
+        String newPassword = GeneratePassword.generatePassword();
+        user.setPassword(newPassword);
         user.encodePassword(passwordEncoder);
         userDao.update(user);
+        BaseEmailTemplate emailTemplate = new ForgottenPassword(emailAddress, newPassword);
+        Email email = new Email(emailTemplate, "klimato2@fel.cvut.cz", emailAddress);
+        email.sendEmail();
     }
 
     @Override

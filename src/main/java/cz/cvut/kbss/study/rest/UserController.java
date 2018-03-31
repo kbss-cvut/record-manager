@@ -8,10 +8,6 @@ import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.UserService;
-import cz.cvut.kbss.study.util.GeneratePassword;
-import cz.cvut.kbss.study.util.Email;
-import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
-import cz.cvut.kbss.study.util.etemplates.ForgottenPassword;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -136,14 +132,9 @@ public class UserController extends BaseController {
     public void forgottenPassword(@RequestBody String emailAddress) {
         final User original = getByEmail(emailAddress);
         if(original != null) {
-            String newPassword = GeneratePassword.generatePassword();
-            original.setPassword(newPassword);
-            userService.resetPassword(original);
-            BaseEmailTemplate emailTemplate = new ForgottenPassword(emailAddress, newPassword);
-            Email email = new Email(emailTemplate, "klimato2@fel.cvut.cz", emailAddress);
-            email.sendEmail();
+            userService.resetPassword(original, emailAddress);
             if (LOG.isTraceEnabled()) {
-                LOG.trace("User's password successfully changed.", original.getUsername());
+                LOG.trace("New password successfully sent.", emailAddress);
             }
         }
     }
