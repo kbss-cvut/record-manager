@@ -118,9 +118,9 @@ public class UserController extends BaseController {
         return userService.findByEmail(email);
     }
 
-    @RequestMapping(value = "/forgotten-password", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(value = "/password-reset", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void forgottenPassword(@RequestBody String emailAddress) {
+    public void resetPassword(@RequestBody String emailAddress) {
         final User original = getByEmail(emailAddress);
         if(original != null) {
             userService.resetPassword(original, emailAddress);

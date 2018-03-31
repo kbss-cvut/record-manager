@@ -13,7 +13,7 @@ import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.Email;
 import cz.cvut.kbss.study.util.GeneratePassword;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
-import cz.cvut.kbss.study.util.etemplates.ForgottenPassword;
+import cz.cvut.kbss.study.util.etemplates.PasswordReset;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +89,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         user.setPassword(newPassword);
         user.encodePassword(passwordEncoder);
         userDao.update(user);
-        BaseEmailTemplate emailTemplate = new ForgottenPassword(emailAddress, newPassword);
+        BaseEmailTemplate emailTemplate = new PasswordReset(emailAddress, newPassword);
         Email email = new Email(emailTemplate, "klimato2@fel.cvut.cz", emailAddress);
         email.sendEmail();
     }

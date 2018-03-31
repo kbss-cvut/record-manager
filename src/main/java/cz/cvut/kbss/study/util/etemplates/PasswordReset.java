@@ -1,7 +1,7 @@
 package cz.cvut.kbss.study.util.etemplates;
 
-public class ForgottenPassword extends BaseEmailTemplate{
-    public ForgottenPassword(String username, String newPassword) {
+public class PasswordReset extends BaseEmailTemplate{
+    public PasswordReset(String username, String newPassword) {
         this.username = username;
         this.newPassword = newPassword;
     }
