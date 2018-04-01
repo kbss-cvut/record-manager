@@ -89,8 +89,8 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         user.setPassword(newPassword);
         user.encodePassword(passwordEncoder);
         userDao.update(user);
-        BaseEmailTemplate emailTemplate = new PasswordReset(emailAddress, newPassword);
-        Email email = new Email(emailTemplate, "klimato2@fel.cvut.cz", emailAddress);
+        BaseEmailTemplate emailTemplate = new PasswordReset(user.getUsername(), newPassword);
+        Email email = new Email(emailTemplate, emailAddress);
         email.sendEmail();
     }
 

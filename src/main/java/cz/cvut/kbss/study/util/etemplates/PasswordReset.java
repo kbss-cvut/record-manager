@@ -18,10 +18,9 @@ public class PasswordReset extends BaseEmailTemplate{
     @Override
     public String getHTMLContent() {
         String content = "<div>" +
-                "<p>Hello "+ this.username + "</p>" +
-                "<p>Your new password is: " + this.newPassword + "</p>" +
-                "<p>Thanks,</p>" +
-                "<p>StudyManager</p>" +
+                "<p>Hello "+ this.username + ", </p>" +
+                "<p>your new password is: " + this.newPassword + " </p>" +
+                "<p>Your, <br>StudyManager</p>" +
                 "</div>";
         return content;
     }

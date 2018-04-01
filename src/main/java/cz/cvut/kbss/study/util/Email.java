@@ -5,32 +5,38 @@ import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.activation.*;
 
 public class Email {
-    public Email(BaseEmailTemplate emailTemplate, String senderEmail, String recipientEmail) {
+    public Email(BaseEmailTemplate emailTemplate, String recipientEmail) {
         this.emailTemplate = emailTemplate;
-        this.senderEmail = senderEmail;
         this.recipientEmail = recipientEmail;
     }
 
     private BaseEmailTemplate emailTemplate;
-    private String senderEmail;
     private String recipientEmail;
-    private static final String HOST = "localhost";
 
+    private static final String HOST = "smtp.gmail.com";
+    private static final String USER_NAME = "studymanagercvut";
+    private static final String DISPLAY_NAME = "StudyManager";
+    private static final String PASSWORD = "Klinika321";
     protected static final Logger LOG = LoggerFactory.getLogger(BaseRepositoryService.class);
 
     private Session getSession() {
         // Get system properties
-        Properties properties = System.getProperties();
-        // Setup mail server
-        properties.setProperty("mail.smtp.host", HOST);
+        Properties props = System.getProperties();
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", HOST);
+        props.put("mail.smtp.user", USER_NAME);
+        props.put("mail.smtp.password", PASSWORD);
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
         // Get the default Session object.
-        return Session.getDefaultInstance(properties);
+        return Session.getDefaultInstance(props);
     }
 
     public void sendEmail() {
@@ -40,7 +46,7 @@ public class Email {
             MimeMessage message = new MimeMessage(session);
 
             // Set From: header field of the header.
-            message.setFrom(new InternetAddress(senderEmail));
+            message.setFrom(new InternetAddress(USER_NAME, DISPLAY_NAME));
 
             // Set To: header field of the header.
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
@@ -52,13 +58,24 @@ public class Email {
             message.setContent(emailTemplate.getHTMLContent(), "text/html");
 
             // Send message
-            Transport.send(message);
+            Transport transport = session.getTransport("smtp");
+            transport.connect(HOST, USER_NAME, PASSWORD);
+            transport.sendMessage(message, message.getAllRecipients());
+            transport.close();
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Email sent successfully");
+            }
+        } catch (AddressException ae) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Unable to send email.", ae);
             }
         } catch (MessagingException mex) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Unable to send email.", mex);
+            }
+        } catch (UnsupportedEncodingException e) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Unable to send email.", e);
             }
         }
     }
