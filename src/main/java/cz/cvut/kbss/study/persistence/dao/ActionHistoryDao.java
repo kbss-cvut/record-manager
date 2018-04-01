@@ -4,7 +4,7 @@ import cz.cvut.kbss.study.model.ActionHistory;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ActionHistoryDao extends DerivableUriDao<ActionHistory>{
+public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
 
     public ActionHistoryDao() {
         super(ActionHistory.class);

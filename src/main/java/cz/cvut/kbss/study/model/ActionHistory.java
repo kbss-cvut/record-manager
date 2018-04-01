@@ -1,15 +1,17 @@
 package cz.cvut.kbss.study.model;
 
 import cz.cvut.kbss.jopa.model.annotations.*;
-import cz.cvut.kbss.study.model.util.HasDerivableUri;
+import cz.cvut.kbss.study.model.util.HasOwlKey;
 
 import java.net.URI;
 import java.util.Date;
 
 @OWLClass(iri = Vocabulary.s_c_action_history)
-public class ActionHistory extends AbstractEntity implements HasDerivableUri {
-    @Id(generated = true)
-    private URI uri;
+public class ActionHistory extends AbstractEntity implements HasOwlKey {
+
+    @ParticipationConstraints(nonEmpty = true)
+    @OWLDataProperty(iri = Vocabulary.s_p_key)
+    private String key;
 
     @ParticipationConstraints(nonEmpty = true)
     @OWLObjectProperty(iri = Vocabulary.s_p_has_owner, fetch = FetchType.EAGER)
@@ -72,7 +74,12 @@ public class ActionHistory extends AbstractEntity implements HasDerivableUri {
     }
 
     @Override
-    public void generateUri() {
+    public String getKey() {
+        return key;
+    }
 
+    @Override
+    public void setKey(String key) {
+        this.key = key;
     }
 }
