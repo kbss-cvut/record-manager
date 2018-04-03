@@ -33,9 +33,7 @@ public class RepositoryActionHistoryService extends BaseRepositoryService<Action
     }
 
     @Override
-    public List<ActionHistory> findByType(String type) {
-        return actionHistoryDao.findByType(type);
-    }
+    public List<ActionHistory> findByType(String type) { return actionHistoryDao.findByType(type); }
 
     @Override
     public List<ActionHistory> findByAuthor(User author) { return actionHistoryDao.findByAuthor(author); }

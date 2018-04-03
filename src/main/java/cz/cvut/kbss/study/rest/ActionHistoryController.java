@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import cz.cvut.kbss.study.service.ActionHistoryService;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -57,7 +58,12 @@ public class ActionHistoryController extends BaseController {
 
     private List<ActionHistory> getByAuthor(String authorUsername) {
         assert authorUsername != null;
-        final User author = userController.getByUsername(authorUsername);
+        final User author;
+        try {
+            author = userController.getByUsername(authorUsername);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
         return actionHistoryService.findByAuthor(author);
     }
 }

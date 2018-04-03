@@ -2,6 +2,7 @@ package cz.cvut.kbss.study.persistence.dao;
 
 import cz.cvut.kbss.jopa.exceptions.NoResultException;
 import cz.cvut.kbss.jopa.model.EntityManager;
+import cz.cvut.kbss.jopa.model.query.Query;
 import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
@@ -40,10 +41,9 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         Objects.requireNonNull(type);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?isType ?actionType . }", ActionHistory.class)
-                    .setParameter("type", typeUri)
+            return em.createNativeQuery("SELECT ?x WHERE { ?x ?isType ?actionType . }", ActionHistory.class)
                     .setParameter("isType", URI.create(Vocabulary.s_p_label))
-                    .setParameter("actionType", type).getResultList();
+                    .setParameter("actionType", type, Constants.PU_LANGUAGE).getResultList();
         } catch (NoResultException e) {
             return null;
         } finally {
@@ -55,10 +55,10 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         Objects.requireNonNull(author);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?createdBy ?author . }", ActionHistory.class)
-                    .setParameter("type", typeUri)
-                    .setParameter("createdBy", URI.create(Vocabulary.s_p_has_author))
-                    .setParameter("author", author.getUri()).getResultList();
+            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?hasOwner ?author. }", ActionHistory.class)
+                            .setParameter("type", typeUri)
+                            .setParameter("hasOwner", URI.create(Vocabulary.s_p_has_owner))
+                            .setParameter("author", author.getUri()).getResultList();
         } finally {
             em.close();
         }
