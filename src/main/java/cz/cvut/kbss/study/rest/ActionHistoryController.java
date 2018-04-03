@@ -1,6 +1,8 @@
 package cz.cvut.kbss.study.rest;
 
+import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.ActionHistory;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
@@ -22,6 +24,9 @@ public class ActionHistoryController extends BaseController {
     @Autowired
     private ActionHistoryService actionHistoryService;
 
+    @Autowired
+    private UserController userController;
+
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void create(@RequestBody ActionHistory actionHistory) {
@@ -33,8 +38,26 @@ public class ActionHistoryController extends BaseController {
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ActionHistory> getActions() {
-        return actionHistoryService.findAll();
+    public List<ActionHistory> getActions(@RequestParam(value = "author", required = false) String authorUsername,
+                                          @RequestParam(value = "type", required = false) String type) {
+        final List<ActionHistory> actions = authorUsername != null ? getByAuthor(authorUsername)
+                : type != null ? actionHistoryService.findByType(type) : actionHistoryService.findAll();
+        return actions;
     }
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @RequestMapping(method = RequestMethod.GET, value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ActionHistory getByKey(@PathVariable("key") String key) {
+        final ActionHistory action = actionHistoryService.findByKey(key);
+        if (action == null) {
+            throw NotFoundException.create("ActionHistory", key);
+        }
+        return action;
+    }
+
+    private List<ActionHistory> getByAuthor(String authorUsername) {
+        assert authorUsername != null;
+        final User author = userController.getByUsername(authorUsername);
+        return actionHistoryService.findByAuthor(author);
+    }
 }

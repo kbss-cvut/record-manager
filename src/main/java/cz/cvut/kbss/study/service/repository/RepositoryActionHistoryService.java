@@ -26,4 +26,17 @@ public class RepositoryActionHistoryService extends BaseRepositoryService<Action
     protected GenericDao<ActionHistory> getPrimaryDao() {
         return actionHistoryDao;
     }
+
+    @Override
+    public ActionHistory findByKey(String key) {
+        return actionHistoryDao.findByKey(key);
+    }
+
+    @Override
+    public List<ActionHistory> findByType(String type) {
+        return actionHistoryDao.findByType(type);
+    }
+
+    @Override
+    public List<ActionHistory> findByAuthor(User author) { return actionHistoryDao.findByAuthor(author); }
 }
