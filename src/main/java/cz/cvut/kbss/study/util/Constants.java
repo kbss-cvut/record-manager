@@ -32,4 +32,9 @@ public final class Constants {
      * Prefix for basic authentication for the Authorization HTTP header.
      */
     public static final String BASIC_AUTHORIZATION_PREFIX = "Basic ";
+
+    /**
+     * Number of history actions fetched from database. Needs to be changes also in front-end.
+     */
+    public static final int ACTIONS_PER_PAGE = 5;
 }

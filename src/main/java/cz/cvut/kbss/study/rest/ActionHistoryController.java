@@ -2,15 +2,11 @@ package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.ActionHistory;
-import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import cz.cvut.kbss.study.service.ActionHistoryService;
@@ -19,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/action-history")
+@RequestMapping("/history")
 public class ActionHistoryController extends BaseController {
 
     @Autowired
