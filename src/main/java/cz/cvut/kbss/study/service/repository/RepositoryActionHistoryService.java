@@ -28,8 +28,8 @@ public class RepositoryActionHistoryService extends BaseRepositoryService<Action
     }
 
     @Override
-    public List<ActionHistory> findAllByOrderAsc() {
-        return actionHistoryDao.findAllOrderByAsc();
+    public List<ActionHistory> findAllByOrderAsc(int pageNumber) {
+        return actionHistoryDao.findAllOrderByAsc(pageNumber);
     }
 
     @Override
@@ -38,8 +38,12 @@ public class RepositoryActionHistoryService extends BaseRepositoryService<Action
     }
 
     @Override
-    public List<ActionHistory> findByType(String type) { return actionHistoryDao.findByType(type); }
+    public List<ActionHistory> findByType(String type, int pageNumber) {
+        return actionHistoryDao.findByType(type, pageNumber);
+    }
 
     @Override
-    public List<ActionHistory> findByAuthor(User author) { return actionHistoryDao.findByAuthor(author); }
+    public List<ActionHistory> findByAuthor(User author, int pageNumber) {
+        return actionHistoryDao.findByAuthor(author, pageNumber);
+    }
 }

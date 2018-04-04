@@ -21,12 +21,14 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         super(ActionHistory.class);
     }
 
-    public List<ActionHistory> findAllOrderByAsc() {
+    public List<ActionHistory> findAllOrderByAsc(int pageNumber) {
         final EntityManager em = entityManager();
         try {
             return em.createNativeQuery("SELECT ?x WHERE { ?x a ?type; ?isCreated ?timestamp . } ORDER BY DESC(?timestamp)", ActionHistory.class)
                     .setParameter("type", typeUri)
                     .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
+                    .setFirstResult((pageNumber-1) * 2)
+                    .setMaxResults(3)
                     .getResultList();
         } catch (NoResultException e) {
             return null;
@@ -51,7 +53,7 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         }
     }
 
-    public List<ActionHistory> findByType(String type) {
+    public List<ActionHistory> findByType(String type, int pageNumber) {
         Objects.requireNonNull(type);
         final EntityManager em = entityManager();
         try {
@@ -59,6 +61,8 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
                     .setParameter("isType", URI.create(Vocabulary.s_p_label))
                     .setParameter("actionType", type, Constants.PU_LANGUAGE)
                     .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
+                    .setFirstResult((pageNumber-1) * 2)
+                    .setMaxResults(3)
                     .getResultList();
         } catch (NoResultException e) {
             return null;
@@ -67,7 +71,7 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         }
     }
 
-    public List<ActionHistory> findByAuthor(User author) {
+    public List<ActionHistory> findByAuthor(User author, int pageNumber) {
         Objects.requireNonNull(author);
         final EntityManager em = entityManager();
         try {
@@ -76,6 +80,8 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
                             .setParameter("hasOwner", URI.create(Vocabulary.s_p_has_owner))
                     .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
                     .setParameter("author", author.getUri())
+                    .setFirstResult((pageNumber-1) * 2)
+                    .setMaxResults(3)
                     .getResultList();
         } finally {
             em.close();

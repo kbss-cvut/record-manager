@@ -40,9 +40,11 @@ public class ActionHistoryController extends BaseController {
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ActionHistory> getActions(@RequestParam(value = "author", required = false) String authorUsername,
-                                          @RequestParam(value = "type", required = false) String type) {
-        final List<ActionHistory> actions = authorUsername != null ? getByAuthor(authorUsername)
-                : type != null ? actionHistoryService.findByType(type) : actionHistoryService.findAllByOrderAsc();
+                                          @RequestParam(value = "type", required = false) String type,
+                                          @RequestParam(value = "page") int pageNumber) {
+        final List<ActionHistory> actions = authorUsername != null ? getByAuthor(authorUsername, pageNumber)
+                : type != null ? actionHistoryService.findByType(type, pageNumber)
+                : actionHistoryService.findAllByOrderAsc(pageNumber);
         return actions;
     }
 
@@ -56,7 +58,7 @@ public class ActionHistoryController extends BaseController {
         return action;
     }
 
-    private List<ActionHistory> getByAuthor(String authorUsername) {
+    private List<ActionHistory> getByAuthor(String authorUsername, int pageNumber) {
         assert authorUsername != null;
         final User author;
         try {
@@ -64,6 +66,6 @@ public class ActionHistoryController extends BaseController {
         } catch (Exception e) {
             return Collections.emptyList();
         }
-        return actionHistoryService.findByAuthor(author);
+        return actionHistoryService.findByAuthor(author, pageNumber);
     }
 }
