@@ -28,6 +28,11 @@ public class RepositoryActionHistoryService extends BaseRepositoryService<Action
     }
 
     @Override
+    public List<ActionHistory> findAllByOrderAsc() {
+        return actionHistoryDao.findAllOrderByAsc();
+    }
+
+    @Override
     public ActionHistory findByKey(String key) {
         return actionHistoryDao.findByKey(key);
     }

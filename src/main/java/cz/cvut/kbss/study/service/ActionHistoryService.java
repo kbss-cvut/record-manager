@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ActionHistoryService extends BaseService<ActionHistory> {
 
+    List<ActionHistory> findAllByOrderAsc();
+
     ActionHistory findByKey(String key);
 
     List<ActionHistory> findByType(String type);

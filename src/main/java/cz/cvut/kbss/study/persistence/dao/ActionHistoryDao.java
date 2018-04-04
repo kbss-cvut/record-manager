@@ -21,6 +21,20 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         super(ActionHistory.class);
     }
 
+    public List<ActionHistory> findAllOrderByAsc() {
+        final EntityManager em = entityManager();
+        try {
+            return em.createNativeQuery("SELECT ?x WHERE { ?x a ?type; ?isCreated ?timestamp . } ORDER BY DESC(?timestamp)", ActionHistory.class)
+                    .setParameter("type", typeUri)
+                    .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
     public ActionHistory findByKey(String key) {
         Objects.requireNonNull(key);
         final EntityManager em = entityManager();
@@ -41,9 +55,11 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         Objects.requireNonNull(type);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery("SELECT ?x WHERE { ?x ?isType ?actionType . }", ActionHistory.class)
+            return em.createNativeQuery("SELECT ?x WHERE { ?x ?isType ?actionType; ?isCreated ?timestamp .} ORDER BY DESC(?timestamp)", ActionHistory.class)
                     .setParameter("isType", URI.create(Vocabulary.s_p_label))
-                    .setParameter("actionType", type, Constants.PU_LANGUAGE).getResultList();
+                    .setParameter("actionType", type, Constants.PU_LANGUAGE)
+                    .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
+                    .getResultList();
         } catch (NoResultException e) {
             return null;
         } finally {
@@ -55,10 +71,12 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         Objects.requireNonNull(author);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?hasOwner ?author. }", ActionHistory.class)
+            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?hasOwner ?author; ?isCreated ?timestamp . } ORDER BY DESC(?timestamp)", ActionHistory.class)
                             .setParameter("type", typeUri)
                             .setParameter("hasOwner", URI.create(Vocabulary.s_p_has_owner))
-                            .setParameter("author", author.getUri()).getResultList();
+                    .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
+                    .setParameter("author", author.getUri())
+                    .getResultList();
         } finally {
             em.close();
         }

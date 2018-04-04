@@ -42,7 +42,7 @@ public class ActionHistoryController extends BaseController {
     public List<ActionHistory> getActions(@RequestParam(value = "author", required = false) String authorUsername,
                                           @RequestParam(value = "type", required = false) String type) {
         final List<ActionHistory> actions = authorUsername != null ? getByAuthor(authorUsername)
-                : type != null ? actionHistoryService.findByType(type) : actionHistoryService.findAll();
+                : type != null ? actionHistoryService.findByType(type) : actionHistoryService.findAllByOrderAsc();
         return actions;
     }
 
