@@ -36,5 +36,5 @@ public final class Constants {
     /**
      * Number of history actions fetched from database. Needs to be changes also in front-end.
      */
-    public static final int ACTIONS_PER_PAGE = 5;
+    public static final int ACTIONS_PER_PAGE = 25;
 }
