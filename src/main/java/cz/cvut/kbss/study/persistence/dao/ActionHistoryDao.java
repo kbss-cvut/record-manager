@@ -40,11 +40,13 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         Objects.requireNonNull(key);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery(
+            ActionHistory action = em.createNativeQuery(
                     "SELECT ?x WHERE { ?x ?hasKey ?key . }", ActionHistory.class)
                     .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
                     .setParameter("key", key, Constants.PU_LANGUAGE)
                     .getSingleResult();
+            action.getPayload();
+            return action;
         } catch (NoResultException e) {
             return null;
         } finally {
@@ -78,6 +80,26 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
             return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?hasOwner ?author; ?isCreated ?timestamp . } " +
                     "ORDER BY DESC(?timestamp)", ActionHistory.class)
                     .setParameter("type", typeUri)
+                    .setParameter("hasOwner", URI.create(Vocabulary.s_p_has_owner))
+                    .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
+                    .setParameter("author", author.getUri())
+                    .setFirstResult((pageNumber - 1) * Constants.ACTIONS_PER_PAGE)
+                    .setMaxResults(Constants.ACTIONS_PER_PAGE + 1)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<ActionHistory> findByTypeAndAuthor(String type, User author, int pageNumber) {
+        Objects.requireNonNull(author);
+        final EntityManager em = entityManager();
+        try {
+            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?isType ?actionType;  ?hasOwner ?author; ?isCreated ?timestamp . } " +
+                    "ORDER BY DESC(?timestamp)", ActionHistory.class)
+                    .setParameter("type", typeUri)
+                    .setParameter("isType", URI.create(Vocabulary.s_p_label))
+                    .setParameter("actionType", type, Constants.PU_LANGUAGE)
                     .setParameter("hasOwner", URI.create(Vocabulary.s_p_has_owner))
                     .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
                     .setParameter("author", author.getUri())

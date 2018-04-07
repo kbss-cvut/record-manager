@@ -40,4 +40,9 @@ public class RepositoryActionHistoryService extends BaseRepositoryService<Action
     public List<ActionHistory> findByAuthor(User author, int pageNumber) {
         return actionHistoryDao.findByAuthor(author, pageNumber);
     }
+
+    @Override
+    public List<ActionHistory> findByTypeAndAuthor(String type, User author, int pageNumber) {
+        return actionHistoryDao.findByTypeAndAuthor(type, author, pageNumber);
+    }
 }

@@ -25,7 +25,7 @@ public class ActionHistory extends AbstractEntity implements HasOwlKey {
     @OWLDataProperty(iri = Vocabulary.s_p_label)
     private String type;
 
-    @OWLDataProperty(iri = Vocabulary.s_p_has_data_value)
+    @OWLDataProperty(iri = Vocabulary.s_p_has_data_value, fetch = FetchType.LAZY)
     private String payload;
 
     @Override
