@@ -5,7 +5,13 @@ public enum ConfigParam {
     REPOSITORY_URL("repositoryUrl"),
     DRIVER("driver"),
     FORM_GEN_REPOSITORY_URL("formGenRepositoryUrl"),
-    FORM_GEN_SERVICE_URL("formGenServiceUrl");
+    FORM_GEN_SERVICE_URL("formGenServiceUrl"),
+
+    E_USERNAME("eUsername"),
+    E_PASSWORD("ePassword"),
+    E_DISPLAY_NAME("eDisplayName"),
+    E_PASSWORD_RESET_SUBJECT("ePasswordResetSubject"),
+    E_PASSWORD_RESET_CONTENT("ePasswordResetContent");
 
     private final String name;
 

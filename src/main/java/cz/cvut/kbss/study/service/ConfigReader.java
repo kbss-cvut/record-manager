@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class ConfigReader {
 
@@ -26,5 +28,13 @@ public class ConfigReader {
             return environment.getProperty(param.toString());
         }
         return defaultValue;
+    }
+
+    public String getConfigWithParams(ConfigParam param, Map<String, String> params) {
+        String str = environment.getProperty(param.toString());
+        for ( String key : params.keySet() ) {
+            str = str.replace("{{" + key + "}}", params.get(key));
+        }
+        return str;
     }
 }
