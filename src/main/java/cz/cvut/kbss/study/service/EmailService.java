@@ -1,30 +1,37 @@
-package cz.cvut.kbss.study.util;
+package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.service.repository.BaseRepositoryService;
+import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import javax.annotation.PostConstruct;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.activation.*;
 
-public class Email {
-    public Email(BaseEmailTemplate emailTemplate, String recipientEmail) {
-        this.emailTemplate = emailTemplate;
-        this.recipientEmail = recipientEmail;
-    }
+@Service
+public class EmailService {
+    @Autowired
+    private ConfigReader config;
 
-    private BaseEmailTemplate emailTemplate;
-    private String recipientEmail;
-
-    private static final String HOST = "smtp.gmail.com";
-    private static final String USER_NAME = "studymanagercvut";
-    private static final String DISPLAY_NAME = "StudyManager";
-    private static final String PASSWORD = "Klinika321";
+    private String USER_NAME;
+    private String DISPLAY_NAME;
+    private String PASSWORD;
+    private final String HOST = "smtp.gmail.com";
     protected static final Logger LOG = LoggerFactory.getLogger(BaseRepositoryService.class);
+
+    @PostConstruct
+    private void initConstants() {
+        USER_NAME = config.getConfig(ConfigParam.E_USERNAME);
+        DISPLAY_NAME = config.getConfig(ConfigParam.E_DISPLAY_NAME);
+        PASSWORD = config.getConfig(ConfigParam.E_PASSWORD);
+    }
 
     private Session getSession() {
         // Get system properties
@@ -39,7 +46,7 @@ public class Email {
         return Session.getDefaultInstance(props);
     }
 
-    public void sendEmail() {
+    public void sendEmail(BaseEmailTemplate emailTemplate, String recipientEmail, String ccEmail) {
         Session session = getSession();
         try {
             // Create a default MimeMessage object.
@@ -50,6 +57,11 @@ public class Email {
 
             // Set To: header field of the header.
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+
+            // Set CC: header field of the header.
+            if (ccEmail != null) {
+                message.addRecipient(Message.RecipientType.CC, new InternetAddress(ccEmail));
+            }
 
             // Set Subject: header field
             message.setSubject(emailTemplate.getSubject());
@@ -62,9 +74,6 @@ public class Email {
             transport.connect(HOST, USER_NAME, PASSWORD);
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Email sent successfully");
-            }
         } catch (AddressException ae) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Unable to send email.", ae);

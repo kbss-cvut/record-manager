@@ -29,7 +29,7 @@ public class ActionHistoryController extends BaseController {
     public void create(@RequestBody ActionHistory actionHistory) {
         actionHistoryService.persist(actionHistory);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("User {} successfully registered.", actionHistory);
+            LOG.trace("Action {} successfully created.", actionHistory);
         }
     }
 

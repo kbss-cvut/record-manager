@@ -8,9 +8,10 @@ import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
+import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
-import cz.cvut.kbss.study.util.Email;
+import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.util.GeneratePassword;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
 import cz.cvut.kbss.study.util.etemplates.PasswordReset;
@@ -38,6 +39,12 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
     @Autowired
     private PatientRecordDao patientRecordDao;
+
+    @Autowired
+    private EmailService email;
+
+    @Autowired
+    private ConfigReader config;
 
     @Override
     protected GenericDao<User> getPrimaryDao() {
@@ -83,15 +90,14 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     }
 
     @Override
-    public void resetPassword(User user, String emailAddress) {
+    public void resetPassword(User user, String recipientEmail) {
         Objects.requireNonNull(user);
         String newPassword = GeneratePassword.generatePassword();
         user.setPassword(newPassword);
         user.encodePassword(passwordEncoder);
         userDao.update(user);
-        BaseEmailTemplate emailTemplate = new PasswordReset(user.getUsername(), newPassword);
-        Email email = new Email(emailTemplate, emailAddress);
-        email.sendEmail();
+        BaseEmailTemplate emailTemplate = new PasswordReset(config, user.getUsername(), newPassword);
+        email.sendEmail(emailTemplate, recipientEmail, null);
     }
 
     @Override
