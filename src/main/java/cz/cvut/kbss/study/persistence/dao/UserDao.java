@@ -72,4 +72,16 @@ public class UserDao extends DerivableUriDao<User> {
             em.close();
         }
     }
+
+    public int getNumberOfInvestigators() {
+        final EntityManager em = entityManager();
+        try {
+            return (int)em.createNativeQuery(
+                    "SELECT (count(?p) as ?investigatorCount) WHERE { ?p a ?typeDoctor . MINUS {?p a ?typeAdmin}}")
+                    .setParameter("typeDoctor", URI.create(Vocabulary.s_c_doctor))
+                    .setParameter("typeAdmin", URI.create(Vocabulary.s_c_administrator)).getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
 }

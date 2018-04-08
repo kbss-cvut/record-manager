@@ -101,4 +101,15 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
             em.close();
         }
     }
+
+    public int getNumberOfProcessedRecords() {
+        final EntityManager em = entityManager();
+        try {
+            return (int) em.createNativeQuery(
+                    "SELECT (count(?p) as ?patientRecordsCount) WHERE { ?p a ?record . }")
+                    .setParameter("record", URI.create(Vocabulary.s_c_patient_record)).getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
 }
