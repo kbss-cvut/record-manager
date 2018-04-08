@@ -58,8 +58,6 @@ public class User implements HasDerivableUri, Serializable {
     private Set<String> types;
 
     public User() {
-        this.types = new HashSet<>();
-        types.add(Vocabulary.s_c_doctor);
     }
 
     @Override
