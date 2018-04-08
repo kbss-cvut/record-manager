@@ -12,7 +12,7 @@ import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.service.EmailService;
-import cz.cvut.kbss.study.util.GeneratePassword;
+import cz.cvut.kbss.study.util.PasswordGenerator;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
 import cz.cvut.kbss.study.util.etemplates.PasswordReset;
 import org.apache.commons.lang.StringUtils;
@@ -92,7 +92,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     public void resetPassword(User user, String recipientEmail) {
         Objects.requireNonNull(user);
-        String newPassword = GeneratePassword.generatePassword();
+        String newPassword = PasswordGenerator.generatePassword();
         user.setPassword(newPassword);
         user.encodePassword(passwordEncoder);
         userDao.update(user);

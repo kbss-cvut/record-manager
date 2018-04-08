@@ -2,7 +2,7 @@ package cz.cvut.kbss.study.util;
 
 import org.apache.commons.lang.RandomStringUtils;
 
-public class GeneratePassword {
+public class PasswordGenerator {
     private static final int PASSWORD_LENGHT = 4;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
