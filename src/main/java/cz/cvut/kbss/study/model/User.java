@@ -8,6 +8,8 @@ import cz.cvut.kbss.study.util.Constants;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
+import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -177,7 +179,9 @@ public class User implements HasDerivableUri, Serializable {
             throw new IllegalStateException("Cannot generate Person URI without last name.");
         }
         try {
-            this.uri = URI.create(Constants.BASE_URI + URLEncoder.encode(firstName + "-" + lastName, StandardCharsets.UTF_8.toString()));
+            this.uri = URI.create(Constants.BASE_URI +
+                    URLEncoder.encode(firstName + "-" + lastName + "-" + IdentificationUtils.generateRandomURINumber(),
+                    StandardCharsets.UTF_8.toString()));
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("Cannot generate Person URI due to unsupported encoding.", e);
         }

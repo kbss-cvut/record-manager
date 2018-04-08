@@ -21,4 +21,13 @@ public class IdentificationUtils {
         String key = Long.toString(System.nanoTime());
         return key.concat(Integer.toString(RANDOM.nextInt(RANDOM_BOUND)));
     }
+
+    /**
+     * Generates a number for uri using  a random generator.
+     *
+     * @return String number
+     */
+    public static String generateRandomURINumber() {
+        return Integer.toString(RANDOM.nextInt(RANDOM_BOUND));
+    }
 }
