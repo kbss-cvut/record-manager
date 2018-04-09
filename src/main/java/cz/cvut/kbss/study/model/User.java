@@ -60,6 +60,7 @@ public class User implements HasDerivableUri, Serializable {
     private Set<String> types;
 
     public User() {
+        this.types = new HashSet<>();
     }
 
     @Override
