@@ -183,7 +183,9 @@
 <http://xmlns.com/foaf/0.1/mbox> rdf:type owl:DatatypeProperty .
 
 
+###  http://onto.fel.cvut.cz/ontologies/documentation/token
 
+<http://onto.fel.cvut.cz/ontologies/documentation/token> rdf:type owl:DatatypeProperty .
 
 
 #################################################################

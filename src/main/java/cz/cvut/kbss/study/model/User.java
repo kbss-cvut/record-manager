@@ -50,6 +50,9 @@ public class User implements HasDerivableUri, Serializable {
     @OWLDataProperty(iri = Vocabulary.s_p_mbox)
     private String emailAddress;
 
+    @OWLDataProperty(iri = Vocabulary.s_p_token)
+    private String token;
+
     @OWLDataProperty(iri = Vocabulary.s_p_created)
     private Date dateCreated;
 
@@ -58,6 +61,7 @@ public class User implements HasDerivableUri, Serializable {
 
     @Types
     private Set<String> types;
+
 
     public User() {
         this.types = new HashSet<>();
@@ -138,6 +142,10 @@ public class User implements HasDerivableUri, Serializable {
     public void setTypes(Set<String> types) {
         this.types = types;
     }
+
+    public String getToken() { return token; }
+
+    public void setToken(String token) { this.token = token; }
 
     /**
      * Encodes password of this person.
