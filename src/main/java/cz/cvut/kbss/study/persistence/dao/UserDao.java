@@ -51,6 +51,22 @@ public class UserDao extends DerivableUriDao<User> {
         }
     }
 
+    public User findByToken(String token) {
+        Objects.requireNonNull(token);
+        final EntityManager em = entityManager();
+        try {
+            return em.createNativeQuery(
+                    "SELECT ?x WHERE { ?x ?valid ?token . }", User.class)
+                    .setParameter("valid", URI.create(Vocabulary.s_p_token))
+                    .setParameter("token", token, Constants.PU_LANGUAGE)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
     /**
      * Gets all users associated with the specified institution.
      *

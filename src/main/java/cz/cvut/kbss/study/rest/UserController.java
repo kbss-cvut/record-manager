@@ -7,11 +7,13 @@ import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.UserService;
+import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -134,5 +136,30 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/generate-username/{usernamePrefix}", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     public String generateUsername(@PathVariable(value = "usernamePrefix") String usernamePrefix) {
         return userService.generateUsername(usernamePrefix);
+    }
+
+    @RequestMapping(value = "/validate-token", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void validateToken(@RequestBody String token) {
+        User user = getByToken(token);
+        if (user == null) {
+            throw new AccessDeniedException("Token does not exist.");
+        }
+    }
+
+    @RequestMapping(value = "/password-change-token", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePasswordByToken(@RequestBody Map<String, String> data) {
+        final User original = getByToken(data.get("token"));
+        assert original != null;
+        userService.changePasswordByToken(original, data.get("password"));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("User's password successfully changed by token.", original.getUsername());
+        }
+    }
+
+    private User getByToken(String token) {
+        assert token != null;
+        return userService.findByToken(token);
     }
 }

@@ -11,6 +11,8 @@ public interface UserService extends BaseService<User> {
 
     User findByEmail(String email);
 
+    User findByToken(String token);
+
     /**
      * Gets users associated with the specified institution.
      *
@@ -22,6 +24,8 @@ public interface UserService extends BaseService<User> {
     String generateUsername(String usernamePrefix);
 
     void changePassword(User user, String newPassword, String currentPassword);
+
+    void changePasswordByToken(User user, String password);
 
     void resetPassword(User user, String emailAddress);
 
