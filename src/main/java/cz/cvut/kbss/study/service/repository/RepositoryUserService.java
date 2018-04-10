@@ -127,7 +127,8 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         } catch (IllegalStateException e) {
             throw new ValidationException(e.getMessage());
         }
-        instance.setToken(IdentificationUtils.generateRandomToken());
+        instance.setToken(null);
+        instance.setIsInvited("false");
     }
 
     @Override

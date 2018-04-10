@@ -188,6 +188,10 @@
 <http://onto.fel.cvut.cz/ontologies/documentation/token> rdf:type owl:DatatypeProperty .
 
 
+###  http://onto.fel.cvut.cz/ontologies/documentation/isInvited
+
+<http://onto.fel.cvut.cz/ontologies/documentation/isInvited> rdf:type owl:DatatypeProperty .
+
 #################################################################
 #
 #    Classes
