@@ -158,6 +158,20 @@ public class UserController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/send-invitation/{username}", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void sendInvitation(@PathVariable(value = "username") String username) {
+        final User original = getByUsername(username);
+        assert original != null;
+        if (!original.getIsInvited().equals("false")) {
+            throw new UnauthorizedException("Cannot invite already invited user.");
+        }
+        userService.sendInvitation(original);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Invitation has been sent to user", original.getUsername());
+        }
+    }
+
     private User getByToken(String token) {
         assert token != null;
         return userService.findByToken(token);

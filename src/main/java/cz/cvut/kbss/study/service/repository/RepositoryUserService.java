@@ -15,6 +15,7 @@ import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import cz.cvut.kbss.study.util.PasswordGenerator;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
+import cz.cvut.kbss.study.util.etemplates.Invitation;
 import cz.cvut.kbss.study.util.etemplates.PasswordReset;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
@@ -111,9 +112,20 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         String newPassword = PasswordGenerator.generatePassword();
         user.setPassword(newPassword);
         user.encodePassword(passwordEncoder);
-        userDao.update(user);
         BaseEmailTemplate emailTemplate = new PasswordReset(config, user.getUsername(), newPassword);
         email.sendEmail(emailTemplate, recipientEmail, null);
+        userDao.update(user);
+    }
+
+    @Override
+    public void sendInvitation(User user) {
+        final User currentUser = securityUtils.getCurrentUser();
+        Objects.requireNonNull(user);
+        user.setIsInvited("true");
+        user.setToken(IdentificationUtils.generateRandomToken());
+        BaseEmailTemplate emailTemplate = new Invitation(config, user);
+        email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
+        userDao.update(user);
     }
 
     @Override

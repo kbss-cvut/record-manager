@@ -29,4 +29,6 @@ public interface UserService extends BaseService<User> {
 
     void resetPassword(User user, String emailAddress);
 
+    void sendInvitation(User user);
+
 }
