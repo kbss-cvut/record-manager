@@ -136,6 +136,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         try {
             instance.encodePassword(passwordEncoder);
             instance.validateUsername();
+            instance.validateEmail();
         } catch (IllegalStateException e) {
             throw new ValidationException(e.getMessage());
         }
@@ -153,6 +154,11 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
         if (!findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {
             throw new UsernameExistsException("User with specified username already exists.");
+        }
+        try {
+            instance.validateEmail();
+        } catch (IllegalStateException e) {
+            throw new ValidationException(e.getMessage());
         }
         final User orig = userDao.find(instance.getUri());
         if (orig == null) {

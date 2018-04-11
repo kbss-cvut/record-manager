@@ -184,6 +184,16 @@ public class User implements HasDerivableUri, Serializable {
         }
     }
 
+    public void validateEmail() {
+        Pattern p = Pattern.compile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]" +
+                "+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])" +
+                "|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$");
+        Matcher m = p.matcher(this.emailAddress);
+        if (!m.find()) {
+            throw new ValidationException("Email is not valid.");
+        }
+    }
+
     @Override
     public void generateUri() {
         if (uri != null) {
