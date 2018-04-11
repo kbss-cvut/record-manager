@@ -14,6 +14,7 @@ import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import cz.cvut.kbss.study.util.PasswordGenerator;
+import cz.cvut.kbss.study.util.Validator;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
 import cz.cvut.kbss.study.util.etemplates.Invitation;
 import cz.cvut.kbss.study.util.etemplates.PasswordReset;
@@ -135,8 +136,8 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
         try {
             instance.encodePassword(passwordEncoder);
-            instance.validateUsername();
-            instance.validateEmail();
+            Validator.validateUsername(instance.getUsername());
+            Validator.validateEmail(instance.getEmailAddress());
         } catch (IllegalStateException e) {
             throw new ValidationException(e.getMessage());
         }
@@ -156,7 +157,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             throw new UsernameExistsException("User with specified username already exists.");
         }
         try {
-            instance.validateEmail();
+            Validator.validateEmail(instance.getEmailAddress());
         } catch (IllegalStateException e) {
             throw new ValidationException(e.getMessage());
         }

@@ -176,24 +176,6 @@ public class User implements HasDerivableUri, Serializable {
         this.password = null;
     }
 
-    public void validateUsername() {
-        Pattern p = Pattern.compile("[^A-Za-z0-9]");
-        Matcher m = p.matcher(this.username);
-        if (m.find()) {
-            throw new ValidationException("Username cannot contain special characters.");
-        }
-    }
-
-    public void validateEmail() {
-        Pattern p = Pattern.compile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]" +
-                "+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])" +
-                "|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$");
-        Matcher m = p.matcher(this.emailAddress);
-        if (!m.find()) {
-            throw new ValidationException("Email is not valid.");
-        }
-    }
-
     @Override
     public void generateUri() {
         if (uri != null) {
