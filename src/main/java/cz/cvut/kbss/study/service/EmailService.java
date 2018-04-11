@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.service;
 
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.service.repository.BaseRepositoryService;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
@@ -78,14 +79,12 @@ public class EmailService {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Unable to send email.", ae);
             }
-        } catch (MessagingException mex) {
+            throw new ValidationException("Unable to send email", ae);
+        } catch (MessagingException | UnsupportedEncodingException mex) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Unable to send email.", mex);
             }
-        } catch (UnsupportedEncodingException e) {
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Unable to send email.", e);
-            }
+            throw new IllegalArgumentException("Unable to send email.", mex);
         }
     }
 }
