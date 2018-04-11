@@ -13,7 +13,6 @@ public class ActionHistory extends AbstractEntity implements HasOwlKey {
     @OWLDataProperty(iri = Vocabulary.s_p_key)
     private String key;
 
-    @ParticipationConstraints(nonEmpty = true)
     @OWLObjectProperty(iri = Vocabulary.s_p_has_owner, fetch = FetchType.EAGER)
     private User author;
 
