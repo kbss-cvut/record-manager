@@ -3,9 +3,11 @@ package cz.cvut.kbss.study.rest;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.UserService;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -175,5 +180,19 @@ public class UserController extends BaseController {
     private User getByToken(String token) {
         assert token != null;
         return userService.findByToken(token);
+    }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @RequestMapping(value = "/impersonate", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void impersonate(@RequestBody String username) {
+        User user = getByUsername(username);
+        if (user.getTypes().contains(Vocabulary.s_c_administrator)) {
+            throw new UnauthorizedException("Cannot impersonate admin.");
+        }
+        final SecurityContext context = SecurityContextHolder.getContext();
+        UserDetails ud = new UserDetails(user);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities());
+        context.setAuthentication(auth);
     }
 }
