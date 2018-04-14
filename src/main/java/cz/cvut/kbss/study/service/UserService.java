@@ -23,7 +23,9 @@ public interface UserService extends BaseService<User> {
 
     String generateUsername(String usernamePrefix);
 
-    void changePassword(User user, String newPassword, String currentPassword);
+    void update(User user, boolean sendEmail, String emailType);
+
+    void changePassword(User user, String newPassword, String currentPassword, boolean sendEmail);
 
     void changePasswordByToken(User user, String password);
 
