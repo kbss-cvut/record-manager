@@ -12,12 +12,11 @@ import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.service.EmailService;
+import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import cz.cvut.kbss.study.util.PasswordGenerator;
 import cz.cvut.kbss.study.util.Validator;
-import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
-import cz.cvut.kbss.study.util.etemplates.Invitation;
-import cz.cvut.kbss.study.util.etemplates.PasswordReset;
+import cz.cvut.kbss.study.util.etemplates.*;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,14 +87,29 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     }
 
     @Override
-    public void changePassword(User user, String newPassword, String currentPassword) {
+    public void update(User user, boolean sendEmail, String emailType) {
+        final User currentUser = securityUtils.getCurrentUser();
+        this.update(user);
+        if (currentUser.getUsername().equals(user.getUsername()) || sendEmail) {
+            BaseEmailTemplate emailTemplate;
+            if (emailType.equals("passwordChange")) {
+                emailTemplate = new PasswordChange(config, user);
+            } else {
+                emailTemplate = new ProfileUpdate(config, user);
+            }
+            email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
+        }
+    }
+
+    @Override
+    public void changePassword(User user, String newPassword, String currentPassword, boolean sendEmail) {
         final User currentUser = securityUtils.getCurrentUser();
         if (currentUser.getUsername().equals(user.getUsername()) && !passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new ValidationException("The passed user's current password is different from the specified one.");
         }
         user.setPassword(newPassword);
         user.encodePassword(passwordEncoder);
-        userDao.update(user);
+        this.update(user, sendEmail, "passwordChange");
     }
 
     @Override
@@ -124,7 +138,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         Objects.requireNonNull(user);
         user.setIsInvited("true");
         user.setToken(IdentificationUtils.generateRandomToken());
-        BaseEmailTemplate emailTemplate = new Invitation(config, user);
+        BaseEmailTemplate emailTemplate = new UserInvite(config, user);
         email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
         userDao.update(user);
     }

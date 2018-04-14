@@ -10,11 +10,18 @@ public enum ConfigParam {
     E_USERNAME("eUsername"),
     E_PASSWORD("ePassword"),
     E_DISPLAY_NAME("eDisplayName"),
+
     E_PASSWORD_RESET_SUBJECT("ePasswordResetSubject"),
     E_PASSWORD_RESET_CONTENT("ePasswordResetContent"),
 
     E_INVITATION_SUBJECT("eInvitationSubject"),
-    E_INVITATION_CONTENT("eInvitationContent");
+    E_INVITATION_CONTENT("eInvitationContent"),
+
+    E_PASSWORD_CHANGE_SUBJECT("ePasswordChangeSubject"),
+    E_PASSWORD_CHANGE_CONTENT("ePasswordChangeContent"),
+
+    E_PROFILE_UPDATE_SUBJECT("eProfileUpdateSubject"),
+    E_PROFILE_UPDATE_CONTENT("eProfileUpdateContent");
 
     private final String name;
 

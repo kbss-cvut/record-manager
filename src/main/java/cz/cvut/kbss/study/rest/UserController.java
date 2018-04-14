@@ -82,21 +82,6 @@ public class UserController extends BaseController {
         return userService.findByInstitution(institution);
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
-    @RequestMapping(value = "/{username}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUser(@PathVariable("username") String username, @RequestBody User user) {
-        if (!username.equals(user.getUsername())) {
-            throw new BadRequestException("The passed user's username is different from the specified one.");
-        }
-        final User original = getByUsername(username);
-        assert original != null;
-        userService.update(user);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("User {} successfully updated.", user);
-        }
-    }
-
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -109,12 +94,29 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
-    @RequestMapping(value = "/{username}/password-change", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{username}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updatePassword(@PathVariable("username") String username, @RequestBody Map<String, String> password) {
+    public void updateUser(@PathVariable("username") String username, @RequestBody User user,
+                           @RequestParam(value = "email", defaultValue = "true") boolean sendEmail) {
+        if (!username.equals(user.getUsername())) {
+            throw new BadRequestException("The passed user's username is different from the specified one.");
+        }
         final User original = getByUsername(username);
         assert original != null;
-        userService.changePassword(original, password.get("newPassword"), password.get("currentPassword"));
+        userService.update(user, sendEmail, "profileUpdate");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("User {} successfully updated.", user);
+        }
+    }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
+    @RequestMapping(value = "/{username}/password-change", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePassword(@PathVariable("username") String username, @RequestBody Map<String, String> password,
+                               @RequestParam(value = "email", defaultValue = "true") boolean sendEmail) {
+        final User original = getByUsername(username);
+        assert original != null;
+        userService.changePassword(original, password.get("newPassword"), password.get("currentPassword"), sendEmail);
         if (LOG.isTraceEnabled()) {
             LOG.trace("User's password successfully changed.", username);
         }
@@ -173,7 +175,7 @@ public class UserController extends BaseController {
         }
         userService.sendInvitation(original);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Invitation has been sent to user", original.getUsername());
+            LOG.trace("UserInvite has been sent to user", original.getUsername());
         }
     }
 
