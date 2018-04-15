@@ -136,7 +136,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     public void sendInvitation(User user) {
         final User currentUser = securityUtils.getCurrentUser();
         Objects.requireNonNull(user);
-        user.setIsInvited("true");
+        user.setIsInvited(true);
         user.setToken(IdentificationUtils.generateRandomToken());
         BaseEmailTemplate emailTemplate = new UserInvite(config, user);
         email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
@@ -156,7 +156,9 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             throw new ValidationException(e.getMessage());
         }
         instance.setToken(null);
-        instance.setIsInvited("false");
+        if (instance.getIsInvited() == null) {
+            instance.setIsInvited(false);
+        }
     }
 
     @Override
