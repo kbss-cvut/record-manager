@@ -55,7 +55,7 @@ public class User implements HasDerivableUri, Serializable {
     private String token;
 
     @OWLDataProperty(iri = Vocabulary.s_p_isInvited)
-    private String isInvited;
+    private Boolean isInvited;
 
     @OWLDataProperty(iri = Vocabulary.s_p_created)
     private Date dateCreated;
@@ -151,9 +151,9 @@ public class User implements HasDerivableUri, Serializable {
 
     public void setToken(String token) { this.token = token; }
 
-    public String getIsInvited() { return isInvited; }
+    public Boolean getIsInvited() { return isInvited; }
 
-    public void setIsInvited(String isInvited) { this.isInvited = isInvited; }
+    public void setIsInvited(Boolean isInvited) { this.isInvited = isInvited; }
 
     /**
      * Encodes password of this person.

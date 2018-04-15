@@ -170,7 +170,7 @@ public class UserController extends BaseController {
     public void sendInvitation(@PathVariable(value = "username") String username) {
         final User original = getByUsername(username);
         assert original != null;
-        if (!original.getIsInvited().equals("false")) {
+        if (original.getIsInvited()) {
             throw new UnauthorizedException("Cannot invite already invited user.");
         }
         userService.sendInvitation(original);

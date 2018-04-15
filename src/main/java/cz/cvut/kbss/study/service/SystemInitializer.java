@@ -32,6 +32,7 @@ public class SystemInitializer {
             admin.setEmailAddress("admin@admin.org");
             admin.setUsername(ADMIN_USERNAME);
             admin.setPassword("5y5t3mAdm1n.");
+            admin.setIsInvited(true);
             admin.getTypes().add(Vocabulary.s_c_administrator);
             LOG.debug("Persisting default administrator {}", admin);
             userService.persist(admin);
