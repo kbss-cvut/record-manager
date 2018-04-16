@@ -175,7 +175,7 @@ public class UserController extends BaseController {
         }
         userService.sendInvitation(original);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("UserInvite has been sent to user", original.getUsername());
+            LOG.trace("Invitation has been sent to user", original.getUsername());
         }
     }
 
@@ -196,5 +196,8 @@ public class UserController extends BaseController {
         UserDetails ud = new UserDetails(user);
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities());
         context.setAuthentication(auth);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("User {} impersonated.", user.getUsername());
+        }
     }
 }
