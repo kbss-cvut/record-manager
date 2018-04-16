@@ -7,6 +7,8 @@ public enum ConfigParam {
     FORM_GEN_REPOSITORY_URL("formGenRepositoryUrl"),
     FORM_GEN_SERVICE_URL("formGenServiceUrl"),
 
+    APP_CONTEXT("appContext"),
+
     E_USERNAME("eUsername"),
     E_PASSWORD("ePassword"),
     E_DISPLAY_NAME("eDisplayName"),
