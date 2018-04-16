@@ -124,10 +124,8 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     public void resetPassword(User user, String recipientEmail) {
         Objects.requireNonNull(user);
-        String newPassword = PasswordGenerator.generatePassword();
-        user.setPassword(newPassword);
-        user.encodePassword(passwordEncoder);
-        BaseEmailTemplate emailTemplate = new PasswordReset(config, user.getUsername(), newPassword);
+        user.setToken(IdentificationUtils.generateRandomToken());
+        BaseEmailTemplate emailTemplate = new PasswordReset(config, user);
         email.sendEmail(emailTemplate, recipientEmail, null);
         userDao.update(user);
     }
