@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.service.repository.BaseRepositoryService;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
+import cz.cvut.kbss.study.util.etemplates.UserInvite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,22 @@ public class EmailService {
     @Autowired
     private ConfigReader config;
 
-    private String USER_NAME;
-    private String DISPLAY_NAME;
+    private String HOST;
+    private String PORT;
+    private String EMAIL;
     private String PASSWORD;
-    private final String HOST = "smtp.gmail.com";
+    private String DISPLAY_NAME;
+    private String CC_ADDRESS;
     protected static final Logger LOG = LoggerFactory.getLogger(BaseRepositoryService.class);
 
     @PostConstruct
     private void initConstants() {
-        USER_NAME = config.getConfig(ConfigParam.E_USERNAME);
-        DISPLAY_NAME = config.getConfig(ConfigParam.E_DISPLAY_NAME);
+        HOST = config.getConfig(ConfigParam.E_HOST);
+        PORT = config.getConfig(ConfigParam.E_PORT);
+        EMAIL = config.getConfig(ConfigParam.E_EMAIL);
         PASSWORD = config.getConfig(ConfigParam.E_PASSWORD);
+        DISPLAY_NAME = config.getConfig(ConfigParam.E_DISPLAY_NAME);
+        CC_ADDRESS = config.getConfig(ConfigParam.E_CC_ADDRESS);
     }
 
     private Session getSession() {
@@ -39,9 +45,9 @@ public class EmailService {
         Properties props = System.getProperties();
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", HOST);
-        props.put("mail.smtp.user", USER_NAME);
+        props.put("mail.smtp.user", EMAIL);
         props.put("mail.smtp.password", PASSWORD);
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.port", PORT);
         props.put("mail.smtp.auth", "true");
         // Get the default Session object.
         return Session.getDefaultInstance(props);
@@ -54,16 +60,21 @@ public class EmailService {
             MimeMessage message = new MimeMessage(session);
 
             // Set From: header field of the header.
-            message.setFrom(new InternetAddress(USER_NAME, DISPLAY_NAME));
+            message.setFrom(new InternetAddress(EMAIL, DISPLAY_NAME));
 
             // Set To: header field of the header.
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
 
             // Set CC: header field of the header.
-            if (ccEmail != null) {
+            if (ccEmail != null && !ccEmail.equals(recipientEmail)) {
                 message.addRecipient(Message.RecipientType.CC, new InternetAddress(ccEmail));
             }
-
+            if (!CC_ADDRESS.equals("") && emailTemplate instanceof UserInvite) {
+                String[] ccEmails = CC_ADDRESS.split(",");
+                for (String email : ccEmails) {
+                    message.addRecipient(Message.RecipientType.CC, new InternetAddress(email));
+                }
+            }
             // Set Subject: header field
             message.setSubject(emailTemplate.getSubject());
 
@@ -72,7 +83,7 @@ public class EmailService {
 
             // Send message
             Transport transport = session.getTransport("smtp");
-            transport.connect(HOST, USER_NAME, PASSWORD);
+            transport.connect(HOST, EMAIL, PASSWORD);
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
         } catch (AddressException ae) {

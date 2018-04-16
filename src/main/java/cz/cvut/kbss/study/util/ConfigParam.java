@@ -9,9 +9,12 @@ public enum ConfigParam {
 
     APP_CONTEXT("appContext"),
 
-    E_USERNAME("eUsername"),
+    E_HOST("eHost"),
+    E_PORT("ePort"),
+    E_EMAIL("eEmail"),
     E_PASSWORD("ePassword"),
     E_DISPLAY_NAME("eDisplayName"),
+    E_CC_ADDRESS("eCCAddress"),
 
     E_PASSWORD_RESET_SUBJECT("ePasswordResetSubject"),
     E_PASSWORD_RESET_CONTENT("ePasswordResetContent"),
