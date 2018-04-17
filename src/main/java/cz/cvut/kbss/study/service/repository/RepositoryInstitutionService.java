@@ -7,6 +7,7 @@ import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.InstitutionService;
+import cz.cvut.kbss.study.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,28 @@ public class RepositoryInstitutionService extends KeySupportingRepositoryService
     protected void preRemove(Institution instance) {
         if (!userDao.findByInstitution(instance).isEmpty() || !patientRecordDao.findByInstitution(instance).isEmpty()) {
             throw new ValidationException("Institution with members or patient records cannot be deleted.");
+        }
+    }
+
+    @Override
+    protected void prePersist(Institution instance) {
+        try {
+            if (!instance.getEmailAddress().equals("")) {
+                Validator.validateEmail(instance.getEmailAddress());
+            }
+        } catch (IllegalStateException e) {
+            throw new ValidationException(e.getMessage());
+        }
+    }
+
+    @Override
+    protected void preUpdate(Institution instance) {
+        try {
+            if (!instance.getEmailAddress().equals("")) {
+                Validator.validateEmail(instance.getEmailAddress());
+            }
+        } catch (IllegalStateException e) {
+            throw new ValidationException(e.getMessage());
         }
     }
 }
