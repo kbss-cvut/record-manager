@@ -2,6 +2,7 @@ package cz.cvut.kbss.study.persistence.dao;
 
 import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.jopa.model.query.Query;
+import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.PatientRecordSummaryDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
@@ -30,20 +31,30 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         questionSaver.persistIfNecessary(entity.getQuestion(), em);
     }
 
+    public List<PatientRecordDto> findAllRecords() {
+        final EntityManager em = entityManager();
+        try {
+            return findAllRecords(em);
+        } finally {
+            em.close();
+        }
+    }
+
     /**
      * Gets records of patients treated at the specified institution.
      *
      * @param institution The institution to filter by
      * @return Records of matching patients
      */
-    public List<PatientRecord> findByInstitution(Institution institution) {
+    public List<PatientRecordDto> findByInstitution(Institution institution) {
         Objects.requireNonNull(institution);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?treatedAt ?institution . }", PatientRecord.class)
+            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?treatedAt ?institution . }", PatientRecordDto.class)
                 .setParameter("type", typeUri)
                 .setParameter("treatedAt", URI.create(Vocabulary.s_p_was_treated_at))
-                .setParameter("institution", institution.getUri()).getResultList();
+                .setParameter("institution", institution.getUri())
+                .getResultList();
         } finally {
             em.close();
         }
@@ -112,4 +123,11 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
             em.close();
         }
     }
+
+    private List<PatientRecordDto> findAllRecords(EntityManager em) {
+        return em.createNativeQuery("SELECT ?x WHERE { ?x a ?type . }", PatientRecordDto.class)
+            .setParameter("type", typeUri)
+            .getResultList();
+    }
+
 }

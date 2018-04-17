@@ -67,7 +67,7 @@ public class PersistenceFactory {
     private static Map<String, String> initParams() {
         final Map<String, String> map = new HashMap<>();
         map.put(OntoDriverProperties.ONTOLOGY_LANGUAGE, Constants.PU_LANGUAGE);
-        map.put(SCAN_PACKAGE, "cz.cvut.kbss.study.model");
+        map.put(SCAN_PACKAGE, "cz.cvut.kbss.study");
         map.put(JPA_PERSISTENCE_PROVIDER, JOPAPersistenceProvider.class.getName());
         return map;
     }

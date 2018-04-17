@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.service.repository;
 
+import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.PatientRecordSummaryDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
@@ -31,7 +32,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     }
 
     @Override
-    public List<PatientRecord> findByInstitution(Institution institution) {
+    public List<PatientRecordDto> findByInstitution(Institution institution) {
         return recordDao.findByInstitution(institution);
     }
 
@@ -43,6 +44,11 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Override
     public List<PatientRecordSummaryDto> getRecordSummaries(Institution institution) {
         return recordDao.getRecordSummaries(institution);
+    }
+
+    @Override
+    public List<PatientRecordDto> findAllRecords() {
+        return recordDao.findAllRecords();
     }
 
     @Override

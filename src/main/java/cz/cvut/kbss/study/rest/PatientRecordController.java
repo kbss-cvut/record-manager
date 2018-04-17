@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.rest;
 
+import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
@@ -30,11 +31,11 @@ public class PatientRecordController extends BaseController {
     private InstitutionService institutionService;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PatientRecord> getRecords(@RequestParam(value = "institution", required = false) String institutionKey) {
-        return institutionKey != null ? findByInstitution(institutionKey) : recordService.findAll();
+    public List<PatientRecordDto> getRecords(@RequestParam(value = "institution", required = false) String institutionKey) {
+        return institutionKey != null ? findByInstitution(institutionKey) : recordService.findAllRecords();
     }
 
-    private List<PatientRecord> findByInstitution(String institutionKey) {
+    private List<PatientRecordDto> findByInstitution(String institutionKey) {
         final Institution institution = institutionService.findByKey(institutionKey);
         if (institution == null) {
             throw NotFoundException.create("Institution", institutionKey);
