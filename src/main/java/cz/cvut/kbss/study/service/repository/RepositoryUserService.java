@@ -94,10 +94,11 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             BaseEmailTemplate emailTemplate;
             if (emailType.equals("passwordChange")) {
                 emailTemplate = new PasswordChange(config, user);
-            } else {
+                email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
+            } else if (sendEmail){
                 emailTemplate = new ProfileUpdate(config, user);
+                email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
             }
-            email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
         }
     }
 
