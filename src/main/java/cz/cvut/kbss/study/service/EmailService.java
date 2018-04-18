@@ -71,7 +71,7 @@ public class EmailService {
      * @param toEmailAddressList Comma-separated list of recipients w.r.t. TO: header.
      * @param ccEmailAddressList Comma-separated list of recepients w.r.t. CC: header.
      */
-    public void sendEmail(BaseEmailTemplate emailTemplate, String toEmailAddressList, String ccEmailAddressList) {
+    public void sendEmail(BaseEmailTemplate emailTemplate, String toEmailAddressList, String ccEmailAddressList, boolean sendCCandBCC) {
         Session session = getSession();
         try {
             // Create a default MimeMessage object.
@@ -93,11 +93,11 @@ public class EmailService {
             if (ccEmailAddressList != null && !ccEmailAddressList.equals(toEmailAddressList)) {
                 message.addRecipients(Message.RecipientType.CC, InternetAddress.parse(ccEmailAddressList));
             }
-            if (emailTemplate instanceof UserInvite) {
+            if (sendCCandBCC) {
                 message.addRecipients(Message.RecipientType.CC, parseAddressList(E_CC_ADDRESS_LIST));
                 message.addRecipients(Message.RecipientType.BCC, parseAddressList(E_BCC_ADDRESS_LIST));
-                message.setReplyTo(parseAddressList(E_REPLY_TO_ADDRESS_LIST));
             }
+            message.setReplyTo(parseAddressList(E_REPLY_TO_ADDRESS_LIST));
 
 
             // Set Subject: header field
