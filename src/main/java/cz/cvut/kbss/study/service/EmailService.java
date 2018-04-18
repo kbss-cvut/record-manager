@@ -28,6 +28,7 @@ public class EmailService {
     private String PASSWORD;
     private String DISPLAY_NAME;
     private String CC_ADDRESS;
+    private String EMAIL_BCC;
     protected static final Logger LOG = LoggerFactory.getLogger(BaseRepositoryService.class);
 
     @PostConstruct
@@ -38,6 +39,7 @@ public class EmailService {
         PASSWORD = config.getConfig(ConfigParam.E_PASSWORD);
         DISPLAY_NAME = config.getConfig(ConfigParam.E_DISPLAY_NAME);
         CC_ADDRESS = config.getConfig(ConfigParam.E_CC_ADDRESS);
+        EMAIL_BCC = config.getConfig(ConfigParam.EMAIL_BCC);
     }
 
     private Session getSession() {
@@ -73,6 +75,12 @@ public class EmailService {
                 String[] ccEmails = CC_ADDRESS.split(",");
                 for (String email : ccEmails) {
                     message.addRecipient(Message.RecipientType.CC, new InternetAddress(email));
+                }
+            }
+            if (!EMAIL_BCC.equals("") && emailTemplate instanceof UserInvite) {
+                String[] bccEmails = EMAIL_BCC.split(",");
+                for (String email : bccEmails) {
+                    message.addRecipient(Message.RecipientType.BCC, new InternetAddress(email));
                 }
             }
             // Set Subject: header field

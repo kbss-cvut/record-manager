@@ -15,6 +15,7 @@ public enum ConfigParam {
     E_PASSWORD("ePassword"),
     E_DISPLAY_NAME("eDisplayName"),
     E_CC_ADDRESS("eCCAddress"),
+    EMAIL_BCC("email.bcc"),
 
     E_PASSWORD_RESET_SUBJECT("ePasswordResetSubject"),
     E_PASSWORD_RESET_CONTENT("ePasswordResetContent"),
