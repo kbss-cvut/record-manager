@@ -90,15 +90,13 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     public void update(User user, boolean sendEmail, String emailType) {
         final User currentUser = securityUtils.getCurrentUser();
         this.update(user);
-        if (currentUser.getUsername().equals(user.getUsername()) || sendEmail) {
-            BaseEmailTemplate emailTemplate;
-            if (emailType.equals("passwordChange")) {
-                emailTemplate = new PasswordChange(config, user);
-                email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
-            } else if (sendEmail){
-                emailTemplate = new ProfileUpdate(config, user);
-                email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
-            }
+        BaseEmailTemplate emailTemplate;
+        if (emailType.equals("passwordChange") && (currentUser.getUsername().equals(user.getUsername()) || sendEmail)) {
+            emailTemplate = new PasswordChange(config, user);
+            email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress(), !user.getUsername().equals(currentUser.getUsername()));
+        } else if (emailType.equals("profileUpdate") && !currentUser.getUsername().equals(user.getUsername()) && sendEmail){
+            emailTemplate = new ProfileUpdate(config, user);
+            email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress(), !user.getUsername().equals(currentUser.getUsername()));
         }
     }
 
@@ -127,7 +125,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         Objects.requireNonNull(user);
         user.setToken(IdentificationUtils.generateRandomToken());
         BaseEmailTemplate emailTemplate = new PasswordReset(config, user);
-        email.sendEmail(emailTemplate, recipientEmail, null);
+        email.sendEmail(emailTemplate, recipientEmail, null, false);
         userDao.update(user);
     }
 
@@ -138,7 +136,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         user.setIsInvited(true);
         user.setToken(IdentificationUtils.generateRandomToken());
         BaseEmailTemplate emailTemplate = new UserInvite(config, user);
-        email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress());
+        email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress(), true);
         userDao.update(user);
     }
 

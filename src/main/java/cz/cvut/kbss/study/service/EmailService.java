@@ -4,7 +4,6 @@ import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.service.repository.BaseRepositoryService;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
-import cz.cvut.kbss.study.util.etemplates.UserInvite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import javax.activation.*;
 
 @Service
 public class EmailService {
+
     @Autowired
     private ConfigReader config;
 
@@ -55,7 +55,7 @@ public class EmailService {
         return Session.getDefaultInstance(props);
     }
 
-    public void sendEmail(BaseEmailTemplate emailTemplate, String recipientEmail, String ccEmail) {
+    public void sendEmail(BaseEmailTemplate emailTemplate, String recipientEmail, String ccEmail, boolean sendCCandBCC) {
         Session session = getSession();
         try {
             // Create a default MimeMessage object.
@@ -71,13 +71,13 @@ public class EmailService {
             if (ccEmail != null && !ccEmail.equals(recipientEmail)) {
                 message.addRecipient(Message.RecipientType.CC, new InternetAddress(ccEmail));
             }
-            if (!CC_ADDRESS.equals("") && emailTemplate instanceof UserInvite) {
+            if (sendCCandBCC && !CC_ADDRESS.equals("")) {
                 String[] ccEmails = CC_ADDRESS.split(",");
                 for (String email : ccEmails) {
                     message.addRecipient(Message.RecipientType.CC, new InternetAddress(email));
                 }
             }
-            if (!EMAIL_BCC.equals("") && emailTemplate instanceof UserInvite) {
+            if (sendCCandBCC && !EMAIL_BCC.equals("")) {
                 String[] bccEmails = EMAIL_BCC.split(",");
                 for (String email : bccEmails) {
                     message.addRecipient(Message.RecipientType.BCC, new InternetAddress(email));
