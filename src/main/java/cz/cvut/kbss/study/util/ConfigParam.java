@@ -9,25 +9,27 @@ public enum ConfigParam {
 
     APP_CONTEXT("appContext"),
 
-    E_HOST("eHost"),
-    E_PORT("ePort"),
-    E_EMAIL("eEmail"),
-    E_PASSWORD("ePassword"),
-    E_DISPLAY_NAME("eDisplayName"),
-    E_CC_ADDRESS("eCCAddress"),
-    EMAIL_BCC("email.bcc"),
+    SMTP_HOST("smtp.host"),
+    SMTP_PORT("smtp.port"),
+    SMTP_USER("smtp.user"),
+    SMTP_PASSWORD("smtp.password"),
+    E_DISPLAY_NAME("email.displayName"),
+    E_FROM_ADDRESS("email.from"),
+    E_CC_ADDRESS_LIST("email.cc"),
+    E_BCC_ADDRESS_LIST("email.bcc"),
+    E_REPLY_TO_ADDRESS_LIST("email.replyTo"),
 
-    E_PASSWORD_RESET_SUBJECT("ePasswordResetSubject"),
-    E_PASSWORD_RESET_CONTENT("ePasswordResetContent"),
+    E_PASSWORD_RESET_SUBJECT("email.passwordResetSubject"),
+    E_PASSWORD_RESET_CONTENT("email.passwordResetContent"),
 
-    E_INVITATION_SUBJECT("eInvitationSubject"),
-    E_INVITATION_CONTENT("eInvitationContent"),
+    E_INVITATION_SUBJECT("email.invitationSubject"),
+    E_INVITATION_CONTENT("email.InvitationContent"),
 
-    E_PASSWORD_CHANGE_SUBJECT("ePasswordChangeSubject"),
-    E_PASSWORD_CHANGE_CONTENT("ePasswordChangeContent"),
+    E_PASSWORD_CHANGE_SUBJECT("email.passwordChangeSubject"),
+    E_PASSWORD_CHANGE_CONTENT("email.passwordChangeContent"),
 
-    E_PROFILE_UPDATE_SUBJECT("eProfileUpdateSubject"),
-    E_PROFILE_UPDATE_CONTENT("eProfileUpdateContent");
+    E_PROFILE_UPDATE_SUBJECT("email.profileUpdateSubject"),
+    E_PROFILE_UPDATE_CONTENT("email.profileUpdateContent");
 
     private final String name;
 
