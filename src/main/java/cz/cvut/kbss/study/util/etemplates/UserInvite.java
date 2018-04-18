@@ -31,6 +31,7 @@ public class UserInvite extends BaseEmailTemplate {
         params.put("username", username);
         params.put("link", link);
         params.put("name", name);
+        params.put("appContext", config.getConfig(ConfigParam.APP_CONTEXT));
         return config.getConfigWithParams(ConfigParam.E_INVITATION_CONTENT, params);
     }
 }

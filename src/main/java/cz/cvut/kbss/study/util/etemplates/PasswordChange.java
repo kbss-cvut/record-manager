@@ -24,6 +24,7 @@ public class PasswordChange extends BaseEmailTemplate {
     public String getHTMLContent() {
         Map<String, String> params = new HashMap<>();
         params.put("username", username);
+        params.put("appContext", config.getConfig(ConfigParam.APP_CONTEXT));
         return config.getConfigWithParams(ConfigParam.E_PASSWORD_CHANGE_CONTENT, params);
     }
 }
