@@ -1,7 +1,6 @@
 package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
-import cz.cvut.kbss.study.dto.PatientRecordSummaryDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
@@ -10,11 +9,10 @@ import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.IdentificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.Date;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class RepositoryPatientRecordService extends KeySupportingRepositoryService<PatientRecord>
@@ -39,11 +37,6 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Override
     public List<PatientRecord> findByAuthor(User user) {
         return recordDao.findByAuthor(user);
-    }
-
-    @Override
-    public List<PatientRecordSummaryDto> getRecordSummaries(Institution institution) {
-        return recordDao.getRecordSummaries(institution);
     }
 
     @Override

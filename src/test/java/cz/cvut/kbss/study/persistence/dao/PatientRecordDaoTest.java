@@ -1,8 +1,8 @@
 package cz.cvut.kbss.study.persistence.dao;
 
-import cz.cvut.kbss.study.dto.PatientRecordSummaryDto;
-import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
@@ -30,11 +30,11 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
     @Test
     @Ignore
-    public void getRecordSummariesByInstitutionReturnsNullWhenNoMatchedFound() throws Exception {
+    public void findByInstitutionReturnsNullWhenNoMatchedFound() throws Exception {
     }
 
     @Test
-    public void getRecordSummariesByInstitutionReturnsMatchingSummaries() throws Exception {
+    public void findByInstitutionReturnsMatchingRecords() throws Exception {
 
         userDao.persist(getUser());
         User user = userDao.findByUsername(USERNAME);
@@ -54,12 +54,12 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         patienRecordDao.persist(record2);
         patienRecordDao.persist(recordOther);
 
-        List<PatientRecordSummaryDto> summaries = patienRecordDao.getRecordSummaries(institution);
+        List<PatientRecordDto> records = patienRecordDao.findByInstitution(institution);
 
 
-        assertEquals(2, summaries.size());
-        assertEquals(1, summaries.stream().filter(rs -> record1.getUri().equals(rs.getRecordUri())).count());
-        assertEquals(1, summaries.stream().filter(rs -> record2.getUri().equals(rs.getRecordUri())).count());
+        assertEquals(2, records.size());
+        assertEquals(1, records.stream().filter(rs -> record1.getUri().equals(rs.getUri())).count());
+        assertEquals(1, records.stream().filter(rs -> record2.getUri().equals(rs.getUri())).count());
 
     }
 

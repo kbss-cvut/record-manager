@@ -1,11 +1,9 @@
 package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
-import cz.cvut.kbss.study.dto.PatientRecordSummaryDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
-
 import java.util.List;
 
 public interface PatientRecordService extends BaseService<PatientRecord> {
@@ -33,14 +31,6 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @return Records of matching patients
      */
     List<PatientRecord> findByAuthor(User author);
-
-    /**
-     * Gets record summaries of patients treated at the specified institution.
-     *
-     * @param institution The institution to filter by
-     * @return Record summaries of matching patients
-     */
-    List<PatientRecordSummaryDto> getRecordSummaries(Institution institution);
 
     /**
      * Gets records of all patients.

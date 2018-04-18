@@ -5,6 +5,8 @@ import cz.cvut.kbss.jopa.model.EntityManagerFactory;
 import cz.cvut.kbss.jopa.model.JOPAPersistenceProperties;
 import cz.cvut.kbss.jopa.model.JOPAPersistenceProvider;
 import cz.cvut.kbss.ontodriver.config.OntoDriverProperties;
+import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_PASSWORD;
+import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_USERNAME;
 import cz.cvut.kbss.ontodriver.sesame.config.SesameOntoDriverProperties;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Constants;
@@ -18,9 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-
-import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_PASSWORD;
-import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_USERNAME;
 
 @Configuration
 @PropertySource("classpath:config.properties")
@@ -64,7 +63,7 @@ public class TestPersistenceFactory {
     static Map<String, String> getDefaultProperties() {
         final Map<String, String> properties = new HashMap<>();
         properties.put(OntoDriverProperties.ONTOLOGY_LANGUAGE, Constants.PU_LANGUAGE);
-        properties.put(JOPAPersistenceProperties.SCAN_PACKAGE, "cz.cvut.kbss.study.model");
+        properties.put(JOPAPersistenceProperties.SCAN_PACKAGE, "cz.cvut.kbss.study");
         properties.put(SesameOntoDriverProperties.SESAME_USE_VOLATILE_STORAGE, Boolean.TRUE.toString());
         properties.put(SesameOntoDriverProperties.SESAME_USE_INFERENCE, Boolean.FALSE.toString());
         properties.put(JOPAPersistenceProperties.JPA_PERSISTENCE_PROVIDER, JOPAPersistenceProvider.class.getName());
