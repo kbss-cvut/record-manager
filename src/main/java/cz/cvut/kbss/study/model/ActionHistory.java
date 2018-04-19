@@ -21,10 +21,10 @@ public class ActionHistory extends AbstractEntity implements HasOwlKey {
     private Date timestamp;
 
     @ParticipationConstraints(nonEmpty = true)
-    @OWLDataProperty(iri = Vocabulary.s_p_label)
+    @OWLDataProperty(iri = Vocabulary.s_p_action_type)
     private String type;
 
-    @OWLDataProperty(iri = Vocabulary.s_p_has_data_value, fetch = FetchType.LAZY)
+    @OWLDataProperty(iri = Vocabulary.s_p_payload, fetch = FetchType.LAZY)
     private String payload;
 
     @Override

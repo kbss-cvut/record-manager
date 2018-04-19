@@ -121,7 +121,7 @@
 
 ###  http://vfn.cz/ontologies/study-manager/has-owner
 
-<http://onto.fel.cvut.cz/ontologies/documentation/has-owner> rdf:type owl:ObjectProperty ;
+<http://vfn.cz/ontologies/study-manager/has-owner> rdf:type owl:ObjectProperty ;
 
                                                               rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
@@ -134,6 +134,16 @@
 #    Data properties
 #
 #################################################################
+
+###  http://vfn.cz/ontologies/study-manager/payload
+
+<http://vfn.cz/ontologies/study-manager/payload> rdf:type owl:DatatypeProperty .
+
+###  http://vfn.cz/ontologies/study-manager/action_type
+
+<http://vfn.cz/ontologies/study-manager/has_data_value> rdf:type owl:DatatypeProperty .
+
+
 
 
 ###  http://purl.org/dc/terms/created
@@ -183,14 +193,14 @@
 <http://xmlns.com/foaf/0.1/mbox> rdf:type owl:DatatypeProperty .
 
 
-###  http://onto.fel.cvut.cz/ontologies/documentation/token
+###  http://vfn.cz/ontologies/study-manager/token
 
-<http://onto.fel.cvut.cz/ontologies/documentation/token> rdf:type owl:DatatypeProperty .
+<http://vfn.cz/ontologies/study-manager/token> rdf:type owl:DatatypeProperty .
 
 
-###  http://onto.fel.cvut.cz/ontologies/documentation/isInvited
+###  http://vfn.cz/ontologies/study-manager/isInvited
 
-<http://onto.fel.cvut.cz/ontologies/documentation/isInvited> rdf:type owl:DatatypeProperty .
+<http://vfn.cz/ontologies/study-manager/isInvited> rdf:type owl:DatatypeProperty .
 
 #################################################################
 #
