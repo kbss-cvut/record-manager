@@ -23,7 +23,7 @@ public enum ConfigParam {
     E_PASSWORD_RESET_CONTENT("email.passwordResetContent"),
 
     E_INVITATION_SUBJECT("email.invitationSubject"),
-    E_INVITATION_CONTENT("email.InvitationContent"),
+    E_INVITATION_CONTENT("email.invitationContent"),
 
     E_PASSWORD_CHANGE_SUBJECT("email.passwordChangeSubject"),
     E_PASSWORD_CHANGE_CONTENT("email.passwordChangeContent"),
