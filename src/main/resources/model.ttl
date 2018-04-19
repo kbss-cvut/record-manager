@@ -141,7 +141,7 @@
 
 ###  http://vfn.cz/ontologies/study-manager/action_type
 
-<http://vfn.cz/ontologies/study-manager/has_data_value> rdf:type owl:DatatypeProperty .
+<http://vfn.cz/ontologies/study-manager/action_type> rdf:type owl:DatatypeProperty .
 
 
 
