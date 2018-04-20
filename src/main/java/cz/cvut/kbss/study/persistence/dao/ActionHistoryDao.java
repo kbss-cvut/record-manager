@@ -54,14 +54,15 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         }
     }
 
-    public List<ActionHistory> findByType(String type, int pageNumber) {
-        Objects.requireNonNull(type);
+    public List<ActionHistory> findByType(String typeFilter, int pageNumber) {
+        Objects.requireNonNull(typeFilter);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery("SELECT ?x WHERE { ?x ?isType ?actionType; ?isCreated ?timestamp .} " +
-                    "ORDER BY DESC(?timestamp)", ActionHistory.class)
-                    .setParameter("isType", URI.create(Vocabulary.s_p_label))
-                    .setParameter("actionType", type, Constants.PU_LANGUAGE)
+            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?isType ?actionType ; ?isCreated ?timestamp . " +
+                    "filter contains(?actionType, ?typeFilter)} ORDER BY DESC(?timestamp)", ActionHistory.class)
+                    .setParameter("type", typeUri)
+                    .setParameter("isType", URI.create(Vocabulary.s_p_action_type))
+                    .setParameter("typeFilter", typeFilter, Constants.PU_LANGUAGE)
                     .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
                     .setFirstResult((pageNumber - 1) * Constants.ACTIONS_PER_PAGE)
                     .setMaxResults(Constants.ACTIONS_PER_PAGE + 1)
@@ -91,15 +92,16 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory>{
         }
     }
 
-    public List<ActionHistory> findByTypeAndAuthor(String type, User author, int pageNumber) {
+    public List<ActionHistory> findByTypeAndAuthor(String typeFilter, User author, int pageNumber) {
         Objects.requireNonNull(author);
+        Objects.requireNonNull(typeFilter);
         final EntityManager em = entityManager();
         try {
-            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?isType ?actionType;  ?hasOwner ?author; ?isCreated ?timestamp . } " +
-                    "ORDER BY DESC(?timestamp)", ActionHistory.class)
+            return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?isType ?actionType;  ?hasOwner ?author; ?isCreated ?timestamp . " +
+                    "filter contains(?actionType, ?typeFilter)} ORDER BY DESC(?timestamp)", ActionHistory.class)
                     .setParameter("type", typeUri)
-                    .setParameter("isType", URI.create(Vocabulary.s_p_label))
-                    .setParameter("actionType", type, Constants.PU_LANGUAGE)
+                    .setParameter("isType", URI.create(Vocabulary.s_p_action_type))
+                    .setParameter("typeFilter", typeFilter, Constants.PU_LANGUAGE)
                     .setParameter("hasOwner", URI.create(Vocabulary.s_p_has_owner))
                     .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
                     .setParameter("author", author.getUri())
