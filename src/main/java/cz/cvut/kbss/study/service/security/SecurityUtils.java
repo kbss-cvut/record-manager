@@ -1,10 +1,8 @@
 package cz.cvut.kbss.study.service.security;
 
-import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.model.UserDetails;
-import cz.cvut.kbss.study.service.InstitutionService;
-import cz.cvut.kbss.study.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +14,7 @@ import java.util.List;
 public class SecurityUtils {
 
     @Autowired
-    private UserService userService;
+    private UserDao userDao;
     /**
      * Gets the currently authenticated user.
      *
@@ -26,7 +24,7 @@ public class SecurityUtils {
         final SecurityContext context = SecurityContextHolder.getContext();
         assert context != null;
         final UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
-        return userDetails.getUser();
+        return userDao.findByUsername(userDetails.getUser().getUsername());
     }
 
     /**
@@ -62,7 +60,7 @@ public class SecurityUtils {
      */
     public boolean areFromSameInstitution(String username) {
         final User user = getCurrentUser();
-        final List<User> users = userService.findByInstitution(user.getInstitution());
+        final List<User> users = userDao.findByInstitution(user.getInstitution());
         return users.stream().anyMatch(o -> o.getUsername().equals(username));
     }
 }
