@@ -165,6 +165,7 @@ public class UserController extends BaseController {
         }
     }
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @RequestMapping(value = "/send-invitation/{username}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void sendInvitation(@PathVariable(value = "username") String username) {
@@ -175,7 +176,20 @@ public class UserController extends BaseController {
         }
         userService.sendInvitation(original);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Invitation has been sent to user", original.getUsername());
+            LOG.trace("Invitation has been sent to user {}.", original.getUsername());
+        }
+    }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @RequestMapping(value = "/send-invitation/delete", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteInvitationOption(@RequestBody String username) {
+        final User original = getByUsername(username);
+        assert original != null;
+        original.setIsInvited(true);
+        userService.update(original);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Invitation option has been canceled for user {}.", original.getUsername());
         }
     }
 
