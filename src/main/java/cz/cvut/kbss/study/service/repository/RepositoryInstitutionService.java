@@ -43,7 +43,7 @@ public class RepositoryInstitutionService extends KeySupportingRepositoryService
     @Override
     protected void prePersist(Institution instance) {
         try {
-            if (!instance.getEmailAddress().equals("")) {
+            if (instance.getEmailAddress() != null && !instance.getEmailAddress().equals("")) {
                 Validator.validateEmail(instance.getEmailAddress());
             }
         } catch (IllegalStateException e) {
