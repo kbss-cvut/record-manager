@@ -24,8 +24,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Autowired
     private InstitutionDao institutionDao;
 
-    public static final String USERNAME = "robert@plant.org";
-    public static final String EMAIL = "robert@plant.org";
+    public static final String USERNAME = "robert4";
     public static final String PASSWORD = "plant48";
 
     @Test
@@ -35,23 +34,14 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
     @Test
     public void findByInstitutionReturnsMatchingRecords() throws Exception {
-
-        Institution institution = generateInstitution();
-        Institution institutionOther = generateInstitution();
-
+        Institution institution = Generator.generateInstitution();
+        Institution institutionOther = Generator.generateInstitution();
         institutionDao.persist(institution);
         institutionDao.persist(institutionOther);
 
-        User user = generateUser();
-        String username = user.getUsername();
-        User userOther = generateUser();
-        String usernameOther = user.getUsername();
-        user.setInstitution(institution);
-        userOther.setInstitution(institutionOther);
+        User user = Generator.generateUser(institution);
         userDao.persist(user);
-        userDao.persist(userOther);
-        user = userDao.findByUsername(username);
-        userOther = userDao.findByUsername(usernameOther);
+        user = userDao.findByUsername(user.getUsername());
 
         PatientRecord record1 = generatePatientRecord(user, institution);
         PatientRecord record2 = generatePatientRecord(user, institution);
@@ -63,11 +53,9 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
         List<PatientRecordDto> records = patienRecordDao.findByInstitution(institution);
 
-
         assertEquals(2, records.size());
         assertEquals(1, records.stream().filter(rs -> record1.getUri().equals(rs.getUri())).count());
         assertEquals(1, records.stream().filter(rs -> record2.getUri().equals(rs.getUri())).count());
-
     }
 
     private Institution generateInstitution() {
@@ -77,14 +65,13 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         return org;
     }
 
-    private User generateUser() {
+    public static User getUser() {
         final User person = new User();
-        final String uuid = UUID.randomUUID().toString();
-        person.setFirstName("Firstname-" + uuid);
-        person.setLastName("Lastname-" + uuid);
-        person.setUsername("username-" + uuid);
-        person.setPassword("password-" + uuid);
-        person.setEmailAddress("email-" + uuid + "@example.org" );
+        person.setFirstName("Robert");
+        person.setLastName("Plant");
+        person.setUsername(USERNAME);
+        person.setPassword(PASSWORD);
+        person.setEmailAddress(EMAIL);
         return person;
     }
 

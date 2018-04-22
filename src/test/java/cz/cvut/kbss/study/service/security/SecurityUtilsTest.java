@@ -1,7 +1,7 @@
 package cz.cvut.kbss.study.service.security;
 
+import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
-import cz.cvut.kbss.study.environment.util.Generator;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.BaseServiceTestRunner;
@@ -24,7 +24,8 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
 
     @Before
     public void setUp() {
-        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", null);;
+
+        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", Generator.generateInstitution());
         user.generateUri();
     }
 
@@ -54,3 +55,4 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
         assertNull(securityUtils.getCurrentUserDetails());
     }
 }
+*/

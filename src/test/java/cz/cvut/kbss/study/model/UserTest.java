@@ -35,11 +35,21 @@ public class UserTest {
     }
 
     @Test
+    public void encodePasswordChangesPassword() {
+        user.setPassword("password");
+        user.encodePassword(new StandardPasswordEncoder());
+        assertFalse(user.getPassword().contains("password"));
+    }
+
+    @Test
     public void generateUriCreatesUriFromFirstNameAndLastName() {
-        user.setFirstName("a");
-        user.setLastName("b");
+        user.setFirstName("Josh");
+        user.setLastName("Ulk");
         user.generateUri();
-        assertEquals(URI.create(Vocabulary.ONTOLOGY_IRI_study_manager + "/a-b"), user.getUri());
+
+        assertNotNull(user.getUri());
+        assertTrue(user.getUri().toString().contains("Josh"));
+        assertTrue(user.getUri().toString().contains("Ulk"));
     }
 
     @Test
@@ -89,8 +99,9 @@ public class UserTest {
         User user = new User();
 
         user.setFirstName("Mike John");
-        user.generateUri();
         user.setLastName("Brave");
+        user.generateUri();
+
         assertNotNull(user.getUri());
         assertTrue(user.getUri().toString().contains("John"));
         assertTrue(user.getUri().toString().contains("Mike"));

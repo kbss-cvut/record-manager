@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.persistence.dao;
 
-import cz.cvut.kbss.study.environment.util.Generator;
+import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
@@ -32,21 +32,30 @@ public class UserDaoTest extends BaseDaoTestRunner {
 
     @Test
     public void getUserByUsername() throws Exception {
+        Institution institution = Generator.generateInstitution();
+        institutionDao.persist(institution);
 
-        userDao.persist(Generator.getUser(USERNAME1, PASSWORD1, FIRST_NAME1, LAST_NAME1, EMAIL1, null));
-        User user = userDao.findByUsername(USERNAME1);
+        User user1 = Generator.generateUser(institution);
+        userDao.persist(user1);
 
-        assertEquals(USERNAME1, user.getUsername());
-        assertEquals(EMAIL1, user.getEmailAddress());
+        User user2 = userDao.findByUsername(user1.getUsername());
+
+        assertEquals(user1.getUsername(), user2.getUsername());
+        assertEquals(user1.getEmailAddress(), user2.getEmailAddress());
     }
 
     @Test
     public void getUserByEmail() throws Exception {
-        userDao.persist(Generator.getUser(USERNAME1, PASSWORD1, FIRST_NAME1, LAST_NAME1, EMAIL1, null));
-        User user = userDao.findByEmail(EMAIL1);
+        Institution institution = Generator.generateInstitution();
+        institutionDao.persist(institution);
 
-        assertEquals(USERNAME1, user.getUsername());
-        assertEquals(EMAIL1, user.getEmailAddress());
+        User user1 = Generator.generateUser(institution);
+        userDao.persist(user1);
+
+        User user2 = userDao.findByEmail(user1.getEmailAddress());
+
+        assertEquals(user1.getUsername(), user2.getUsername());
+        assertEquals(user1.getEmailAddress(), user2.getEmailAddress());
     }
 
     @Test

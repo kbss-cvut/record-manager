@@ -1,6 +1,8 @@
 package cz.cvut.kbss.study.service;
 
-import cz.cvut.kbss.study.environment.util.Generator;
+import cz.cvut.kbss.study.environment.generator.Generator;
+import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.service.security.UserDetailsService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,21 +18,30 @@ public class UserDetailsServiceTest extends BaseServiceTestRunner {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    public static final String USERNAME1 = "Pepa";
-    public static final String PASSWORD1 = "house123";
-    public static final String FIRST_NAME1 = "Josef";
-    public static final String LAST_NAME1 = "Barák";
-    public static final String EMAIL1 = "pepa@barak.pro";
+    @Autowired
+    private InstitutionService institutionService;
 
     @Test
     public void loadUserByUsername() throws Exception {
-        userService.persist(Generator.getUser(USERNAME1, PASSWORD1, FIRST_NAME1, LAST_NAME1, EMAIL1, null));
-        UserDetails user = userDetailsService.loadUserByUsername(USERNAME1);
-        assertEquals(USERNAME1, user.getUsername());
+        Institution institution = Generator.generateInstitution();
+        institutionService.persist(institution);
+
+        User user = Generator.generateUser(institution);
+        userService.persist(user);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        assertEquals(userDetails.getUsername(), user.getUsername());
     }
 
     @Test(expected = UsernameNotFoundException.class)
     public void loadUserByUsernameExpectException() throws Exception {
-        userDetailsService.loadUserByUsername(USERNAME1);
+        userDetailsService.loadUserByUsername("CarolansRoyal12");
     }
 }
+
+@Test(expected = UsernameNotFoundException.class)
+public void loadUserByUsernameExpectException() throws Exception {
+    userDetailsService.loadUserByUsername(USERNAME1);
+}
+}
+*/

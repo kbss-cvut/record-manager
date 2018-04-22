@@ -1,9 +1,13 @@
 package cz.cvut.kbss.study.environment.generator;
 
+import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Random;
+import java.util.UUID;
 
 public class Generator {
 
@@ -12,7 +16,6 @@ public class Generator {
     private Generator() {
         throw new AssertionError();
     }
-
 
     /**
      * Generates a (pseudo) random URI, usable for test individuals.
@@ -58,13 +61,17 @@ public class Generator {
     /**
      * Generates a (pseudo) random integer.
      * <p>
-     * This version has no bounds (aside from the integer range), so the returned number may be negative or zero.
+     * This version always returns number greater or equal to 0.
      *
      * @return Randomly generated integer
      * @see #randomInt(int)
      */
     public static int randomInt() {
-        return random.nextInt();
+        int number = random.nextInt();
+        if (number < 0) {
+            number = number * -1;
+        }
+        return number;
     }
 
     /**
@@ -90,4 +97,68 @@ public class Generator {
         return random.nextBoolean();
     }
 
+    /**
+     * Creates user based params.
+     * @param username
+     * @param password
+     * @param firstName
+     * @param lastName
+     * @param email
+     * @param institution
+     * @return user based on params
+     */
+    public static User getUser(String username, String password, String firstName, String lastName, String email, Institution institution) {
+        final User person = new User();
+        person.setUsername(username);
+        person.setPassword(password);
+        person.setFirstName(firstName);
+        person.setLastName(lastName);
+        person.setEmailAddress(email);
+        person.setInstitution(institution);
+        return person;
+    }
+
+    /**
+     * Generators a (pseudo) random institution.
+     *
+     * @return Random user
+     */
+    public static User generateUser(Institution institution){
+        final User person = new User();
+        person.setUsername("John" + Integer.toString(randomInt()));
+        person.setPassword("password" + Integer.toString(randomInt()));
+        person.setFirstName("John" + Integer.toString(randomInt()));
+        person.setLastName("Ulk" + Integer.toString(randomInt()));
+        person.setEmailAddress("john.ulk" + Integer.toString(randomInt()) + "@gmail.com");
+        person.setInstitution(institution);
+        return person;
+    }
+
+    /**
+     * Generators a (pseudo) random institution.
+     *
+     * @return Random institution
+     */
+    public static Institution generateInstitution() {
+        final Institution org = new Institution();
+        org.setName("RandomInstitution" + Integer.toString(randomInt()));
+        org.setUri(generateUri());
+        return org;
+    }
+
+    /**
+     * Generators a (pseudo) random patient record.
+     *
+     * @param author author of patient record
+     * @param institutionWhereTreated institution where patient is treated
+     * @return Random patient record
+     */
+    public static PatientRecord generatePatientRecord(User author, Institution institutionWhereTreated) {
+        final PatientRecord rec = new PatientRecord();
+        rec.setAuthor(author);
+        rec.setLocalName("RandomRecord" + Integer.toString(randomInt()));
+        rec.setUri(generateUri());
+        rec.setInstitution(institutionWhereTreated);
+        return rec;
+    }
 }

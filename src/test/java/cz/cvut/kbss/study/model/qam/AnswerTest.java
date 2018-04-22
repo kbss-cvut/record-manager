@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.model.qam;
 
-import cz.cvut.kbss.study.environment.util.Generator;
+import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Vocabulary;
 import org.junit.Test;
 
