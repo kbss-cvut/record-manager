@@ -52,14 +52,13 @@ public class FormGenService {
     public RawJson generateForm(PatientRecord record) {
         Objects.requireNonNull(record);
         final User author = securityUtils.getCurrentUser();
+        if (author.getInstitution() != null) {
+            author.getInstitution().setMembers(null);
+        }
         record.setAuthor(author);
         record.setDateCreated(new Date());
         record.setInstitution(author.getInstitution());
         record.setLastModifiedBy(null);
-        record.getAuthor().setInstitution(null);
-        if (record.getInstitution() != null) {
-            record.getInstitution().setMembers(null);
-        }
         final URI context = formGenDao.persist(record);
         return loadFormStructure(context);
     }
