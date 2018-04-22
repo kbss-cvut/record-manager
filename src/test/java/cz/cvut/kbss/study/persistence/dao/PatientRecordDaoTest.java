@@ -36,19 +36,26 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     public void findByInstitutionReturnsMatchingRecords() throws Exception {
 
-        userDao.persist(getUser());
-        User user = userDao.findByUsername(USERNAME);
-
         Institution institution = generateInstitution();
         Institution institutionOther = generateInstitution();
 
         institutionDao.persist(institution);
         institutionDao.persist(institutionOther);
 
+        User user = generateUser();
+        String username = user.getUsername();
+        User userOther = generateUser();
+        String usernameOther = user.getUsername();
+        user.setInstitution(institution);
+        userOther.setInstitution(institutionOther);
+        userDao.persist(user);
+        userDao.persist(userOther);
+        user = userDao.findByUsername(username);
+        userOther = userDao.findByUsername(usernameOther);
 
         PatientRecord record1 = generatePatientRecord(user, institution);
         PatientRecord record2 = generatePatientRecord(user, institution);
-        PatientRecord recordOther = generatePatientRecord(user, institutionOther);
+        PatientRecord recordOther = generatePatientRecord(userOther, institutionOther);
 
         patienRecordDao.persist(record1);
         patienRecordDao.persist(record2);
@@ -70,13 +77,14 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         return org;
     }
 
-    public static User getUser() {
+    private User generateUser() {
         final User person = new User();
-        person.setFirstName("Robert");
-        person.setLastName("Plant");
-        person.setUsername(USERNAME);
-        person.setPassword(PASSWORD);
-        person.setEmailAddress(EMAIL);
+        final String uuid = UUID.randomUUID().toString();
+        person.setFirstName("Firstname-" + uuid);
+        person.setLastName("Lastname-" + uuid);
+        person.setUsername("username-" + uuid);
+        person.setPassword("password-" + uuid);
+        person.setEmailAddress("email-" + uuid + "@example.org" );
         return person;
     }
 
