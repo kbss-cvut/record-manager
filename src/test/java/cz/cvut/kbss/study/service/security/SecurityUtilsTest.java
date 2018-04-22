@@ -2,9 +2,12 @@ package cz.cvut.kbss.study.service.security;
 
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
+import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.BaseServiceTestRunner;
+import cz.cvut.kbss.study.service.InstitutionService;
+import cz.cvut.kbss.study.service.UserService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,15 +21,23 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
     @Autowired
     private SecurityUtils securityUtils;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private InstitutionService institutionService;
+
     private User user;
-    public static final String USERNAME = "halsey@unsc.org";
+    public static final String USERNAME = "halsey";
     public static final String PASSWORD = "john117";
 
     @Before
     public void setUp() {
-
-        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", Generator.generateInstitution());
+        Institution institution = Generator.generateInstitution();
+        institutionService.persist(institution);
+        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", institutionService.findByName(institution.getName()));
         user.generateUri();
+        userService.persist(user);
     }
 
     @After
