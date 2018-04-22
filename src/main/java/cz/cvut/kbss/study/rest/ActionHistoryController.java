@@ -38,17 +38,15 @@ public class ActionHistoryController extends BaseController {
     public List<ActionHistory> getActions(@RequestParam(value = "author", required = false) String authorUsername,
                                           @RequestParam(value = "type", required = false) String type,
                                           @RequestParam(value = "page") int pageNumber) {
-        List<ActionHistory> actions;
-        if (authorUsername != null && type != null) {
-            actions = getByTypeAndAuthor(type, authorUsername, pageNumber);
-        } else if (authorUsername != null) {
-            actions = getByAuthor(authorUsername, pageNumber);
-        } else if (type != null) {
-            actions = actionHistoryService.findByType(type, pageNumber);
-        } else {
-            actions = actionHistoryService.findAllByOrderAsc(pageNumber);
+        User author = null;
+        if (authorUsername != null) {
+            try {
+                author = userController.getByUsername(authorUsername);
+            } catch (Exception e) {
+                return Collections.emptyList();
+            }
         }
-        return actions;
+        return actionHistoryService.findAllWithParams(type, author, pageNumber);
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
@@ -61,25 +59,4 @@ public class ActionHistoryController extends BaseController {
         return action;
     }
 
-    private List<ActionHistory> getByAuthor(String authorUsername, int pageNumber) {
-        assert authorUsername != null;
-        final User author;
-        try {
-            author = userController.getByUsername(authorUsername);
-        } catch (Exception e) {
-            return Collections.emptyList();
-        }
-        return actionHistoryService.findByAuthor(author, pageNumber);
-    }
-
-    private List<ActionHistory> getByTypeAndAuthor(String type, String authorUsername, int pageNumber) {
-        assert authorUsername != null;
-        final User author;
-        try {
-            author = userController.getByUsername(authorUsername);
-        } catch (Exception e) {
-            return Collections.emptyList();
-        }
-        return actionHistoryService.findByTypeAndAuthor(type, author, pageNumber);
-    }
 }

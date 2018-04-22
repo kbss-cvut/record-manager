@@ -7,13 +7,7 @@ import java.util.List;
 
 public interface ActionHistoryService extends BaseService<ActionHistory> {
 
-    List<ActionHistory> findAllByOrderAsc(int pageNumber);
-
     ActionHistory findByKey(String key);
 
-    List<ActionHistory> findByType(String type, int pageNumber);
-
-    List<ActionHistory> findByAuthor(User author, int pageNumber);
-
-    List<ActionHistory> findByTypeAndAuthor(String type, User author, int pageNumber);
+    List <ActionHistory> findAllWithParams(String type, User author, int pageNumber);
 }
