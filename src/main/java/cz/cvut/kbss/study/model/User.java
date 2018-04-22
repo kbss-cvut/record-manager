@@ -60,6 +60,7 @@ public class User implements HasDerivableUri, Serializable {
     @OWLDataProperty(iri = Vocabulary.s_p_created)
     private Date dateCreated;
 
+    @ParticipationConstraints(nonEmpty = true)
     @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
     private Institution institution;
 
