@@ -30,6 +30,7 @@ public class PatientRecordController extends BaseController {
     @Autowired
     private InstitutionService institutionService;
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecordDto> getRecords(@RequestParam(value = "institution", required = false) String institutionKey) {
         return institutionKey != null ? findByInstitution(institutionKey) : recordService.findAllRecords();
