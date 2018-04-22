@@ -17,7 +17,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final User user = userDao.findByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException("User does not exist.");
+            throw new UsernameNotFoundException("User with username '" + username + "' does not exist.");
         }
         return new cz.cvut.kbss.study.security.model.UserDetails(user);
     }
