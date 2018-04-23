@@ -106,6 +106,11 @@ public class UserTest {
         assertTrue(user.getUri().toString().contains("John"));
         assertTrue(user.getUri().toString().contains("Mike"));
         assertTrue(user.getUri().toString().contains("Brave"));
+    }
 
+    @Test
+    public void newUserHasRoleDoctor() throws Exception {
+        User user = new User();
+        assertTrue(user.getTypes().toString().contains(Vocabulary.s_c_doctor));
     }
 }
