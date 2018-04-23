@@ -111,6 +111,9 @@ public class EmailService {
             transport.connect(getValue(SMTP_HOST), getValue(SMTP_USER), getValue(SMTP_PASSWORD));
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("{} email was sent to {}.", emailTemplate.getClass().getSimpleName(), toEmailAddressList);
+            }
         } catch (AddressException ae) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Unable to send email.", ae);
