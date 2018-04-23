@@ -14,9 +14,6 @@ import static org.junit.Assert.*;
 public class BaseDaoTest extends BaseDaoTestRunner{
 
     @Autowired
-    private UserDao userDao;
-
-    @Autowired
     private InstitutionDao institutionDao; // We're using one of the DAO implementations for the basic tests
 
     @Test
@@ -39,8 +36,7 @@ public class BaseDaoTest extends BaseDaoTestRunner{
         final List<Institution> result = institutionDao.findAll();
         assertEquals(institutions.size(), result.size());
         for (Institution i : institutions) {
-            final Institution matching = result.stream().filter(pr -> i.getUri().equals(pr.getUri())).findFirst()
-                    .get();
+            final Institution matching = result.stream().filter(pr -> i.getUri().equals(pr.getUri())).findFirst().get();
             assertNotNull(matching);
         }
     }
@@ -83,7 +79,7 @@ public class BaseDaoTest extends BaseDaoTestRunner{
 
         Institution i1 = institutionDao.findByName(institution.getName());
         assertNotNull(i1);
-        i1.setName("Nemocnice Na Bulovce");
+        i1.setName("Random Gynecology");
         institutionDao.update(i1);
 
         Institution i2 = institutionDao.findByName(i1.getName());

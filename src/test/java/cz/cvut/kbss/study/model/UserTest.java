@@ -73,7 +73,7 @@ public class UserTest {
     public void generateUriThrowsIllegalStateForMissingLastName() {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Cannot generate Person URI without last name.");
-        user.setFirstName("a");
+        user.setFirstName("John");
         user.generateUri();
     }
 
@@ -81,7 +81,7 @@ public class UserTest {
     public void generateUriThrowsIllegalStateForEmptyLastName() {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Cannot generate Person URI without last name.");
-        user.setFirstName("a");
+        user.setFirstName("John");
         user.setLastName("");
         user.generateUri();
     }

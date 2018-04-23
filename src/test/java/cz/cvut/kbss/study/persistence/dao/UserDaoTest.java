@@ -18,18 +18,6 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @Autowired
     private InstitutionDao institutionDao;
 
-    public static final String USERNAME1 = "Pepa";
-    public static final String PASSWORD1 = "house123";
-    public static final String FIRST_NAME1 = "Josef";
-    public static final String LAST_NAME1 = "Barák";
-    public static final String EMAIL1 = "pepa@barak.pro";
-
-    public static final String USERNAME2 = "Franta";
-    public static final String PASSWORD2 = "tree123";
-    public static final String FIRST_NAME2 = "Franta";
-    public static final String LAST_NAME2 = "Strom";
-    public static final String EMAIL2 = "franta@strom.pro";
-
     @Test
     public void getUserByUsername() throws Exception {
         Institution institution = Generator.generateInstitution();
@@ -66,8 +54,8 @@ public class UserDaoTest extends BaseDaoTestRunner {
         institutionDao.persist(institution1);
         institutionDao.persist(institution2);
 
-        User user1 = Generator.getUser(USERNAME1, PASSWORD1, FIRST_NAME1, LAST_NAME1, EMAIL1, institution1);
-        User user2 = Generator.getUser(USERNAME2, PASSWORD2, FIRST_NAME2, LAST_NAME2, EMAIL2, institution1);
+        User user1 = Generator.generateUser(institution1);
+        User user2 = Generator.generateUser(institution1);
 
         userDao.persist(user1);
         userDao.persist(user2);

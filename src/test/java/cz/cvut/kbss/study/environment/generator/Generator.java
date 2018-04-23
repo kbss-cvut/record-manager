@@ -7,7 +7,6 @@ import cz.cvut.kbss.study.model.Vocabulary;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Random;
-import java.util.UUID;
 
 public class Generator {
 
@@ -125,11 +124,11 @@ public class Generator {
      */
     public static User generateUser(Institution institution){
         final User person = new User();
-        person.setUsername("John" + Integer.toString(randomInt()));
-        person.setPassword("password" + Integer.toString(randomInt()));
-        person.setFirstName("John" + Integer.toString(randomInt()));
-        person.setLastName("Ulk" + Integer.toString(randomInt()));
-        person.setEmailAddress("john.ulk" + Integer.toString(randomInt()) + "@gmail.com");
+        person.setUsername("RandomUsername" + Integer.toString(randomInt()));
+        person.setPassword("RandomPassword" + Integer.toString(randomInt()));
+        person.setFirstName("RandomFirstName" + Integer.toString(randomInt()));
+        person.setLastName("RandomLastName" + Integer.toString(randomInt()));
+        person.setEmailAddress("RandomEmail" + Integer.toString(randomInt()) + "@random.rand");
         person.setInstitution(institution);
         return person;
     }
