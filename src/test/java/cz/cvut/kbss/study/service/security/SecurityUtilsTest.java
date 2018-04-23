@@ -28,13 +28,12 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
     private InstitutionService institutionService;
 
     private User user;
-    private Institution institution;
     public static final String USERNAME = "halsey";
     public static final String PASSWORD = "john117";
 
     @Before
     public void setUp() {
-        institution = Generator.generateInstitution();
+        Institution institution = Generator.generateInstitution();
         institutionService.persist(institution);
         this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", institutionService.findByName(institution.getName()));
         user.generateUri();
@@ -83,10 +82,10 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
     public void areFromSameInstitutionReturnsMembershipStatusTrue() {
         Environment.setCurrentUser(user);
 
-        User userFromSameInstitution = Generator.generateUser(institution);
+        User userFromSameInstitution = Generator.generateUser(user.getInstitution());
         userService.persist(userFromSameInstitution);
 
-        assertFalse(securityUtils.areFromSameInstitution(userFromSameInstitution.getUsername()));
+        assertTrue(securityUtils.areFromSameInstitution(userFromSameInstitution.getUsername()));
     }
 
     @Test
@@ -94,6 +93,8 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
         Environment.setCurrentUser(user);
 
         Institution institutionAnother = Generator.generateInstitution();
+        institutionService.persist(institutionAnother);
+
         User userFromAnotherInstitution = Generator.generateUser(institutionAnother);
         userService.persist(userFromAnotherInstitution);
         assertFalse(securityUtils.areFromSameInstitution(userFromAnotherInstitution.getUsername()));
