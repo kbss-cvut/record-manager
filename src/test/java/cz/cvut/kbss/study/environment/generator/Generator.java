@@ -1,11 +1,10 @@
 package cz.cvut.kbss.study.environment.generator;
 
-import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.PatientRecord;
-import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.*;
+
 import java.net.URI;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Random;
 
 public class Generator {
@@ -88,6 +87,15 @@ public class Generator {
     }
 
     /**
+     * Generates a (pseudo)random date.
+     *
+     * @return Random date
+     */
+    public static Date randomDate() {
+        return new Date(Math.abs(System.currentTimeMillis() - randomInt()));
+    }
+
+    /**
      * Generators a (pseudo) random boolean.
      *
      * @return Random boolean
@@ -159,5 +167,19 @@ public class Generator {
         rec.setUri(generateUri());
         rec.setInstitution(institutionWhereTreated);
         return rec;
+    }
+
+    /**
+     * Generators a (pseudo) random action history.
+     *
+     * @return Random action history
+     */
+    public static ActionHistory generateActionHistory(User author) {
+        final ActionHistory action = new ActionHistory();
+        action.setAuthor(author);
+        action.setTimestamp(randomDate());
+        action.setType("RANDOM_TYPE_" + Integer.toString(randomInt()));
+        action.setPayload("RandomPayload" + Integer.toString(randomInt()));
+        return action;
     }
 }

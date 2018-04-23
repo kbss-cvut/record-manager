@@ -17,19 +17,12 @@ public class InstitutionDaoTest extends BaseDaoTestRunner {
 
     @Test
     public void getInstitutionByName() throws Exception {
-        Institution institution1 = generateInstitution();
-        Institution institution2 = generateInstitution();
+        Institution institution1 = Generator.generateInstitution();
+        Institution institution2 = Generator.generateInstitution();
 
         institutionDao.persist(institution1);
         institutionDao.persist(institution2);
 
         assertEquals(institution1.getUri(), institutionDao.findByName(institution1.getName()).getUri());
-    }
-
-    private Institution generateInstitution() {
-        final Institution org = new Institution();
-        org.setName(UUID.randomUUID().toString());
-        org.setUri(Generator.generateUri());
-        return org;
     }
 }

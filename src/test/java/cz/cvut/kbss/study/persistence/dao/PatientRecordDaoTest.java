@@ -58,30 +58,77 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         assertEquals(1, records.stream().filter(rs -> record2.getUri().equals(rs.getUri())).count());
     }
 
-    private Institution generateInstitution() {
-        final Institution org = new Institution();
-        org.setName(UUID.randomUUID().toString());
-        org.setUri(Generator.generateUri());
-        return org;
+    @Test
+    public void findAllRecordsReturnAllRecords() throws Exception {
+        Institution institution1 = Generator.generateInstitution();
+        Institution institution2 = Generator.generateInstitution();
+        institutionDao.persist(institution1);
+        institutionDao.persist(institution2);
+
+        User user1 = Generator.generateUser(institution1);
+        User user2 = Generator.generateUser(institution2);
+        userDao.persist(user1);
+        userDao.persist(user2);
+        user1 = userDao.findByUsername(user1.getUsername());
+        user2 = userDao.findByUsername(user2.getUsername());
+
+        PatientRecord record1 = Generator.generatePatientRecord(user1, institution1);
+        PatientRecord record2 = Generator.generatePatientRecord(user1, institution1);
+        PatientRecord record3 = Generator.generatePatientRecord(user2, institution2);
+
+        patienRecordDao.persist(record1);
+        patienRecordDao.persist(record2);
+        patienRecordDao.persist(record3);
+
+        List<PatientRecordDto> records = patienRecordDao.findAllRecords();
+
+        assertEquals(3, records.size());
     }
 
-    public static User getUser() {
-        final User person = new User();
-        person.setFirstName("Robert");
-        person.setLastName("Plant");
-        person.setUsername(USERNAME);
-        person.setPassword(PASSWORD);
-        person.setEmailAddress(EMAIL);
-        return person;
+    @Test
+    public void getNumberOfProcessedRecords() throws Exception {
+        Institution institution = Generator.generateInstitution();
+        institutionDao.persist(institution);
+
+        User user = Generator.generateUser(institution);
+        userDao.persist(user);
+        user = userDao.findByUsername(user.getUsername());
+
+        PatientRecord record1 = Generator.generatePatientRecord(user, institution);
+        PatientRecord record2 = Generator.generatePatientRecord(user, institution);
+
+        patienRecordDao.persist(record1);
+        patienRecordDao.persist(record2);
+
+        int numberOfProcessedRecords = patienRecordDao.getNumberOfProcessedRecords();
+
+        assertEquals(2, numberOfProcessedRecords);
     }
 
-    private PatientRecord generatePatientRecord(User author, Institution institutionWhereTreated) {
-        final PatientRecord rec = new PatientRecord();
-        rec.setAuthor(author);
-        rec.setLocalName("local name -- " + Integer.toString(Generator.randomInt()));
-        rec.setUri(Generator.generateUri());
-        rec.setInstitution(institutionWhereTreated);
-        return rec;
-    }
+    @Test
+    public void findByAuthorReturnsMatchingRecords() throws Exception {
+        Institution institution = Generator.generateInstitution();
+        institutionDao.persist(institution);
 
+        User user1 = Generator.generateUser(institution);
+        User user2 = Generator.generateUser(institution);
+        userDao.persist(user1);
+        userDao.persist(user2);
+        user1 = userDao.findByUsername(user1.getUsername());
+        user2 = userDao.findByUsername(user2.getUsername());
+
+        PatientRecord record1 = Generator.generatePatientRecord(user1, institution);
+        PatientRecord record2 = Generator.generatePatientRecord(user1, institution);
+        PatientRecord record3 = Generator.generatePatientRecord(user2, institution);
+
+        patienRecordDao.persist(record1);
+        patienRecordDao.persist(record2);
+        patienRecordDao.persist(record3);
+
+        List<PatientRecord> records1 = patienRecordDao.findByAuthor(user1);
+        List<PatientRecord> records2 = patienRecordDao.findByAuthor(user2);
+
+        assertEquals(2, records1.size());
+        assertEquals(1, records2.size());
+    }
 }

@@ -17,14 +17,6 @@ public class BaseDaoTest extends BaseDaoTestRunner{
     private InstitutionDao institutionDao; // We're using one of the DAO implementations for the basic tests
 
     @Test
-    public void existsForExistingInstanceReturnsTrue() throws Exception {
-        final Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-        assertNotNull(institution.getUri());
-        assertTrue(institutionDao.exists(institution.getUri()));
-    }
-
-    @Test
     public void findAllReturnsAllExistingInstances() {
         final List<Institution> institutions = new ArrayList<>();
         final Institution i1 = Generator.generateInstitution();
