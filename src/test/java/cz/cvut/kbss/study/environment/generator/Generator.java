@@ -157,15 +157,14 @@ public class Generator {
      * Generators a (pseudo) random patient record.
      *
      * @param author author of patient record
-     * @param institutionWhereTreated institution where patient is treated
      * @return Random patient record
      */
-    public static PatientRecord generatePatientRecord(User author, Institution institutionWhereTreated) {
+    public static PatientRecord generatePatientRecord(User author) {
         final PatientRecord rec = new PatientRecord();
         rec.setAuthor(author);
         rec.setLocalName("RandomRecord" + Integer.toString(randomInt()));
         rec.setUri(generateUri());
-        rec.setInstitution(institutionWhereTreated);
+        rec.setInstitution(author.getInstitution());
         return rec;
     }
 

@@ -39,13 +39,16 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         institutionDao.persist(institution);
         institutionDao.persist(institutionOther);
 
-        User user = Generator.generateUser(institution);
-        userDao.persist(user);
-        user = userDao.findByUsername(user.getUsername());
+        User user1 = Generator.generateUser(institution);
+        userDao.persist(user1);
+        user1 = userDao.findByUsername(user1.getUsername());
+        User user2 = Generator.generateUser(institutionOther);
+        userDao.persist(user2);
+        user2 = userDao.findByUsername(user2.getUsername());
 
-        PatientRecord record1 = generatePatientRecord(user, institution);
-        PatientRecord record2 = generatePatientRecord(user, institution);
-        PatientRecord recordOther = generatePatientRecord(userOther, institutionOther);
+        PatientRecord record1 = Generator.generatePatientRecord(user1);
+        PatientRecord record2 = Generator.generatePatientRecord(user1);
+        PatientRecord recordOther = Generator.generatePatientRecord(user2);
 
         patienRecordDao.persist(record1);
         patienRecordDao.persist(record2);
@@ -72,9 +75,9 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         user1 = userDao.findByUsername(user1.getUsername());
         user2 = userDao.findByUsername(user2.getUsername());
 
-        PatientRecord record1 = Generator.generatePatientRecord(user1, institution1);
-        PatientRecord record2 = Generator.generatePatientRecord(user1, institution1);
-        PatientRecord record3 = Generator.generatePatientRecord(user2, institution2);
+        PatientRecord record1 = Generator.generatePatientRecord(user1);
+        PatientRecord record2 = Generator.generatePatientRecord(user1);
+        PatientRecord record3 = Generator.generatePatientRecord(user2);
 
         patienRecordDao.persist(record1);
         patienRecordDao.persist(record2);
@@ -94,8 +97,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         userDao.persist(user);
         user = userDao.findByUsername(user.getUsername());
 
-        PatientRecord record1 = Generator.generatePatientRecord(user, institution);
-        PatientRecord record2 = Generator.generatePatientRecord(user, institution);
+        PatientRecord record1 = Generator.generatePatientRecord(user);
+        PatientRecord record2 = Generator.generatePatientRecord(user);
 
         patienRecordDao.persist(record1);
         patienRecordDao.persist(record2);
@@ -117,9 +120,9 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         user1 = userDao.findByUsername(user1.getUsername());
         user2 = userDao.findByUsername(user2.getUsername());
 
-        PatientRecord record1 = Generator.generatePatientRecord(user1, institution);
-        PatientRecord record2 = Generator.generatePatientRecord(user1, institution);
-        PatientRecord record3 = Generator.generatePatientRecord(user2, institution);
+        PatientRecord record1 = Generator.generatePatientRecord(user1);
+        PatientRecord record2 = Generator.generatePatientRecord(user1);
+        PatientRecord record3 = Generator.generatePatientRecord(user2);
 
         patienRecordDao.persist(record1);
         patienRecordDao.persist(record2);
