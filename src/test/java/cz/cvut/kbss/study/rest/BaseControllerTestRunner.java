@@ -3,6 +3,11 @@ package cz.cvut.kbss.study.rest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.config.WebAppConfig;
+import cz.cvut.kbss.study.environment.util.Environment;
+import static cz.cvut.kbss.study.environment.util.Environment.createDefaultMessageConverter;
+import static cz.cvut.kbss.study.environment.util.Environment.createResourceMessageConverter;
+import static cz.cvut.kbss.study.environment.util.Environment.createStringEncodingMessageConverter;
+import cz.cvut.kbss.study.rest.handler.RestExceptionHandler;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,24 +23,26 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {WebAppConfig.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@WebAppConfiguration
 public abstract class BaseControllerTestRunner {
 
-    @Autowired
-    protected WebApplicationContext webApplicationContext;
-
-    @Autowired
     protected ObjectMapper objectMapper;
 
     protected MockMvc mockMvc;
 
-    @Before
-    public void setUp() throws Exception {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    public void setUp(BaseController controller) {
+        setupObjectMapper();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(controller).setControllerAdvice(new RestExceptionHandler())
+            .setMessageConverters(
+                createDefaultMessageConverter(), createStringEncodingMessageConverter(),
+                createResourceMessageConverter())
+            .setUseSuffixPatternMatch(false)
+            .build();
     }
+
+    void setupObjectMapper() {
+        this.objectMapper = Environment.getObjectMapper();
+    }
+
 
     protected String toJson(Object object) throws Exception {
         return objectMapper.writeValueAsString(object);

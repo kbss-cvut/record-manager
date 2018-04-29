@@ -2,10 +2,15 @@ package cz.cvut.kbss.study.environment.util;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.security.model.AuthenticationToken;
 import cz.cvut.kbss.study.security.model.UserDetails;
+import cz.cvut.kbss.study.util.Constants;
+import java.nio.charset.Charset;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -54,4 +59,17 @@ public class Environment {
         }
         return objectMapper;
     }
+
+    public static HttpMessageConverter<?> createDefaultMessageConverter() {
+        return new MappingJackson2HttpMessageConverter(getObjectMapper());
+    }
+
+    public static HttpMessageConverter<?> createStringEncodingMessageConverter() {
+        return new StringHttpMessageConverter(Charset.forName(Constants.UTF_8_ENCODING));
+    }
+
+    public static HttpMessageConverter<?> createResourceMessageConverter() {
+        return new ResourceHttpMessageConverter();
+    }
+
 }
