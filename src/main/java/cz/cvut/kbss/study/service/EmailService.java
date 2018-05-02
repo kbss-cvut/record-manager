@@ -104,7 +104,7 @@ public class EmailService {
             message.setSubject(emailTemplate.getSubject());
 
             // Send the actual HTML message, as big as you like
-            message.setContent(emailTemplate.getHTMLContent(), "text/html");
+            message.setContent(emailTemplate.getHTMLContent(), "text/html; charset=UTF-8");
 
             // Send message
             Transport transport = session.getTransport("smtp");
