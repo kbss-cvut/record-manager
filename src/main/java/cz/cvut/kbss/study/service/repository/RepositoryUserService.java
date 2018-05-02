@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.service.repository;
 
-import cz.cvut.kbss.study.exception.UsernameExistsException;
+import cz.cvut.kbss.study.exception.EntityExistsException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
@@ -12,9 +12,7 @@ import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.service.EmailService;
-import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
-import cz.cvut.kbss.study.util.PasswordGenerator;
 import cz.cvut.kbss.study.util.Validator;
 import cz.cvut.kbss.study.util.etemplates.*;
 import org.apache.commons.lang.StringUtils;
@@ -143,7 +141,10 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void prePersist(User instance) {
         if (findByUsername(instance.getUsername()) != null) {
-            throw new UsernameExistsException("User with specified username already exists.");
+            throw new EntityExistsException("User with specified username already exists.");
+        }
+        if (findByEmail(instance.getEmailAddress()) != null) {
+            throw new EntityExistsException("User with specified email already exists.");
         }
         try {
             instance.encodePassword(passwordEncoder);
@@ -167,7 +168,10 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             throw new UnauthorizedException("Cannot update user.");
         }
         if (!findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {
-            throw new UsernameExistsException("User with specified username already exists.");
+            throw new EntityExistsException("User with specified username already exists.");
+        }
+        if (!findByEmail(instance.getEmailAddress()).getUsername().equals(instance.getUsername())) {
+            throw new EntityExistsException("User with specified email already exists.");
         }
         try {
             Validator.validateEmail(instance.getEmailAddress());
