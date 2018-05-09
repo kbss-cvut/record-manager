@@ -44,6 +44,7 @@ public class PatientRecordController extends BaseController {
         return recordService.findByInstitution(institution);
     }
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
     @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public PatientRecord getRecord(@PathVariable("key") String key) {
         return findInternal(key);
