@@ -100,4 +100,3 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
         assertFalse(securityUtils.areFromSameInstitution(userFromAnotherInstitution.getUsername()));
     }
 }
-*/

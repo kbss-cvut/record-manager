@@ -28,52 +28,43 @@ public class OntologyAuthenticationProviderTest extends BaseServiceTestRunner {
     @Qualifier("ontologyAuthenticationProvider")
     private AuthenticationProvider provider;
 
-@Before
-public void setUp() throws Exception {
-    super.setUp();
-    SecurityContextHolder.setContext(new SecurityContextImpl());
-}
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        SecurityContextHolder.setContext(new SecurityContextImpl());
+    }
 
     @After
     public void tearDown() throws Exception {
         SecurityContextHolder.setContext(new SecurityContextImpl());
     }
 
-@Test
-public void successfulAuthenticationSetsSecurityContext() {
-    final Authentication auth = new UsernamePasswordAuthenticationToken(BaseServiceTestRunner.USERNAME, BaseServiceTestRunner.PASSWORD);
-    final SecurityContext context = SecurityContextHolder.getContext();
-    assertNull(context.getAuthentication());
-    final Authentication result = provider.authenticate(auth);
-    assertNotNull(SecurityContextHolder.getContext());
-    final UserDetails details = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
-    assertEquals(BaseServiceTestRunner.USERNAME, details.getUsername());
-    assertTrue(result.isAuthenticated());
-}
-
-@Test(expected = UsernameNotFoundException.class)
-public void authenticateThrowsUserNotFoundExceptionForUnknownUsername() {
-    final Authentication auth = new UsernamePasswordAuthenticationToken("unknownUsername", BaseServiceTestRunner.PASSWORD);
-    try {
-        provider.authenticate(auth);
-    } finally {
+    @Test
+    public void successfulAuthenticationSetsSecurityContext() {
+        final Authentication auth = new UsernamePasswordAuthenticationToken(BaseServiceTestRunner.USERNAME, BaseServiceTestRunner.PASSWORD);
         final SecurityContext context = SecurityContextHolder.getContext();
         assertNull(context.getAuthentication());
         final Authentication result = provider.authenticate(auth);
         assertNotNull(SecurityContextHolder.getContext());
         final UserDetails details = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
-        assertEquals(USERNAME, details.getUsername());
+        assertEquals(BaseServiceTestRunner.USERNAME, details.getUsername());
         assertTrue(result.isAuthenticated());
     }
 
-@Test(expected = BadCredentialsException.class)
-public void authenticateThrowsBadCredentialsForInvalidPassword() {
-    final Authentication auth = new UsernamePasswordAuthenticationToken(BaseServiceTestRunner.USERNAME, "unknownPassword");
-    try {
-        provider.authenticate(auth);
-    } finally {
-        final SecurityContext context = SecurityContextHolder.getContext();
-        assertNull(context.getAuthentication());
+    @Test(expected = UsernameNotFoundException.class)
+    public void authenticateThrowsUserNotFoundExceptionForUnknownUsername() {
+        final Authentication auth = new UsernamePasswordAuthenticationToken("unknownUsername", BaseServiceTestRunner.PASSWORD);
+        try {
+            provider.authenticate(auth);
+        } finally {
+            final SecurityContext context = SecurityContextHolder.getContext();
+            assertNull(context.getAuthentication());
+            final Authentication result = provider.authenticate(auth);
+            assertNotNull(SecurityContextHolder.getContext());
+            final UserDetails details = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+            assertEquals(USERNAME, details.getUsername());
+            assertTrue(result.isAuthenticated());
+        }
     }
 
     @Test(expected = BadCredentialsException.class)
@@ -87,5 +78,6 @@ public void authenticateThrowsBadCredentialsForInvalidPassword() {
         }
     }
 }
-}
+
+
 

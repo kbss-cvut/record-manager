@@ -38,10 +38,3 @@ public class UserDetailsServiceTest extends BaseServiceTestRunner {
         userDetailsService.loadUserByUsername("CarolansRoyal12");
     }
 }
-
-@Test(expected = UsernameNotFoundException.class)
-public void loadUserByUsernameExpectException() throws Exception {
-    userDetailsService.loadUserByUsername(USERNAME1);
-}
-}
-*/
