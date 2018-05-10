@@ -39,6 +39,10 @@ public class MockServiceConfig {
         return mock(ActionHistoryService.class);
     }
 
+    @Bean
+    public StatisticsService statisticsService() {
+        return mock(StatisticsService.class);
+    }
 
     @Bean
     public ActionHistoryDao actionHistoryDao() {
