@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.environment.generator;
 
+import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.model.*;
 
 import java.net.URI;
@@ -163,6 +164,21 @@ public class Generator {
         final PatientRecord rec = new PatientRecord();
         rec.setAuthor(author);
         rec.setLocalName("RandomRecord" + Integer.toString(randomInt()));
+        rec.setUri(generateUri());
+        rec.setInstitution(author.getInstitution());
+        return rec;
+    }
+
+    /**
+     * Generators a (pseudo) random patient record dto.
+     *
+     * @param author author of patient record dto
+     * @return Random patient record dto
+     */
+    public static PatientRecordDto generatePatientRecordDto(User author) {
+        final PatientRecordDto rec = new PatientRecordDto();
+        rec.setLocalName("RandomRecordDto" + Integer.toString(randomInt()));
+        rec.setAuthor(author);
         rec.setUri(generateUri());
         rec.setInstitution(author.getInstitution());
         return rec;
