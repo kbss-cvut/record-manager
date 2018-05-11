@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import cz.cvut.kbss.study.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,10 +23,10 @@ public class ActionHistoryController extends BaseController {
     private ActionHistoryService actionHistoryService;
 
     @Autowired
-    private UserController userController;
+    private UserService userService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody ActionHistory actionHistory) {
         actionHistoryService.persist(actionHistory);
         if (LOG.isTraceEnabled()) {
@@ -41,7 +42,7 @@ public class ActionHistoryController extends BaseController {
         User author = null;
         if (authorUsername != null) {
             try {
-                author = userController.getByUsername(authorUsername);
+                author = userService.findByUsername(authorUsername);
             } catch (Exception e) {
                 return Collections.emptyList();
             }

@@ -54,6 +54,7 @@ public class InstitutionController extends BaseController {
         return result;
     }
 
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
     @RequestMapping(value = "/{key}/patients", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecordDto> getTreatedPatientRecords(@PathVariable("key") String key) {
         final Institution institution = findInternal(key);

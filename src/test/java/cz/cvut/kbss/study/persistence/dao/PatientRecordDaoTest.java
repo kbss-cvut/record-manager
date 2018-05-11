@@ -24,38 +24,23 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Autowired
     private InstitutionDao institutionDao;
 
-    public static final String USERNAME = "robert@plant.org";
-    public static final String EMAIL = "robert@plant.org";
-    public static final String PASSWORD = "plant48";
-
-    @Test
-    @Ignore
-    public void findByInstitutionReturnsNullWhenNoMatchedFound() throws Exception {
-    }
-
     @Test
     public void findByInstitutionReturnsMatchingRecords() throws Exception {
-
-        Institution institution = generateInstitution();
-        Institution institutionOther = generateInstitution();
-
+        Institution institution = Generator.generateInstitution();
+        Institution institutionOther = Generator.generateInstitution();
         institutionDao.persist(institution);
         institutionDao.persist(institutionOther);
 
-        User user = generateUser();
-        String username = user.getUsername();
-        User userOther = generateUser();
-        String usernameOther = user.getUsername();
-        user.setInstitution(institution);
-        userOther.setInstitution(institutionOther);
-        userDao.persist(user);
-        userDao.persist(userOther);
-        user = userDao.findByUsername(username);
-        userOther = userDao.findByUsername(usernameOther);
+        User user1 = Generator.generateUser(institution);
+        userDao.persist(user1);
+        user1 = userDao.findByUsername(user1.getUsername());
+        User user2 = Generator.generateUser(institutionOther);
+        userDao.persist(user2);
+        user2 = userDao.findByUsername(user2.getUsername());
 
-        PatientRecord record1 = generatePatientRecord(user, institution);
-        PatientRecord record2 = generatePatientRecord(user, institution);
-        PatientRecord recordOther = generatePatientRecord(userOther, institutionOther);
+        PatientRecord record1 = Generator.generatePatientRecord(user1);
+        PatientRecord record2 = Generator.generatePatientRecord(user1);
+        PatientRecord recordOther = Generator.generatePatientRecord(user2);
 
         patienRecordDao.persist(record1);
         patienRecordDao.persist(record2);
@@ -63,38 +48,82 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
         List<PatientRecordDto> records = patienRecordDao.findByInstitution(institution);
 
-
         assertEquals(2, records.size());
         assertEquals(1, records.stream().filter(rs -> record1.getUri().equals(rs.getUri())).count());
         assertEquals(1, records.stream().filter(rs -> record2.getUri().equals(rs.getUri())).count());
-
     }
 
-    private Institution generateInstitution() {
-        final Institution org = new Institution();
-        org.setName(UUID.randomUUID().toString());
-        org.setUri(Generator.generateUri());
-        return org;
+    @Test
+    public void findAllRecordsReturnAllRecords() throws Exception {
+        Institution institution1 = Generator.generateInstitution();
+        Institution institution2 = Generator.generateInstitution();
+        institutionDao.persist(institution1);
+        institutionDao.persist(institution2);
+
+        User user1 = Generator.generateUser(institution1);
+        User user2 = Generator.generateUser(institution2);
+        userDao.persist(user1);
+        userDao.persist(user2);
+        user1 = userDao.findByUsername(user1.getUsername());
+        user2 = userDao.findByUsername(user2.getUsername());
+
+        PatientRecord record1 = Generator.generatePatientRecord(user1);
+        PatientRecord record2 = Generator.generatePatientRecord(user1);
+        PatientRecord record3 = Generator.generatePatientRecord(user2);
+
+        patienRecordDao.persist(record1);
+        patienRecordDao.persist(record2);
+        patienRecordDao.persist(record3);
+
+        List<PatientRecordDto> records = patienRecordDao.findAllRecords();
+
+        assertEquals(3, records.size());
     }
 
-    private User generateUser() {
-        final User person = new User();
-        final String uuid = UUID.randomUUID().toString();
-        person.setFirstName("Firstname-" + uuid);
-        person.setLastName("Lastname-" + uuid);
-        person.setUsername("username-" + uuid);
-        person.setPassword("password-" + uuid);
-        person.setEmailAddress("email-" + uuid + "@example.org" );
-        return person;
+    @Test
+    public void getNumberOfProcessedRecords() throws Exception {
+        Institution institution = Generator.generateInstitution();
+        institutionDao.persist(institution);
+
+        User user = Generator.generateUser(institution);
+        userDao.persist(user);
+        user = userDao.findByUsername(user.getUsername());
+
+        PatientRecord record1 = Generator.generatePatientRecord(user);
+        PatientRecord record2 = Generator.generatePatientRecord(user);
+
+        patienRecordDao.persist(record1);
+        patienRecordDao.persist(record2);
+
+        int numberOfProcessedRecords = patienRecordDao.getNumberOfProcessedRecords();
+
+        assertEquals(2, numberOfProcessedRecords);
     }
 
-    private PatientRecord generatePatientRecord(User author, Institution institutionWhereTreated) {
-        final PatientRecord rec = new PatientRecord();
-        rec.setAuthor(author);
-        rec.setLocalName("local name -- " + Integer.toString(Generator.randomInt()));
-        rec.setUri(Generator.generateUri());
-        rec.setInstitution(institutionWhereTreated);
-        return rec;
-    }
+    @Test
+    public void findByAuthorReturnsMatchingRecords() throws Exception {
+        Institution institution = Generator.generateInstitution();
+        institutionDao.persist(institution);
 
+        User user1 = Generator.generateUser(institution);
+        User user2 = Generator.generateUser(institution);
+        userDao.persist(user1);
+        userDao.persist(user2);
+        user1 = userDao.findByUsername(user1.getUsername());
+        user2 = userDao.findByUsername(user2.getUsername());
+
+        PatientRecord record1 = Generator.generatePatientRecord(user1);
+        PatientRecord record2 = Generator.generatePatientRecord(user1);
+        PatientRecord record3 = Generator.generatePatientRecord(user2);
+
+        patienRecordDao.persist(record1);
+        patienRecordDao.persist(record2);
+        patienRecordDao.persist(record3);
+
+        List<PatientRecord> records1 = patienRecordDao.findByAuthor(user1);
+        List<PatientRecord> records2 = patienRecordDao.findByAuthor(user2);
+
+        assertEquals(2, records1.size());
+        assertEquals(1, records2.size());
+    }
 }

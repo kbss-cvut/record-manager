@@ -8,6 +8,7 @@ import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.security.model.UserDetails;
+import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.UserService;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class UserController extends BaseController {
     private UserService userService;
 
     @Autowired
-    private InstitutionController institutionController;
+    private InstitutionService institutionService;
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name or " +
             "hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.areFromSameInstitution(#username)")
@@ -78,7 +79,7 @@ public class UserController extends BaseController {
 
     private List<User> getByInstitution(String institutionKey) {
         assert institutionKey != null;
-        final Institution institution = institutionController.findByKey(institutionKey);
+        final Institution institution = institutionService.findByKey(institutionKey);
         return userService.findByInstitution(institution);
     }
 
@@ -150,7 +151,7 @@ public class UserController extends BaseController {
     public void validateToken(@RequestBody String token) {
         User user = getByToken(token);
         if (user == null) {
-            throw new AccessDeniedException("Token does not exist.");
+            throw new BadRequestException("Token does not exists.");
         }
     }
 
@@ -172,7 +173,7 @@ public class UserController extends BaseController {
         final User original = getByUsername(username);
         assert original != null;
         if (original.getIsInvited()) {
-            throw new UnauthorizedException("Cannot invite already invited user.");
+            throw new BadRequestException("Cannot invite already invited user.");
         }
         userService.sendInvitation(original);
         if (LOG.isTraceEnabled()) {
@@ -204,7 +205,7 @@ public class UserController extends BaseController {
     public void impersonate(@RequestBody String username) {
         User user = getByUsername(username);
         if (user.getTypes().contains(Vocabulary.s_c_administrator)) {
-            throw new UnauthorizedException("Cannot impersonate admin.");
+            throw new BadRequestException("Cannot impersonate admin.");
         }
         final SecurityContext context = SecurityContextHolder.getContext();
         UserDetails ud = new UserDetails(user);
