@@ -71,7 +71,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    public void getRecordsReturnsNullWhenNoReportsAreFound() throws Exception {
+    public void getRecordsReturnsEmptyListWhenNoReportsAreFound() throws Exception {
         when(patientRecordServiceMock.findAllRecords()).thenReturn(Collections.emptyList());
 
         final MvcResult result = mockMvc.perform(get("/records/")).andReturn();
