@@ -5,13 +5,11 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import static org.junit.Assert.*;
 
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
-import cz.cvut.kbss.study.service.StatisticsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;

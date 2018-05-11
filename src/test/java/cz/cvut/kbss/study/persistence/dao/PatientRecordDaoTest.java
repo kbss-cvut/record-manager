@@ -24,14 +24,6 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Autowired
     private InstitutionDao institutionDao;
 
-    public static final String USERNAME = "robert4";
-    public static final String PASSWORD = "plant48";
-
-    @Test
-    @Ignore
-    public void findByInstitutionReturnsNullWhenNoMatchedFound() throws Exception {
-    }
-
     @Test
     public void findByInstitutionReturnsMatchingRecords() throws Exception {
         Institution institution = Generator.generateInstitution();
