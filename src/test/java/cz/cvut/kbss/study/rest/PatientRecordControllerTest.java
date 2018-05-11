@@ -55,6 +55,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
         final MvcResult result = mockMvc.perform(get("/records/" + key)).andReturn();
         assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
+        verify(patientRecordServiceMock).findByKey(key);
     }
 
     @Test
@@ -107,6 +108,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                 new TypeReference<List<PatientRecordDto>>() {
                 });
         assertEquals(3, body.size());
+        verify(patientRecordServiceMock).findAllRecords();
     }
 
     @Test
@@ -135,6 +137,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                 new TypeReference<List<PatientRecordDto>>() {
                 });
         assertEquals(2, body.size());
+        verify(institutionServiceMock).findByKey(institution.getKey());
     }
 
     @Test
@@ -174,6 +177,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
         assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
+        verify(patientRecordServiceMock).findByKey(key);
     }
 
     @Test
@@ -208,6 +212,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
         assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
+        verify(patientRecordServiceMock).findByKey(key);
     }
 
     @Test
@@ -224,6 +229,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final MvcResult result = mockMvc.perform(delete("/records/12345" )).andReturn();
 
         assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
+        verify(patientRecordServiceMock).findByKey(key);
     }
 
 }
