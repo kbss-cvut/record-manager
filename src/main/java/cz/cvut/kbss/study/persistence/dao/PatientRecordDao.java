@@ -27,6 +27,14 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         questionSaver.persistIfNecessary(entity.getQuestion(), em);
     }
 
+    @Override
+    protected void update(PatientRecord entity, EntityManager em) {
+        final PatientRecord orig = em.find(PatientRecord.class, entity.getUri());
+        assert orig != null;
+        orig.setQuestion(null);
+        em.merge(entity);
+    }
+
     public List<PatientRecordDto> findAllRecords() {
         final EntityManager em = entityManager();
         try {
