@@ -27,7 +27,7 @@ public class Institution extends AbstractEntity implements HasOwlKey {
     private Date dateCreated;
 
     @Inferred
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_member, readOnly = true)
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_member)
     private Set<User> members;
 
     @Transient

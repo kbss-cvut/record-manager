@@ -12,13 +12,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.8</jdk.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <cz.cvut.kbss.jopa.version>0.10.0</cz.cvut.kbss.jopa.version>
-        <org.springframework.version>4.3.5.RELEASE</org.springframework.version>
-        <org.springframework.security.version>4.2.1.RELEASE</org.springframework.security.version>
-        <com.fasterxml.jackson.version>2.8.1</com.fasterxml.jackson.version>
+        <cz.cvut.kbss.jopa.version>0.10.4</cz.cvut.kbss.jopa.version>
+        <org.aspectj.version>1.9.1</org.aspectj.version>
+        <org.springframework.version>5.0.7.RELEASE</org.springframework.version>
+        <org.springframework.security.version>5.0.6.RELEASE</org.springframework.security.version>
+        <com.fasterxml.jackson.version>2.9.6</com.fasterxml.jackson.version>
         <junit.version>4.12</junit.version>
         <org.mockito.version>1.10.19</org.mockito.version>
         <ch.qos.logback.version>1.1.6</ch.qos.logback.version>
@@ -304,9 +306,9 @@
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>1.11</version>
                 <configuration>
-                    <complianceLevel>1.8</complianceLevel>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <complianceLevel>${jdk.version}</complianceLevel>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
                     <aspectLibraries>
                         <aspectLibrary>
                             <groupId>cz.cvut.kbss.jopa</groupId>
@@ -318,12 +320,12 @@
                     <dependency>
                         <groupId>org.aspectj</groupId>
                         <artifactId>aspectjtools</artifactId>
-                        <version>1.8.12</version>
+                        <version>${org.aspectj.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.aspectj</groupId>
                         <artifactId>aspectjrt</artifactId>
-                        <version>1.8.12</version>
+                        <version>${org.aspectj.version}</version>
                     </dependency>
                 </dependencies>
                 <executions>
