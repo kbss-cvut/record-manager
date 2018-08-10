@@ -15,7 +15,7 @@ import java.util.Map;
 @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
 @RestController
 @RequestMapping("/statistics")
-public class StatisticsController {
+public class StatisticsController extends BaseController{
 
     @Autowired
     private StatisticsService statisticsService;

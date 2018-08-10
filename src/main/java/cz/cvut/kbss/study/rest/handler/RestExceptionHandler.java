@@ -34,8 +34,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorInfo(request, e.getCause()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UsernameExistsException.class)
-    public ResponseEntity<ErrorInfo> usernameExistsException(HttpServletRequest request, UsernameExistsException e) {
+    @ExceptionHandler(EntityExistsException.class)
+    public ResponseEntity<ErrorInfo> entityExistsException(HttpServletRequest request, EntityExistsException e) {
         return new ResponseEntity<>(errorInfo(request, e), HttpStatus.CONFLICT);
     }
 

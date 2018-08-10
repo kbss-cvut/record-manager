@@ -1,6 +1,8 @@
 package cz.cvut.kbss.study.service.security;
 
+import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,10 @@ public class SecurityUtils {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private PatientRecordDao patientRecordDao;
+
     /**
      * Gets the currently authenticated user.
      *
@@ -50,6 +56,18 @@ public class SecurityUtils {
     public boolean isMemberOfInstitution(String institutionKey) {
         final User user = getCurrentUser();
         return user.getInstitution() != null && user.getInstitution().getKey().equals(institutionKey);
+    }
+
+    /**
+     * Checks whether the current user is in same institution as the patient record was created.
+     *
+     * @param recordKey PatientRecord identifier
+     * @return Membership status of the current user and patient record
+     */
+    public boolean isRecordInUsersInstitution(String recordKey) {
+        final User user = getCurrentUser();
+        final PatientRecord record = patientRecordDao.findByKey(recordKey);
+        return user.getInstitution().getKey().equals(record.getInstitution().getKey());
     }
 
     /**
