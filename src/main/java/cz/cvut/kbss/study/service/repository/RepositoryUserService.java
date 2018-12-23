@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.study.exception.EntityExistsException;
+import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
@@ -9,21 +10,25 @@ import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.ConfigReader;
+import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
-import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import cz.cvut.kbss.study.util.Validator;
-import cz.cvut.kbss.study.util.etemplates.*;
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
+import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
+import cz.cvut.kbss.study.util.etemplates.PasswordChange;
+import cz.cvut.kbss.study.util.etemplates.PasswordReset;
+import cz.cvut.kbss.study.util.etemplates.ProfileUpdate;
+import cz.cvut.kbss.study.util.etemplates.UserInvite;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class RepositoryUserService extends BaseRepositoryService<User> implements UserService {
@@ -65,7 +70,12 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
     @Override
     public User findByEmail(String email) {
-        return userDao.findByEmail(email);
+        return Optional.ofNullable(userDao.findByEmail(email))
+            .orElseThrow(
+                () -> new NotFoundException(
+                    String.format("Could not find user by email \"%s\".", email)
+                )
+            );
     }
 
     @Override
@@ -76,12 +86,12 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     public String generateUsername(String usernamePrefix) {
         return usernamePrefix + (userDao.findAll().stream()
-                .filter(u -> u.getUsername().startsWith(usernamePrefix))
-                .map(u -> u.getUsername().replaceFirst(usernamePrefix, ""))
-                .filter(s -> StringUtils.isNotBlank(s) && StringUtils.isNumeric(s))
-                .map(s -> Integer.parseInt(s))
-                .max(Comparator.naturalOrder())
-                .orElse(0) + 1);
+            .filter(u -> u.getUsername().startsWith(usernamePrefix))
+            .map(u -> u.getUsername().replaceFirst(usernamePrefix, ""))
+            .filter(s -> StringUtils.isNotBlank(s) && StringUtils.isNumeric(s))
+            .map(s -> Integer.parseInt(s))
+            .max(Comparator.naturalOrder())
+            .orElse(0) + 1);
     }
 
     @Override
@@ -92,7 +102,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         if (emailType.equals("passwordChange") && (currentUser.getUsername().equals(user.getUsername()) || sendEmail)) {
             emailTemplate = new PasswordChange(config, user);
             email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress(), !user.getUsername().equals(currentUser.getUsername()));
-        } else if (emailType.equals("profileUpdate") && !currentUser.getUsername().equals(user.getUsername()) && sendEmail){
+        } else if (emailType.equals("profileUpdate") && !currentUser.getUsername().equals(user.getUsername()) && sendEmail) {
             emailTemplate = new ProfileUpdate(config, user);
             email.sendEmail(emailTemplate, user.getEmailAddress(), currentUser.getEmailAddress(), !user.getUsername().equals(currentUser.getUsername()));
         }
@@ -162,9 +172,9 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void preUpdate(User instance) {
         final User currentUser = securityUtils.getCurrentUser();
-        if (!currentUser.getTypes().contains(Vocabulary.s_c_administrator) &&
-                (!instance.getTypes().equals(currentUser.getTypes()) || (instance.getInstitution() != null &&
-                !instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey())))) {
+        if (!currentUser.getTypes().contains(Vocabulary.s_c_administrator)
+            && (!instance.getTypes().equals(currentUser.getTypes()) || (instance.getInstitution() != null
+            && !instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey())))) {
             throw new UnauthorizedException("Cannot update user.");
         }
         if (!findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {

@@ -22,35 +22,53 @@ public class UserDaoTest extends BaseDaoTestRunner {
     private InstitutionDao institutionDao;
 
     @Test
-    public void getUserByUsername() throws Exception {
-        Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
-        User user1 = Generator.generateUser(institution);
-        userDao.persist(user1);
+    public void getUserByUsername() {
+        User user1 = getPersistedUser();
 
         User user2 = userDao.findByUsername(user1.getUsername());
 
-        assertEquals(user1.getUsername(), user2.getUsername());
-        assertEquals(user1.getEmailAddress(), user2.getEmailAddress());
+        assertSameUser(user1, user2);
     }
 
     @Test
-    public void getUserByEmail() throws Exception {
-        Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
-        User user1 = Generator.generateUser(institution);
-        userDao.persist(user1);
+    public void getUserByEmailWithExistingEmailSucceeds() {
+        User user1 = getPersistedUser();
 
         User user2 = userDao.findByEmail(user1.getEmailAddress());
 
-        assertEquals(user1.getUsername(), user2.getUsername());
-        assertEquals(user1.getEmailAddress(), user2.getEmailAddress());
+        assertSameUser(user1, user2);
     }
 
     @Test
-    public void getUsersByToken() throws Exception {
+    public void getUserByEmailIsCaseInsensitive() {
+        User user1 = getPersistedUser();
+
+        User user2 = userDao.findByEmail(user1.getEmailAddress().toLowerCase());
+        User user3 = userDao.findByEmail(user1.getEmailAddress().toUpperCase());
+
+        assertSameUser(user1, user2);
+        assertSameUser(user1, user3);
+
+    }
+
+    @Test
+    public void getUserByEmailWithoutTrimmingSucceeds() {
+        User user1 = getPersistedUser();
+
+        User user2 = userDao.findByEmail("  \n" + user1.getEmailAddress() + " \n\t");
+
+        assertSameUser(user1, user2);
+    }
+
+    @Test
+    public void getUserByEmailWithNonExistingEmailReturnsNull() {
+
+        User user = userDao.findByEmail("non-existing@email.com");
+        assertNull(user);
+    }
+
+    @Test
+    public void getUsersByToken() {
         Institution institution = Generator.generateInstitution();
 
         institutionDao.persist(institution);
@@ -68,7 +86,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void getUsersByInstitution() throws Exception {
+    public void getUsersByInstitution() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
 
@@ -94,7 +112,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void getNumberOfInvestigators() throws Exception {
+    public void getNumberOfInvestigators() {
         Institution institution = Generator.generateInstitution();
 
         institutionDao.persist(institution);
@@ -117,4 +135,20 @@ public class UserDaoTest extends BaseDaoTestRunner {
 
         assertEquals(2, numberOfInvestigators);
     }
+
+
+    private User getPersistedUser() {
+        Institution institution = Generator.generateInstitution();
+        institutionDao.persist(institution);
+
+        User user = Generator.generateUser(institution);
+        userDao.persist(user);
+        return user;
+    }
+
+    private void assertSameUser(User expectedUser, User actualUser) {
+        assertEquals(expectedUser.getUsername(), actualUser.getUsername());
+        assertEquals(expectedUser.getEmailAddress(), actualUser.getEmailAddress());
+    }
+
 }

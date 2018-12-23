@@ -38,11 +38,14 @@ public class UserDao extends DerivableUriDao<User> {
     public User findByEmail(String email) {
         Objects.requireNonNull(email);
         final EntityManager em = entityManager();
+        final String normalizedEmail = email.trim().toLowerCase();
         try {
             return em.createNativeQuery(
-                    "SELECT ?x WHERE { ?x ?hasEmail ?emailAddress . }", User.class)
+                    "SELECT ?x WHERE { " +
+                        "?x ?hasEmail ?emailAddress . " +
+                        "FILTER(lcase(?emailAddress) = ?normalizedEmailAddress) }", User.class)
                     .setParameter("hasEmail", URI.create(Vocabulary.s_p_mbox))
-                    .setParameter("emailAddress", email, Constants.PU_LANGUAGE)
+                    .setParameter("normalizedEmailAddress", normalizedEmail, Constants.PU_LANGUAGE)
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
