@@ -6,6 +6,8 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
@@ -14,6 +16,8 @@ import java.util.Objects;
 
 @Repository
 public class UserDao extends DerivableUriDao<User> {
+
+    protected static final Logger LOG = LoggerFactory.getLogger(UserDao.class);
 
     public UserDao() {
         super(User.class);

@@ -118,7 +118,7 @@ public class EmailService {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Unable to send email.", ae);
             }
-            throw new ValidationException("Unable to send email", ae);
+            throw new ValidationException("Unable to send email.", ae);
         } catch (MessagingException | UnsupportedEncodingException mex) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Unable to send email.", mex);

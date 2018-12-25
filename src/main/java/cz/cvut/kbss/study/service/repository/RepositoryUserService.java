@@ -72,9 +72,16 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     public User findByEmail(String email) {
         return Optional.ofNullable(userDao.findByEmail(email))
             .orElseThrow(
-                () -> new NotFoundException(
-                    String.format("Could not find user by email \"%s\".", email)
-                )
+                () -> {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace(
+                            String.format("Could not find user by email '%s'.", email)
+                        );
+                    }
+                    return new NotFoundException(
+                        String.format("Could not find user by email '%s'.", email)
+                    );
+                }
             );
     }
 
