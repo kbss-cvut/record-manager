@@ -157,10 +157,10 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
     @Override
     protected void prePersist(User instance) {
-        if (findByUsername(instance.getUsername()) != null) {
+        if (userDao.findByUsername(instance.getUsername()) != null) {
             throw new EntityExistsException("User with specified username already exists.");
         }
-        if (findByEmail(instance.getEmailAddress()) != null) {
+        if (userDao.findByEmail(instance.getEmailAddress()) != null) {
             throw new EntityExistsException("User with specified email already exists.");
         }
         try {
@@ -184,10 +184,10 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             && !instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey())))) {
             throw new UnauthorizedException("Cannot update user.");
         }
-        if (!findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {
+        if (!userDao.findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {
             throw new EntityExistsException("User with specified username already exists.");
         }
-        if (!findByEmail(instance.getEmailAddress()).getUsername().equals(instance.getUsername())) {
+        if (!userDao.findByEmail(instance.getEmailAddress()).getUsername().equals(instance.getUsername())) {
             throw new EntityExistsException("User with specified email already exists.");
         }
         try {
