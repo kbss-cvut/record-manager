@@ -184,16 +184,16 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             && !instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey())))) {
             throw new UnauthorizedException("Cannot update user.");
         }
+        try {
+            Validator.validateEmail(instance.getEmailAddress());
+        } catch (IllegalStateException e) {
+            throw new ValidationException(e.getMessage());
+        }
         if (!userDao.findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {
             throw new EntityExistsException("User with specified username already exists.");
         }
         if (!userDao.findByEmail(instance.getEmailAddress()).getUsername().equals(instance.getUsername())) {
             throw new EntityExistsException("User with specified email already exists.");
-        }
-        try {
-            Validator.validateEmail(instance.getEmailAddress());
-        } catch (IllegalStateException e) {
-            throw new ValidationException(e.getMessage());
         }
         final User orig = userDao.find(instance.getUri());
         if (orig == null) {

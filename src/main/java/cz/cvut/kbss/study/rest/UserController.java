@@ -119,7 +119,7 @@ public class UserController extends BaseController {
         assert original != null;
         userService.changePassword(original, password.get("newPassword"), password.get("currentPassword"), sendEmail);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("User's password successfully changed.", username);
+            LOG.trace("Password for username {} successfully changed.", username);
         }
     }
 
@@ -162,7 +162,7 @@ public class UserController extends BaseController {
         assert original != null;
         userService.changePasswordByToken(original, data.get("password"));
         if (LOG.isTraceEnabled()) {
-            LOG.trace("User's ({}) password successfully changed by token.", original.getUsername());
+            LOG.trace("Password for username {} successfully changed by token.", original.getUsername());
         }
     }
 
