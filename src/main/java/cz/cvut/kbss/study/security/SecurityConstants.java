@@ -25,7 +25,7 @@ public class SecurityConstants {
     /**
      * Session timeout in seconds.
      */
-    public static final int SESSION_TIMEOUT = 30 * 60;
+    public static final int SESSION_TIMEOUT = 12 * 60 * 60;
 
     public static final String ROLE_USER = "ROLE_USER";
 
