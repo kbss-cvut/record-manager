@@ -3,7 +3,6 @@ package cz.cvut.kbss.study.rest;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;

@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+
 import java.util.List;
 
 public interface PatientRecordService extends BaseService<PatientRecord> {

@@ -8,17 +8,14 @@ import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.service.data.DataLoader;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.ConfigParam;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+
+import java.net.URI;
+import java.util.*;
 
 @Service
 public class FormGenService {

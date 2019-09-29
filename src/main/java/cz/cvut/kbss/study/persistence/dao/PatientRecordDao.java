@@ -7,10 +7,11 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
+import org.springframework.stereotype.Repository;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {

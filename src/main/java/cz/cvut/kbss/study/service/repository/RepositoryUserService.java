@@ -15,20 +15,17 @@ import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import cz.cvut.kbss.study.util.Validator;
-import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
-import cz.cvut.kbss.study.util.etemplates.PasswordChange;
-import cz.cvut.kbss.study.util.etemplates.PasswordReset;
-import cz.cvut.kbss.study.util.etemplates.ProfileUpdate;
-import cz.cvut.kbss.study.util.etemplates.UserInvite;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import cz.cvut.kbss.study.util.etemplates.*;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class RepositoryUserService extends BaseRepositoryService<User> implements UserService {

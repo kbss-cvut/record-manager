@@ -2,19 +2,12 @@ package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.util.ConfigParam;
-import static cz.cvut.kbss.study.util.ConfigParam.E_BCC_ADDRESS_LIST;
-import static cz.cvut.kbss.study.util.ConfigParam.E_CC_ADDRESS_LIST;
-import static cz.cvut.kbss.study.util.ConfigParam.E_DISPLAY_NAME;
-import static cz.cvut.kbss.study.util.ConfigParam.E_FROM_ADDRESS;
-import static cz.cvut.kbss.study.util.ConfigParam.E_REPLY_TO_ADDRESS_LIST;
-import static cz.cvut.kbss.study.util.ConfigParam.SMTP_HOST;
-import static cz.cvut.kbss.study.util.ConfigParam.SMTP_PASSWORD;
-import static cz.cvut.kbss.study.util.ConfigParam.SMTP_PORT;
-import static cz.cvut.kbss.study.util.ConfigParam.SMTP_USER;
 import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
-import cz.cvut.kbss.study.util.etemplates.UserInvite;
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -22,10 +15,10 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
+
+import static cz.cvut.kbss.study.util.ConfigParam.*;
 
 @Service
 public class EmailService {

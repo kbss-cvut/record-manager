@@ -3,7 +3,6 @@ package cz.cvut.kbss.study.util.etemplates;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;

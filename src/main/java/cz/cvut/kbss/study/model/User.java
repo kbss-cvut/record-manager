@@ -2,25 +2,21 @@ package cz.cvut.kbss.study.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import cz.cvut.kbss.jopa.model.annotations.*;
-import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @OWLClass(iri = Vocabulary.s_c_user)
 public class User implements HasDerivableUri, Serializable {

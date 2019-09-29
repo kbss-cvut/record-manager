@@ -1,11 +1,6 @@
 package cz.cvut.kbss.study.rest.handler;
 
-import cz.cvut.kbss.study.exception.EntityExistsException;
-import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.exception.PersistenceException;
-import cz.cvut.kbss.study.exception.ValidationException;
-import cz.cvut.kbss.study.exception.WebServiceIntegrationException;
-import javax.servlet.http.HttpServletRequest;
+import cz.cvut.kbss.study.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -13,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Contains exception handlers for REST controllers.
