@@ -6,7 +6,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @base <http://vfn.cz/ontologies/study-manager> .
 
-<http://vfn.cz/ontologies/study-manager> rdf:type owl:Ontology .
+<http://vfn.cz/ontologies/study-manager> rdf:type owl:Ontology ;
+                                         owl:imports <http://onto.fel.cvut.cz/ontologies/form> .
 
 
 #################################################################
@@ -15,29 +16,14 @@
 #
 #################################################################
 
-
-###  http://onto.fel.cvut.cz/ontologies/form/has-answer-origin
-
-<http://onto.fel.cvut.cz/ontologies/form/has-answer-origin> rdf:type owl:ObjectProperty .
-
-
-
-###  http://onto.fel.cvut.cz/ontologies/form/has-question-origin
-
-<http://onto.fel.cvut.cz/ontologies/form/has-question-origin> rdf:type owl:ObjectProperty .
-
-
-
 ###  http://purl.org/dc/terms/modified
 
 <http://purl.org/dc/terms/modified> rdf:type owl:ObjectProperty .
 
-
-
 ###  http://onto.fel.cvut.cz/ontologies/documentation/has_answer
 
 <http://onto.fel.cvut.cz/ontologies/documentation/has_answer> rdf:type owl:ObjectProperty ;
-                                                              
+
                                                               rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
 
 
@@ -65,12 +51,6 @@
                                                               owl:inverseOf <http://vfn.cz/ontologies/study-manager/is-member-of> ;
                                                               
                                                               rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
-
-
-
-###  http://onto.fel.cvut.cz/ontologies/documentation/has_object_value
-
-<http://onto.fel.cvut.cz/ontologies/documentation/has_object_value> rdf:type owl:ObjectProperty .
 
 
 
@@ -152,12 +132,6 @@
 
 
 
-###  http://onto.fel.cvut.cz/ontologies/documentation/has_data_value
-
-<http://onto.fel.cvut.cz/ontologies/documentation/has_data_value> rdf:type owl:DatatypeProperty .
-
-
-
 ###  http://vfn.cz/ontologies/study-manager/key
 
 <http://vfn.cz/ontologies/study-manager/key> rdf:type owl:DatatypeProperty .
@@ -216,15 +190,6 @@
                                                                  rdfs:label "Administrator"@en .
 
 
-
-###  http://onto.fel.cvut.cz/ontologies/documentation/answer
-
-<http://onto.fel.cvut.cz/ontologies/documentation/answer> rdf:type owl:Class ;
-                                                          
-                                                          rdfs:label "Answer"@en .
-
-
-
 ###  http://vfn.cz/ontologies/study-manager/institution
 
 <http://vfn.cz/ontologies/study-manager/institution> rdf:type owl:Class ;
@@ -246,15 +211,6 @@
 <http://vfn.cz/ontologies/study-manager/patient-record> rdf:type owl:Class ;
                                                                   
                                                                   rdfs:label "PatientRecord"@en .
-
-
-
-###  http://onto.fel.cvut.cz/ontologies/documentation/question
-
-<http://onto.fel.cvut.cz/ontologies/documentation/question> rdf:type owl:Class ;
-                                                            
-                                                            rdfs:label "Question"@en .
-
 
 
 ###  http://vfn.cz/ontologies/study-manager/user
