@@ -1,230 +1,160 @@
-@prefix : <http://vfn.cz/ontologies/study-manager/> .
+@prefix : <http://vfn.cz/ontologies/study-manager#> .
+@prefix sm: <http://vfn.cz/ontologies/study-manager/> .
+@prefix doc: <http://onto.fel.cvut.cz/ontologies/documentation/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @base <http://vfn.cz/ontologies/study-manager> .
 
 <http://vfn.cz/ontologies/study-manager> rdf:type owl:Ontology ;
-                                         owl:imports <http://onto.fel.cvut.cz/ontologies/form> .
-
+                                          owl:imports <http://onto.fel.cvut.cz/ontologies/form> .
 
 #################################################################
-#
 #    Object Properties
-#
 #################################################################
-
-###  http://purl.org/dc/terms/modified
-
-<http://purl.org/dc/terms/modified> rdf:type owl:ObjectProperty .
 
 ###  http://onto.fel.cvut.cz/ontologies/documentation/has_answer
-
-<http://onto.fel.cvut.cz/ontologies/documentation/has_answer> rdf:type owl:ObjectProperty ;
-
-                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
-
-
-
-###  http://vfn.cz/ontologies/study-manager/has-author
-
-<http://vfn.cz/ontologies/study-manager/has-author> rdf:type owl:ObjectProperty ;
-                                                              
-                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
-
-
-
-###  http://vfn.cz/ontologies/study-manager/has-last-editor
-
-<http://vfn.cz/ontologies/study-manager/has-last-editor> rdf:type owl:ObjectProperty ;
-                                                                   
-                                                                   rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
-
-
-
-###  http://vfn.cz/ontologies/study-manager/has-member
-
-<http://vfn.cz/ontologies/study-manager/has-member> rdf:type owl:ObjectProperty ;
-                                                              
-                                                              owl:inverseOf <http://vfn.cz/ontologies/study-manager/is-member-of> ;
-                                                              
-                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
-
-
-
-###  http://vfn.cz/ontologies/study-manager/has-part
-
-<http://vfn.cz/ontologies/study-manager/has-part> rdf:type owl:ObjectProperty ;
-                                                            
-                                                            rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
-
-
-
-###  http://vfn.cz/ontologies/study-manager/has-question
-
-<http://vfn.cz/ontologies/study-manager/has-question> rdf:type owl:ObjectProperty ;
-                                                                
-                                                                rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
-
+doc:has_answer rdf:type owl:ObjectProperty ;
+               rdfs:subPropertyOf sm:relates-to .
 
 
 ###  http://onto.fel.cvut.cz/ontologies/documentation/has_related_question
-
-<http://onto.fel.cvut.cz/ontologies/documentation/has_related_question> rdf:type owl:ObjectProperty ;
-                                                                        
-                                                                        rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/has-part> .
+doc:has_related_question rdf:type owl:ObjectProperty ;
+                         rdfs:subPropertyOf sm:has-part .
 
 
-
-###  http://vfn.cz/ontologies/study-manager/is-member-of
-
-<http://vfn.cz/ontologies/study-manager/is-member-of> rdf:type owl:ObjectProperty ;
-                                                                
-                                                                rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
+###  http://purl.org/dc/terms/modified
+<http://purl.org/dc/terms/modified> rdf:type owl:ObjectProperty .
 
 
-
-###  http://vfn.cz/ontologies/study-manager/relates-to
-
-<http://vfn.cz/ontologies/study-manager/relates-to> rdf:type owl:ObjectProperty .
-
+###  http://vfn.cz/ontologies/study-manager/has-author
+sm:has-author rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf sm:relates-to .
 
 
-###  http://vfn.cz/ontologies/study-manager/was-treated-at
+###  http://vfn.cz/ontologies/study-manager/has-last-editor
+sm:has-last-editor rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf sm:relates-to .
 
-<http://vfn.cz/ontologies/study-manager/was-treated-at> rdf:type owl:ObjectProperty ;
-                                                                  
-                                                                  rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
+
+###  http://vfn.cz/ontologies/study-manager/has-member
+sm:has-member rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf sm:relates-to ;
+              owl:inverseOf sm:is-member-of .
 
 
 ###  http://vfn.cz/ontologies/study-manager/has-owner
-
-<http://vfn.cz/ontologies/study-manager/has-owner> rdf:type owl:ObjectProperty ;
-
-                                                              rdfs:subPropertyOf <http://vfn.cz/ontologies/study-manager/relates-to> .
+sm:has-owner rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf sm:relates-to .
 
 
+###  http://vfn.cz/ontologies/study-manager/has-part
+sm:has-part rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf sm:relates-to .
 
+
+###  http://vfn.cz/ontologies/study-manager/has-question
+sm:has-question rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf sm:relates-to .
+
+
+###  http://vfn.cz/ontologies/study-manager/is-member-of
+sm:is-member-of rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf sm:relates-to .
+
+
+###  http://vfn.cz/ontologies/study-manager/relates-to
+sm:relates-to rdf:type owl:ObjectProperty .
+
+
+###  http://vfn.cz/ontologies/study-manager/was-treated-at
+sm:was-treated-at rdf:type owl:ObjectProperty ;
+                  rdfs:subPropertyOf sm:relates-to .
 
 
 #################################################################
-#
 #    Data properties
-#
 #################################################################
-
-###  http://vfn.cz/ontologies/study-manager/payload
-
-<http://vfn.cz/ontologies/study-manager/payload> rdf:type owl:DatatypeProperty .
-
-###  http://vfn.cz/ontologies/study-manager/action_type
-
-<http://vfn.cz/ontologies/study-manager/action_type> rdf:type owl:DatatypeProperty .
-
-
-
 
 ###  http://purl.org/dc/terms/created
-
 <http://purl.org/dc/terms/created> rdf:type owl:DatatypeProperty .
 
 
-
-###  http://vfn.cz/ontologies/study-manager/key
-
-<http://vfn.cz/ontologies/study-manager/key> rdf:type owl:DatatypeProperty .
-
-
-
-###  http://vfn.cz/ontologies/study-manager/password
-
-<http://vfn.cz/ontologies/study-manager/password> rdf:type owl:DatatypeProperty .
-
-
-
-###  http://xmlns.com/foaf/0.1/accountName
-
-<http://xmlns.com/foaf/0.1/accountName> rdf:type owl:DatatypeProperty .
-
-
-
-###  http://xmlns.com/foaf/0.1/firstName
-
-<http://xmlns.com/foaf/0.1/firstName> rdf:type owl:DatatypeProperty .
-
-
-
-###  http://xmlns.com/foaf/0.1/lastName
-
-<http://xmlns.com/foaf/0.1/lastName> rdf:type owl:DatatypeProperty .
-
-
-
-###  http://xmlns.com/foaf/0.1/mbox
-
-<http://xmlns.com/foaf/0.1/mbox> rdf:type owl:DatatypeProperty .
-
-
-###  http://vfn.cz/ontologies/study-manager/token
-
-<http://vfn.cz/ontologies/study-manager/token> rdf:type owl:DatatypeProperty .
+###  http://vfn.cz/ontologies/study-manager/action_type
+sm:action_type rdf:type owl:DatatypeProperty .
 
 
 ###  http://vfn.cz/ontologies/study-manager/isInvited
+sm:isInvited rdf:type owl:DatatypeProperty .
 
-<http://vfn.cz/ontologies/study-manager/isInvited> rdf:type owl:DatatypeProperty .
+
+###  http://vfn.cz/ontologies/study-manager/key
+sm:key rdf:type owl:DatatypeProperty .
+
+
+###  http://vfn.cz/ontologies/study-manager/password
+sm:password rdf:type owl:DatatypeProperty .
+
+
+###  http://vfn.cz/ontologies/study-manager/payload
+sm:payload rdf:type owl:DatatypeProperty .
+
+
+###  http://vfn.cz/ontologies/study-manager/token
+sm:token rdf:type owl:DatatypeProperty .
+
+
+###  http://xmlns.com/foaf/0.1/accountName
+<http://xmlns.com/foaf/0.1/accountName> rdf:type owl:DatatypeProperty .
+
+
+###  http://xmlns.com/foaf/0.1/firstName
+<http://xmlns.com/foaf/0.1/firstName> rdf:type owl:DatatypeProperty .
+
+
+###  http://xmlns.com/foaf/0.1/lastName
+<http://xmlns.com/foaf/0.1/lastName> rdf:type owl:DatatypeProperty .
+
+
+###  http://xmlns.com/foaf/0.1/mbox
+<http://xmlns.com/foaf/0.1/mbox> rdf:type owl:DatatypeProperty .
+
 
 #################################################################
-#
 #    Classes
-#
 #################################################################
+
+###  http://vfn.cz/ontologies/study-manager/action-history
+sm:action-history rdf:type owl:Class ;
+                  rdfs:label "ActionHistory"@en .
 
 
 ###  http://vfn.cz/ontologies/study-manager/administrator
-
-<http://vfn.cz/ontologies/study-manager/administrator> rdf:type owl:Class ;
-                                                                 
-                                                                 rdfs:label "Administrator"@en .
-
-
-###  http://vfn.cz/ontologies/study-manager/institution
-
-<http://vfn.cz/ontologies/study-manager/institution> rdf:type owl:Class ;
-                                                          
-                                                          rdfs:label "Institution"@en .
-
+sm:administrator rdf:type owl:Class ;
+                 rdfs:label "Administrator"@en .
 
 
 ###  http://vfn.cz/ontologies/study-manager/doctor
+sm:doctor rdf:type owl:Class ;
+          rdfs:label "Doctor"@en .
 
-<http://vfn.cz/ontologies/study-manager/doctor> rdf:type owl:Class ;
-                                                          
-                                                          rdfs:label "Doctor"@en .
 
+###  http://vfn.cz/ontologies/study-manager/institution
+sm:institution rdf:type owl:Class ;
+               rdfs:label "Institution"@en .
 
 
 ###  http://vfn.cz/ontologies/study-manager/patient-record
-
-<http://vfn.cz/ontologies/study-manager/patient-record> rdf:type owl:Class ;
-                                                                  
-                                                                  rdfs:label "PatientRecord"@en .
+sm:patient-record rdf:type owl:Class ;
+                  rdfs:label "PatientRecord"@en .
 
 
 ###  http://vfn.cz/ontologies/study-manager/user
-
-<http://vfn.cz/ontologies/study-manager/user> rdf:type owl:Class ;
-                                                        
-                                                        rdfs:label "User"@en .
-
-###  http://vfn.cz/ontologies/study-manager/action-history
-
-<http://vfn.cz/ontologies/study-manager/action-history> rdf:type owl:Class ;
-
-                                                        rdfs:label "ActionHistory"@en .
+sm:user rdf:type owl:Class ;
+        rdfs:label "User"@en .
 
 
-###  Generated by the OWL API (version 3.5.1) http://owlapi.sourceforge.net
-
+###  Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi
