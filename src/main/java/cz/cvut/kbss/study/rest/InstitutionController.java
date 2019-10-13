@@ -31,7 +31,7 @@ public class InstitutionController extends BaseController {
     private PatientRecordService recordService;
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Institution> getAllInstitutions() {
         final List<Institution> institutions = institutionService.findAll();
         Collections.sort(institutions, (a, b) -> a.getName().compareTo(b.getName()));
@@ -40,7 +40,7 @@ public class InstitutionController extends BaseController {
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') " +
      "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfInstitution(#key)")
-    @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Institution findByKey(@PathVariable("key") String key) {
         return findInternal(key);
     }
@@ -54,14 +54,14 @@ public class InstitutionController extends BaseController {
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
-    @RequestMapping(value = "/{key}/patients", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{key}/patients", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecordDto> getTreatedPatientRecords(@PathVariable("key") String key) {
         final Institution institution = findInternal(key);
         return recordService.findByInstitution(institution);
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createInstitution(@RequestBody Institution institution) {
         institutionService.persist(institution);
@@ -74,7 +74,7 @@ public class InstitutionController extends BaseController {
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
-    @RequestMapping(value = "/{key}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{key}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateInstitution(@PathVariable("key") String key, @RequestBody Institution institution) {
         if (!key.equals(institution.getKey())) {
@@ -89,7 +89,7 @@ public class InstitutionController extends BaseController {
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
-    @RequestMapping(value = "/{key}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{key}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteInstitution(@PathVariable("key") String key) {
         final Institution toRemove = findInternal(key);

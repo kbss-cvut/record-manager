@@ -17,7 +17,7 @@ public class FormGenController extends BaseController {
     @Autowired
     private FormGenService formGenService;
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public RawJson generateForm(@RequestBody PatientRecord data) {
         return formGenService.generateForm(data);
     }

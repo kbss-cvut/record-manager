@@ -31,7 +31,7 @@ public class PatientRecordController extends BaseController {
     private InstitutionService institutionService;
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecordDto> getRecords(@RequestParam(value = "institution", required = false) String institutionKey) {
         return institutionKey != null ? findByInstitution(institutionKey) : recordService.findAllRecords();
     }
@@ -45,7 +45,7 @@ public class PatientRecordController extends BaseController {
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
-    @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PatientRecord getRecord(@PathVariable("key") String key) {
         return findInternal(key);
     }
@@ -58,7 +58,7 @@ public class PatientRecordController extends BaseController {
         return record;
     }
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createRecord(@RequestBody PatientRecord record) {
         recordService.persist(record);
@@ -70,7 +70,7 @@ public class PatientRecordController extends BaseController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{key}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{key}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateRecord(@PathVariable("key") String key, @RequestBody PatientRecord record) {
         if (!key.equals(record.getKey())) {
@@ -84,7 +84,7 @@ public class PatientRecordController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/{key}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{key}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeRecord(@PathVariable("key") String key) {
         final PatientRecord toRemove = findInternal(key);

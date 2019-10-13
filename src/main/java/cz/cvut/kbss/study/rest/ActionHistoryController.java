@@ -25,7 +25,7 @@ public class ActionHistoryController extends BaseController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody ActionHistory actionHistory) {
         actionHistoryService.persist(actionHistory);
@@ -35,7 +35,7 @@ public class ActionHistoryController extends BaseController {
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ActionHistory> getActions(@RequestParam(value = "author", required = false) String authorUsername,
                                           @RequestParam(value = "type", required = false) String type,
                                           @RequestParam(value = "page") int pageNumber) {
@@ -51,7 +51,7 @@ public class ActionHistoryController extends BaseController {
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
-    @RequestMapping(method = RequestMethod.GET, value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ActionHistory getByKey(@PathVariable("key") String key) {
         final ActionHistory action = actionHistoryService.findByKey(key);
         if (action == null) {
