@@ -27,6 +27,9 @@ public class Question extends AbstractEntity {
     @OWLObjectProperty(iri = Vocabulary.s_p_has_question_origin)
     private URI origin;
 
+    @OWLDataProperty(iri = Vocabulary.s_p_has_origin_path_id)
+    private String originPathId;
+
     @Types
     private Set<String> types = new HashSet<>();
 
