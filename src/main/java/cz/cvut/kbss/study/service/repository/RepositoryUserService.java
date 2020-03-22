@@ -189,7 +189,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         if (!userDao.findByUsername(instance.getUsername()).getUri().equals(instance.getUri())) {
             throw new EntityExistsException("User with specified username already exists.");
         }
-        if (!userDao.findByEmail(instance.getEmailAddress()).getUsername().equals(instance.getUsername())) {
+        if (userDao.findByEmail(instance.getEmailAddress()) != null) {
             throw new EntityExistsException("User with specified email already exists.");
         }
         final User orig = userDao.find(instance.getUri());
