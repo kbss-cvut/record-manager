@@ -2,6 +2,6 @@
 *.iml
 target
 node_modules
-**/bundle.js
+build
 **/generated-sources
 **/npm-debug.log
