@@ -6,3 +6,4 @@ build
 **/generated-sources
 **/npm-debug.log
 .DS_store
+.env
