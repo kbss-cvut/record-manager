@@ -215,7 +215,7 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                                <phase>install</phase>
+                                <phase>compile</phase>
                                 <configuration>
                                     <workingDirectory>src/main/webapp/</workingDirectory>
                                     <executable>npm</executable>
