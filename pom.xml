@@ -171,25 +171,6 @@
 
     <profiles>
         <profile>
-            <id>dev</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>2.4</version>
-                        <configuration>
-                            <failOnMissingWebXml>false</failOnMissingWebXml>
-                            <warSourceExcludes>
-                                node_modules/**
-                            </warSourceExcludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
             <id>production</id>
             <properties>
                 <profile.name>production</profile.name>
@@ -199,6 +180,13 @@
             </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
@@ -220,6 +208,20 @@
                                 </configuration>
                             </execution>
                             <execution>
+                                <id>npm-install</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <workingDirectory>src/main/webapp/</workingDirectory>
+                                    <executable>npm</executable>
+                                    <arguments>
+                                        <argument>install</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>ui-build</id>
                                 <goals>
                                     <goal>exec</goal>
@@ -230,7 +232,7 @@
                                     <executable>npm</executable>
                                     <arguments>
                                         <argument>run</argument>
-                                        <argument>build</argument>
+                                        <argument>build:static</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -249,50 +251,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.google.code.maven-replacer-plugin</groupId>
-                        <artifactId>replacer</artifactId>
-                        <version>1.5.3</version>
-                        <executions>
-                            <execution>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <ignoreMissingFile>false</ignoreMissingFile>
-                            <file>${project.basedir}/profiles/production/index.html</file>
-                            <outputFile>${project.basedir}/profiles/production/index.html</outputFile>
-                            <regex>false</regex>
-                            <token>$VERSION$</token>
-                            <value>${project.version}</value>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>2.4</version>
-                        <configuration>
-                            <warName>study-manager</warName>
-                            <failOnMissingWebXml>false</failOnMissingWebXml>
-                            <webResources>
-                                <resource>
-                                    <directory>profiles/production</directory>
-                                </resource>
-                            </webResources>
-                            <warSourceExcludes>
-                                node_modules/**
-                            </warSourceExcludes>
-                            <packagingExcludes>
-                                **/js/actions/,**/js/components/,**/js/constants/,**/js/stores/,**/js/utils/,**/js/model/,
-                                **/js/validation/, **/js/i18n/,
-                                **/js/app.js,**/js/bundle.js,**/js/.bundle.js,**/css/study-manager.css,tests/,node_modules/,
-                                package.json,.babelrc,.eslintrc,**/mapping
-                            </packagingExcludes>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
