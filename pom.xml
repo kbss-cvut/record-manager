@@ -185,6 +185,9 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <configuration>
                             <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                            <warSourceExcludes>
+                                **
+                            </warSourceExcludes>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -212,7 +215,7 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                                <phase>compile</phase>
+                                <phase>install</phase>
                                 <configuration>
                                     <workingDirectory>src/main/webapp/</workingDirectory>
                                     <executable>npm</executable>
