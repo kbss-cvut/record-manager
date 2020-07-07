@@ -90,6 +90,9 @@ sm:action_type rdf:type owl:DatatypeProperty .
 ###  http://vfn.cz/ontologies/study-manager/isInvited
 sm:isInvited rdf:type owl:DatatypeProperty .
 
+###  http://vfn.cz/ontologies/study-manager/formType
+sm:formType rdf:type owl:DatatypeProperty .
+
 
 ###  http://vfn.cz/ontologies/study-manager/key
 sm:key rdf:type owl:DatatypeProperty .

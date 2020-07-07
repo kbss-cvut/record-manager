@@ -33,6 +33,9 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
     @OWLObjectProperty(iri = Vocabulary.s_p_was_treated_at, fetch = FetchType.EAGER)
     private Institution institution;
 
+    @OWLDataProperty(iri = Vocabulary.s_p_formType)
+    private String formType;
+
     @OWLObjectProperty(iri = Vocabulary.s_p_has_question, cascade = {CascadeType.MERGE,
             CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private Question question;
@@ -101,6 +104,14 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
 
     public void setQuestion(Question question) {
         this.question = question;
+    }
+
+    public String getFormType() {
+        return formType;
+    }
+
+    public void setFormType(String formType) {
+        this.formType = formType;
     }
 
     @Override
