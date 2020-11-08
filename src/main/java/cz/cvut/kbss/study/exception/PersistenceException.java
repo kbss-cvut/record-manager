@@ -3,10 +3,7 @@ package cz.cvut.kbss.study.exception;
 /**
  * General exception marking an error in the persistence layer.
  */
-public class PersistenceException extends RuntimeException {
-
-    public PersistenceException() {
-    }
+public class PersistenceException extends FormManagerException {
 
     public PersistenceException(String message) {
         super(message);

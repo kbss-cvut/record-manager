@@ -3,7 +3,7 @@ package cz.cvut.kbss.study.exception;
 /**
  * Exception thrown when access to other application's web services fails.
  */
-public class WebServiceIntegrationException extends RuntimeException {
+public class WebServiceIntegrationException extends FormManagerException {
 
     public WebServiceIntegrationException(String message) {
         super(message);
