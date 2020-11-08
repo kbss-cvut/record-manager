@@ -5,15 +5,17 @@ import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.formgen.FormGenDao;
 import cz.cvut.kbss.study.rest.dto.RawJson;
 import cz.cvut.kbss.study.rest.util.RestUtils;
-import cz.cvut.kbss.study.service.data.DataLoader;
+import cz.cvut.kbss.study.persistence.data.DataLoader;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.ConfigParam;
+import cz.cvut.kbss.study.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.*;
 
@@ -27,18 +29,41 @@ public class FormGenService {
     private static final String FORMGEN_REPOSITORY_URL_PARAM = "formGenRepositoryUrl";
     private static final String RECORD_GRAPH_ID_PARAM = "recordGraphId";
 
+    // query
+    private static final String FIND_FORM_TYPES_QUERY_FILE = "findFormTypes.rq";
+    private String findFormTypesQuery;
 
-    @Autowired
-    private FormGenDao formGenDao;
+    // environment variables
+    private String serviceUrl;
+    private String repoUrl;
+    private String formGenRepoUrl;
 
-    @Autowired
-    private DataLoader dataLoader;
 
-    @Autowired
-    private Environment environment;
+    private final FormGenDao formGenDao;
 
-    @Autowired
-    private SecurityUtils securityUtils;
+    private final DataLoader dataLoader;
+
+    private final Environment environment;
+
+    private final SecurityUtils securityUtils;
+
+    public FormGenService(FormGenDao formGenDao,
+                          DataLoader dataLoader,
+                          Environment environment,
+                          SecurityUtils securityUtils) {
+        this.formGenDao = formGenDao;
+        this.dataLoader = dataLoader;
+        this.environment = environment;
+        this.securityUtils = securityUtils;
+    }
+
+    @PostConstruct
+    private void loadConfiguration() {
+        serviceUrl = environment.getProperty(ConfigParam.FORM_GEN_SERVICE_URL.toString(), "");
+        repoUrl = environment.getProperty(ConfigParam.REPOSITORY_URL.toString(), "");
+        formGenRepoUrl = environment.getProperty(ConfigParam.FORM_GEN_REPOSITORY_URL.toString(), "");
+        this.findFormTypesQuery = Utils.loadQuery(FIND_FORM_TYPES_QUERY_FILE);
+    }
 
     /**
      * Gets a form from a remote generator service.
@@ -61,9 +86,7 @@ public class FormGenService {
     }
 
     private RawJson loadFormStructure(URI context) {
-        final String serviceUrl = environment.getProperty(ConfigParam.FORM_GEN_SERVICE_URL.toString(), "");
-        final String repoUrl = environment.getProperty(ConfigParam.REPOSITORY_URL.toString(), "");
-        final String formGenRepoUrl = environment.getProperty(ConfigParam.FORM_GEN_REPOSITORY_URL.toString(), "");
+
         if (serviceUrl.isEmpty() || repoUrl.isEmpty()) {
             LOG.error("Form generator service URL or repository URL is missing. Service URL: {}, repository URL: {}.",
                     serviceUrl, repoUrl);
@@ -79,5 +102,11 @@ public class FormGenService {
     public RawJson getPossibleValues(String query) {
         Objects.requireNonNull(query);
         return new RawJson(dataLoader.loadData(query, Collections.emptyMap()));
+    }
+
+    public RawJson getFormTypes() {
+        Objects.requireNonNull(this.findFormTypesQuery);
+        String queryUrl = formGenRepoUrl + "?query=" + RestUtils.encodeUrl(this.findFormTypesQuery);
+        return new RawJson(dataLoader.loadData(queryUrl, Collections.emptyMap()));
     }
 }

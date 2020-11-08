@@ -1,4 +1,4 @@
-package cz.cvut.kbss.study.service.data;
+package cz.cvut.kbss.study.persistence.data;
 
 import java.util.Map;
 

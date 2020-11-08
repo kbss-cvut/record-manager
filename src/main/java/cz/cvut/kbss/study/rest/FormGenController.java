@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/formGen")
 public class FormGenController extends BaseController {
 
-    @Autowired
-    private FormGenService formGenService;
+    private final FormGenService formGenService;
+
+    public FormGenController(FormGenService formGenService) {
+        this.formGenService = formGenService;
+    }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public RawJson generateForm(@RequestBody PatientRecord data) {
@@ -25,5 +28,10 @@ public class FormGenController extends BaseController {
     @RequestMapping("/possibleValues")
     public RawJson getPossibleValues(@RequestParam("query") String query) {
         return formGenService.getPossibleValues(query);
+    }
+
+    @RequestMapping("/formTypes")
+    public RawJson getFormTypes() {
+        return formGenService.getFormTypes();
     }
 }

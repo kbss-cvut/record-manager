@@ -37,4 +37,12 @@ public final class Constants {
      * Number of history actions fetched from database. Needs to be changes also in front-end.
      */
     public static final int ACTIONS_PER_PAGE = 25;
+
+    /**
+     * Path to directory containing queries used by the system.
+     * <p>
+     * The path should be relative to the classpath, so that queries from it can be loaded using {@link
+     * ClassLoader#getResourceAsStream(String)}.
+     */
+    public static final String QUERY_DIRECTORY = "query";
 }

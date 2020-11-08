@@ -2,7 +2,6 @@ package cz.cvut.kbss.study.environment.config;
 
 import cz.cvut.kbss.study.persistence.dao.ActionHistoryDao;
 import cz.cvut.kbss.study.service.*;
-import cz.cvut.kbss.study.service.data.RemoteDataLoader;
 import cz.cvut.kbss.study.service.security.UserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -59,8 +58,4 @@ public class MockServiceConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean(name = "remoteDataLoader")
-    public RemoteDataLoader remoteDataLoader() {
-        return mock(RemoteDataLoader.class);
-    }
 }

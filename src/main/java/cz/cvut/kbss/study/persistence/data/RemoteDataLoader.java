@@ -1,4 +1,4 @@
-package cz.cvut.kbss.study.service.data;
+package cz.cvut.kbss.study.persistence.data;
 
 import cz.cvut.kbss.study.exception.WebServiceIntegrationException;
 import cz.cvut.kbss.study.util.Constants;
@@ -9,13 +9,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Map;
 
-@Service("remoteDataLoader")
+@Component("remoteDataLoader")
 public class RemoteDataLoader implements DataLoader {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteDataLoader.class);
@@ -25,8 +25,11 @@ public class RemoteDataLoader implements DataLoader {
      */
     public static final String[] SUPPORTED_HEADERS = {HttpHeaders.ACCEPT, HttpHeaders.CONTENT_TYPE};
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    public RemoteDataLoader(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     /**
      * {@inheritDoc}

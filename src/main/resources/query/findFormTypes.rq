@@ -1,0 +1,20 @@
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+prefix fm: <http://onto.fel.cvut.cz/ontologies/form-metadata/>
+prefix dcterms: <http://purl.org/dc/terms/>
+
+CONSTRUCT {
+      ?formGraph rdfs:label ?label .
+      ?formGraph rdfs:comment ?explanation .
+}
+WHERE {
+    GRAPH ?formGraph {
+       ?formRoot a fm:root-entity .
+    }
+    SERVICE <https://xn--slovnk-7va.gov.cz/sparql> {
+      ?formRoot skos:prefLabel ?label .
+      OPTIONAL {
+         ?formRoot dcterms:description ?explanation .
+      }
+   }
+}
