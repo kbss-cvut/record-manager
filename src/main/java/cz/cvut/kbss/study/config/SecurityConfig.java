@@ -37,20 +37,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             SecurityConstants.CSRF_COOKIE_NAME
     };
 
-    @Autowired
-    private AuthenticationEntryPoint authenticationEntryPoint;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    @Autowired
-    private AuthenticationFailureHandler authenticationFailureHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
-    @Autowired
-    private AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Autowired
-    private LogoutSuccessHandler logoutSuccessHandler;
+    private final LogoutSuccessHandler logoutSuccessHandler;
 
-    @Autowired
-    private AuthenticationProvider ontologyAuthenticationProvider;
+    private final AuthenticationProvider ontologyAuthenticationProvider;
+
+    public SecurityConfig(AuthenticationEntryPoint authenticationEntryPoint,
+                          AuthenticationFailureHandler authenticationFailureHandler,
+                          AuthenticationSuccessHandler authenticationSuccessHandler,
+                          LogoutSuccessHandler logoutSuccessHandler,
+                          AuthenticationProvider ontologyAuthenticationProvider) {
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.authenticationFailureHandler = authenticationFailureHandler;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+        this.logoutSuccessHandler = logoutSuccessHandler;
+        this.ontologyAuthenticationProvider = ontologyAuthenticationProvider;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {

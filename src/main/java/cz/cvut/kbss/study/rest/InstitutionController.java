@@ -24,11 +24,15 @@ import java.util.List;
 @RequestMapping("/institutions")
 public class InstitutionController extends BaseController {
 
-    @Autowired
-    private InstitutionService institutionService;
+    private final InstitutionService institutionService;
 
-    @Autowired
-    private PatientRecordService recordService;
+    private final PatientRecordService recordService;
+    
+    public InstitutionController(InstitutionService institutionService,
+                                 PatientRecordService recordService) {
+        this.institutionService = institutionService;
+        this.recordService = recordService;
+    }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

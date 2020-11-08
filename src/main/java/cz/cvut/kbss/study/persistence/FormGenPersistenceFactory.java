@@ -21,10 +21,13 @@ import static cz.cvut.kbss.study.util.ConfigParam.FORM_GEN_REPOSITORY_URL;
 @PropertySource("classpath:config.properties")
 public class FormGenPersistenceFactory {
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
 
     private EntityManagerFactory emf;
+
+    public FormGenPersistenceFactory(Environment environment) {
+        this.environment = environment;
+    }
 
     @Bean(name = "formGen")
     public EntityManagerFactory getEntityManagerFactory() {

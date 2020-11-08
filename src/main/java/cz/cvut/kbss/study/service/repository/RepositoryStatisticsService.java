@@ -9,11 +9,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class RepositoryStatisticsService implements StatisticsService {
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
 
-    @Autowired
-    private PatientRecordDao recordDao;
+    private final PatientRecordDao recordDao;
+
+    public RepositoryStatisticsService(UserDao userDao,
+                                       PatientRecordDao recordDao) {
+        this.userDao = userDao;
+        this.recordDao = recordDao;
+    }
 
     @Override
     public int getNumberOfInvestigators() {

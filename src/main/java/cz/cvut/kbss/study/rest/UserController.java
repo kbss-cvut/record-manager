@@ -29,11 +29,14 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController extends BaseController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private InstitutionService institutionService;
+    private final InstitutionService institutionService;
+
+    public UserController(UserService userService, InstitutionService institutionService) {
+        this.userService = userService;
+        this.institutionService = institutionService;
+    }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name or " +
             "hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.areFromSameInstitution(#username)")

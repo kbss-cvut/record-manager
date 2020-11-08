@@ -19,11 +19,15 @@ import java.util.List;
 @RequestMapping("/history")
 public class ActionHistoryController extends BaseController {
 
-    @Autowired
-    private ActionHistoryService actionHistoryService;
+    private final ActionHistoryService actionHistoryService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public ActionHistoryController(ActionHistoryService actionHistoryService,
+                                   UserService userService) {
+        this.actionHistoryService = actionHistoryService;
+        this.userService = userService;
+    }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)

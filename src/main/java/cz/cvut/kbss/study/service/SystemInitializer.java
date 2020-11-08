@@ -18,11 +18,15 @@ public class SystemInitializer {
     private static final String ADMIN_USERNAME = "admin";
     private static final String INSTITUTION_NAME = "admin_institution";
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private InstitutionService institutionService;
+    private final InstitutionService institutionService;
+
+    public SystemInitializer(UserService userService,
+                             InstitutionService institutionService) {
+        this.userService = userService;
+        this.institutionService = institutionService;
+    }
 
     @PostConstruct
     private void initializeSystem() {

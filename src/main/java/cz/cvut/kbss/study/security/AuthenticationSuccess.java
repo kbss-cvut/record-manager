@@ -25,11 +25,15 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationSuccess.class);
 
-    @Autowired
-    private ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
-    @Autowired
-    private ConfigReader config;
+    private final ConfigReader config;
+
+    public AuthenticationSuccess(ObjectMapper mapper,
+                                 ConfigReader config) {
+        this.mapper = mapper;
+        this.config = config;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,

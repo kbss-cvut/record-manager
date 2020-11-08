@@ -13,8 +13,11 @@ import java.util.List;
 @Service
 public class RepositoryActionHistoryService extends BaseRepositoryService<ActionHistory> implements ActionHistoryService {
 
-    @Autowired
-    private ActionHistoryDao actionHistoryDao;
+    private final ActionHistoryDao actionHistoryDao;
+
+    public RepositoryActionHistoryService(ActionHistoryDao actionHistoryDao) {
+        this.actionHistoryDao = actionHistoryDao;
+    }
 
     @Override
     protected GenericDao<ActionHistory> getPrimaryDao() {

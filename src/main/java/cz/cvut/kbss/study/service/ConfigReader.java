@@ -10,8 +10,11 @@ import java.util.Map;
 @Component
 public class ConfigReader {
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
+
+    public ConfigReader(Environment environment) {
+        this.environment = environment;
+    }
 
     /**
      * Gets value of the specified configuration parameter.

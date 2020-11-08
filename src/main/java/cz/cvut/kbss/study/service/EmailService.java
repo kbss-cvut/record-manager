@@ -23,8 +23,12 @@ import static cz.cvut.kbss.study.util.ConfigParam.*;
 @Service
 public class EmailService {
     protected static final Logger LOG = LoggerFactory.getLogger(EmailService.class);
-    @Autowired
-    private ConfigReader config;
+
+    private final ConfigReader config;
+
+    public EmailService(ConfigReader config) {
+        this.config = config;
+    }
 
     private Session getSession() {
         // Get system properties

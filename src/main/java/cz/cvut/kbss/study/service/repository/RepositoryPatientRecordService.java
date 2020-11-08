@@ -19,11 +19,15 @@ import java.util.List;
 public class RepositoryPatientRecordService extends KeySupportingRepositoryService<PatientRecord>
         implements PatientRecordService {
 
-    @Autowired
-    private PatientRecordDao recordDao;
+    private final PatientRecordDao recordDao;
 
-    @Autowired
-    private SecurityUtils securityUtils;
+    private final SecurityUtils securityUtils;
+
+    public RepositoryPatientRecordService(PatientRecordDao recordDao,
+                                          SecurityUtils securityUtils) {
+        this.recordDao = recordDao;
+        this.securityUtils = securityUtils;
+    }
 
     @Override
     protected OwlKeySupportingDao<PatientRecord> getPrimaryDao() {

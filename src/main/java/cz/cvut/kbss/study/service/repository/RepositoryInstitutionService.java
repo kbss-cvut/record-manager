@@ -14,14 +14,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class RepositoryInstitutionService extends KeySupportingRepositoryService<Institution> implements InstitutionService {
 
-    @Autowired
-    private InstitutionDao institutionDao;
+    private final InstitutionDao institutionDao;
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
 
-    @Autowired
-    private PatientRecordDao patientRecordDao;
+    private final PatientRecordDao patientRecordDao;
+
+    public RepositoryInstitutionService(InstitutionDao institutionDao,
+                                        UserDao userDao,
+                                        PatientRecordDao patientRecordDao) {
+        this.institutionDao = institutionDao;
+        this.userDao = userDao;
+        this.patientRecordDao = patientRecordDao;
+    }
 
     @Override
     protected OwlKeySupportingDao<Institution> getPrimaryDao() {

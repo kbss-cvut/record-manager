@@ -36,10 +36,13 @@ public class PersistenceFactory {
 
     private static final Map<String, String> DEFAULT_PARAMS = initParams();
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
 
     private EntityManagerFactory emf;
+
+    public PersistenceFactory(Environment environment) {
+        this.environment = environment;
+    }
 
     @Bean
     @Primary

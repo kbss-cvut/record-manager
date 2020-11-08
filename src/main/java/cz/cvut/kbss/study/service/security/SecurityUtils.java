@@ -15,11 +15,14 @@ import java.util.List;
 @Service
 public class SecurityUtils {
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
 
-    @Autowired
-    private PatientRecordDao patientRecordDao;
+    private final PatientRecordDao patientRecordDao;
+
+    public SecurityUtils(UserDao userDao, PatientRecordDao patientRecordDao) {
+        this.userDao = userDao;
+        this.patientRecordDao = patientRecordDao;
+    }
 
     /**
      * Gets the currently authenticated user.

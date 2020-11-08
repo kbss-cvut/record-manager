@@ -17,8 +17,11 @@ import java.util.Map;
 @RequestMapping("/statistics")
 public class StatisticsController extends BaseController {
 
-    @Autowired
-    private StatisticsService statisticsService;
+    private final StatisticsService statisticsService;
+
+    public StatisticsController(StatisticsService statisticsService) {
+        this.statisticsService = statisticsService;
+    }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

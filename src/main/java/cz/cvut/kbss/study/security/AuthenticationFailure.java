@@ -22,8 +22,11 @@ public class AuthenticationFailure implements AuthenticationFailureHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationFailure.class);
 
-    @Autowired
-    private ObjectMapper mapper;
+    private final ObjectMapper mapper;
+
+    public AuthenticationFailure(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,

@@ -30,23 +30,31 @@ import java.util.Optional;
 @Service
 public class RepositoryUserService extends BaseRepositoryService<User> implements UserService {
 
-    @Autowired
-    private SecurityUtils securityUtils;
+    private final SecurityUtils securityUtils;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
 
-    @Autowired
-    private PatientRecordDao patientRecordDao;
+    private final PatientRecordDao patientRecordDao;
 
-    @Autowired
-    private EmailService email;
+    private final EmailService email;
 
-    @Autowired
-    private ConfigReader config;
+    private final ConfigReader config;
+
+    public RepositoryUserService(SecurityUtils securityUtils,
+                                 PasswordEncoder passwordEncoder,
+                                 UserDao userDao,
+                                 PatientRecordDao patientRecordDao,
+                                 EmailService email,
+                                 ConfigReader config) {
+        this.securityUtils = securityUtils;
+        this.passwordEncoder = passwordEncoder;
+        this.userDao = userDao;
+        this.patientRecordDao = patientRecordDao;
+        this.email = email;
+        this.config = config;
+    }
 
     @Override
     protected GenericDao<User> getPrimaryDao() {

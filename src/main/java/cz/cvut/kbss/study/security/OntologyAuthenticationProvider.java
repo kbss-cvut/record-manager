@@ -22,11 +22,15 @@ public class OntologyAuthenticationProvider implements AuthenticationProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(OntologyAuthenticationProvider.class);
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    public OntologyAuthenticationProvider(UserDetailsService userDetailsService,
+                                          PasswordEncoder passwordEncoder) {
+        this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

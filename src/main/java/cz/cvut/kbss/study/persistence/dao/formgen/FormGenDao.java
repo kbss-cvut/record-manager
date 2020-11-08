@@ -18,9 +18,11 @@ import java.util.Objects;
 @Repository
 public class FormGenDao {
 
-    @Autowired
-    @Qualifier("formGen")
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
+
+    public FormGenDao(@Qualifier("formGen") EntityManagerFactory emf) {
+        this.emf = emf;
+    }
 
     public URI persist(PatientRecord record) {
         Objects.requireNonNull(record);
