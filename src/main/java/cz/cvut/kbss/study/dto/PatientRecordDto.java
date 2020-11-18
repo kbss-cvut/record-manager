@@ -16,6 +16,9 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
     @OWLDataProperty(iri = Vocabulary.s_p_key)
     private String key;
 
+    @OWLDataProperty(iri = Vocabulary.s_p_formType)
+    private String formType;
+
     @ParticipationConstraints(nonEmpty = true)
     @OWLAnnotationProperty(iri = Vocabulary.s_p_label)
     private String localName;
@@ -92,6 +95,14 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
 
     public void setInstitution(Institution institution) {
         this.institution = institution;
+    }
+
+    public String getFormType() {
+        return formType;
+    }
+
+    public void setFormType(String formType) {
+        this.formType = formType;
     }
 
     @Override
