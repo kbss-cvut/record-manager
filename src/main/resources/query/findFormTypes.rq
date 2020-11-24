@@ -10,11 +10,15 @@ CONSTRUCT {
 WHERE {
     GRAPH ?formGraph {
        ?formRoot a fm:root-entity .
+       OPTIONAL {
+            ?formGraph skos:prefLabel ?formLabel .
+       }
     }
     SERVICE <https://xn--slovnk-7va.gov.cz/sparql> {
-      ?formRoot skos:prefLabel ?label .
+      ?formRoot skos:prefLabel ?entityLabel .
       OPTIONAL {
          ?formRoot dcterms:description ?explanation .
       }
    }
+   BIND(COALESCE(?formLabel, ?entityLabel) as ?label)
 }
