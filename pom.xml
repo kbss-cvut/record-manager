@@ -7,7 +7,7 @@
     <groupId>cz.cvut.kbss</groupId>
     <artifactId>study-manager</artifactId>
     <version>0.2.1</version>
-    <name>OFN Form Manager</name>
+    <name>OFN Record Manager</name>
     <packaging>war</packaging>
 
     <properties>
