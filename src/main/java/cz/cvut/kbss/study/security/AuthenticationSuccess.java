@@ -6,7 +6,7 @@ import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Writes basic login/logout information into the response.
@@ -42,6 +43,7 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
         if (LOG.isTraceEnabled()) {
             LOG.trace("Successfully authenticated user {}", username);
         }
+        addSameSiteCookieAttribute(httpServletResponse);
         final LoginStatus loginStatus = new LoginStatus(true, authentication.isAuthenticated(), username, null);
         mapper.writeValue(httpServletResponse.getOutputStream(), loginStatus);
     }
@@ -61,5 +63,21 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
         }
         final LoginStatus loginStatus = new LoginStatus(false, true, null, null);
         mapper.writeValue(httpServletResponse.getOutputStream(), loginStatus);
+    }
+
+    private void addSameSiteCookieAttribute(HttpServletResponse response) {
+        Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
+        boolean firstHeader = true;
+        // there can be multiple Set-Cookie attributes
+        for (String header : headers) {
+            if (firstHeader) {
+                response.setHeader(HttpHeaders.SET_COOKIE,
+                        String.format("%s; %s", header, "Secure; SameSite=None"));
+                firstHeader = false;
+                continue;
+            }
+            response.addHeader(HttpHeaders.SET_COOKIE,
+                    String.format("%s; %s", header, "Secure; SameSite=None"));
+        }
     }
 }
