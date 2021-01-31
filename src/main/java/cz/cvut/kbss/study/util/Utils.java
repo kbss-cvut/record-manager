@@ -3,7 +3,9 @@ package cz.cvut.kbss.study.util;
 import cz.cvut.kbss.study.exception.FormManagerException;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -29,5 +31,16 @@ public class Utils {
         } catch (IOException e) {
             throw new FormManagerException("Initialization exception. Unable to load query!", e);
         }
+    }
+
+    public static URI prepareUri(String remoteUrl, Map<String, String> queryParams) {
+        final StringBuilder sb = new StringBuilder(remoteUrl);
+        boolean containsQueryString = remoteUrl.matches("^.+\\?.+=.+$");
+        for (Map.Entry<String, String> e : queryParams.entrySet()) {
+            sb.append(!containsQueryString ? '?' : '&');
+            sb.append(e.getKey()).append('=').append(e.getValue());
+            containsQueryString = true;
+        }
+        return URI.create(sb.toString());
     }
 }

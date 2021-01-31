@@ -2,6 +2,7 @@ package cz.cvut.kbss.study.persistence.data;
 
 import cz.cvut.kbss.study.exception.WebServiceIntegrationException;
 import cz.cvut.kbss.study.util.Constants;
+import cz.cvut.kbss.study.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class RemoteDataLoader implements DataLoader {
      */
     public String loadData(String remoteUrl, Map<String, String> params) {
         final HttpHeaders headers = processHeaders(params);
-        final URI urlWithQuery = prepareUri(remoteUrl, params);
+        final URI urlWithQuery = Utils.prepareUri(remoteUrl, params);
         final HttpEntity<Object> entity = new HttpEntity<>(null, headers);
         if (LOG.isTraceEnabled()) {
             LOG.trace("Getting remote data using {}", urlWithQuery.toString());
@@ -77,14 +78,5 @@ public class RemoteDataLoader implements DataLoader {
         return headers;
     }
 
-    private URI prepareUri(String remoteUrl, Map<String, String> queryParams) {
-        final StringBuilder sb = new StringBuilder(remoteUrl);
-        boolean containsQueryString = remoteUrl.matches("^.+\\?.+=.+$");
-        for (Map.Entry<String, String> e : queryParams.entrySet()) {
-            sb.append(!containsQueryString ? '?' : '&');
-            sb.append(e.getKey()).append('=').append(e.getValue());
-            containsQueryString = true;
-        }
-        return URI.create(sb.toString());
-    }
+
 }
