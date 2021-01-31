@@ -16,11 +16,11 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <cz.cvut.kbss.jopa.version>0.10.4</cz.cvut.kbss.jopa.version>
-        <org.aspectj.version>1.9.1</org.aspectj.version>
-        <org.springframework.version>5.0.7.RELEASE</org.springframework.version>
-        <org.springframework.security.version>5.0.6.RELEASE</org.springframework.security.version>
-        <com.fasterxml.jackson.version>2.9.6</com.fasterxml.jackson.version>
+        <cz.cvut.kbss.jopa.version>0.16.2</cz.cvut.kbss.jopa.version>
+        <org.aspectj.version>1.9.6</org.aspectj.version>
+        <org.springframework.version>5.3.3</org.springframework.version>
+        <org.springframework.security.version>5.4.2</org.springframework.security.version>
+        <com.fasterxml.jackson.version>2.12.1</com.fasterxml.jackson.version>
         <junit.version>4.12</junit.version>
         <org.mockito.version>1.10.19</org.mockito.version>
         <ch.qos.logback.version>1.1.6</ch.qos.logback.version>
@@ -137,6 +137,12 @@
             <version>${org.mapstruct.version}</version>
         </dependency>
 
+        <!-- String utils -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
         <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>
