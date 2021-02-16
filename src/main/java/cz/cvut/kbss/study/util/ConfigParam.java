@@ -2,6 +2,8 @@ package cz.cvut.kbss.study.util;
 
 public enum ConfigParam {
 
+    SECURITY_SAME_SITE("security.sameSite"),
+
     REPOSITORY_URL("repositoryUrl"),
     DRIVER("driver"),
     FORM_GEN_REPOSITORY_URL("formGenRepositoryUrl"),

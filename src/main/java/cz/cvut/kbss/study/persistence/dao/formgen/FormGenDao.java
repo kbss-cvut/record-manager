@@ -8,11 +8,12 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 @Repository
@@ -24,19 +25,33 @@ public class FormGenDao {
         this.emf = emf;
     }
 
+    private static URI generateContextUri() {
+        return URI.create(Constants.FORM_GEN_CONTEXT_BASE + System.currentTimeMillis());
+    }
+
     public URI persist(PatientRecord record) {
-        Objects.requireNonNull(record);
-        initRequiredFieldsIfNecessary(record);
+        return persist(Collections.singletonList(record));
+    }
+
+    public URI persist(List<PatientRecord> records) {
         final EntityManager em = emf.createEntityManager();
+
         try {
             em.getTransaction().begin();
             final Descriptor descriptor = new EntityDescriptor(generateContextUri());
-            persistRelatedFieldsIfNecessary(record, em, descriptor);
-            em.persist(record, descriptor);
-            final QuestionSaver questionSaver = new QuestionSaver(descriptor);
-            questionSaver.persistIfNecessary(record.getQuestion(), em);
+
+            for (PatientRecord r : records) {
+                Objects.requireNonNull(r);
+                initRequiredFieldsIfNecessary(r);
+                persistRelatedFieldsIfNecessary(r, em, descriptor);
+                em.persist(r, descriptor);
+                final QuestionSaver questionSaver = new QuestionSaver(descriptor);
+                questionSaver.persistIfNecessary(r.getQuestion(), em);
+            }
+
             em.getTransaction().commit();
-            return descriptor.getContext();
+            return descriptor.getSingleContext()
+                    .orElseThrow(() -> new IllegalStateException("Generated context was not retrieved."));
         } finally {
             em.close();
         }
@@ -53,9 +68,5 @@ public class FormGenDao {
         if (record.getInstitution() != null) {
             em.persist(record.getInstitution(), descriptor);
         }
-    }
-
-    private static URI generateContextUri() {
-        return URI.create(Constants.FORM_GEN_CONTEXT_BASE + System.currentTimeMillis());
     }
 }
