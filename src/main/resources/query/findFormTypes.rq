@@ -14,7 +14,7 @@ WHERE {
             ?formGraph skos:prefLabel ?formLabel .
        }
     }
-    SERVICE <https://xn--slovnk-7va.gov.cz/sparql> {
+    SERVICE <https://onto.fel.cvut.cz:7200/repositories/kodi-slovnik-gov-cz> {
       ?formRoot skos:prefLabel ?entityLabel .
       OPTIONAL {
          ?formRoot dcterms:description ?explanation .
