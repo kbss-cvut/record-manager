@@ -189,7 +189,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
-                        <version>3.2.3</version>
+                        <version>3.3.1</version>
                         <configuration>
                             <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
                             <warSourceExcludes>
@@ -200,7 +200,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.4.0</version>
+                        <version>3.0.0</version>
                         <executions>
                             <execution>
                                 <id>npm-module-cleanup</id>
@@ -270,6 +270,11 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>1.11</version>
@@ -318,12 +323,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.8.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
+                <version>2.22.2</version>
             </plugin>
             <plugin>
                 <!-- Generate entity classes from OWL integrity constraints -->
@@ -352,7 +357,7 @@
             <plugin>
                 <groupId>org.bsc.maven</groupId>
                 <artifactId>maven-processor-plugin</artifactId>
-                <version>2.2.4</version>
+                <version>3.3.3</version>
                 <configuration>
                     <additionalSourceDirectories>
                         <additionalSourceDirectory>
@@ -406,7 +411,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.7</version>
+                <version>1.10</version>
                 <executions>
                     <execution>
                         <id>add-source</id>
@@ -433,6 +438,11 @@
                         </fileset>
                     </filesets>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
             </plugin>
         </plugins>
     </build>
