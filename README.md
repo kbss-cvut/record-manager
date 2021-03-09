@@ -10,7 +10,7 @@ Manager of records based on OFN (https://opendata.gov.cz/otevřené-formální-n
 
 ## System Architecture
 
-The system can be split into two parts. __Main application__ provides management of users, organizations and their records. The system manages multiple types of records which are generated dynamically by __Form service__ from models defined in https://github.com/opendata-mvcr/ssp .  
+The system can be split into two parts. __Main application__ provides management of users, organizations and their records. The system manages multiple types of records which are generated dynamically by __Form service__ defined in https://github.com/opendata-mvcr/sgov-forms .  
 
 ## Documentation
 
