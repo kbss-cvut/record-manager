@@ -39,30 +39,30 @@ Production war file can be produced by maven command: `mvn clean package -B -P p
 ## Deployment
 
 Deployment requires 4 steps:
-1) deploy internal RDF4J repository
+1) deploy Record manager RDF4J repository
 2) deploy Form service RDF4J repository
 2) deploy SGoV models repository
-3) deploy SForms service
-4) deploy this application
+3) deploy Form service
+4) deploy Record Manager application
 
 ### System Requirements
 
 - JDK 8 (newer or older versions are not supported at the moment)
 - Apache Tomcat 8.5 or later (9.x is recommended) or any Servlet API 4-compatible application server
 
- ### Internal RDF4J repository
+ ### Record Manager RDF4J Repository
  
  Main repository of the application is configured by `repositoryUrl` parameter. 
  
- ### Form service RDF4J repository
+ ### Form service RDF4J Repository
  
  Repository dedicated to provide data to Form service is configured by `formGenRepositoryUrl`. Additionally, this repository can contain a configuration of generation of forms fom SGoV model.
  
- ### SGoV model repository
+ ### SGoV Model Repository
   
  This repository is query parameter of Form service call specified in `sgovRepositoryUrl`.
 
- ### SForms service
+ ### SForms Service
  
  SForms service is configured in `formGenServiceUrl`, the call to the service should contain SGoV model repository as query parameter. Example call:
  `formGenRepositoryUrl=`http://localhost:8080/s-pipes/service?_pId=transform&sgovRepositoryUrl=https%3A%2F%2Fgraphdb.onto.fel.cvut.cz%2Frepositories%2Fkodi-slovnik-gov-cz`
