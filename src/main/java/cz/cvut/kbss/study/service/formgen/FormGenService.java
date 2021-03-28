@@ -11,7 +11,6 @@ import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +29,8 @@ public class FormGenService {
     private static final String RECORD_GRAPH_ID_PARAM = "recordGraphId";
 
     // query
-    private static final String FIND_FORM_TYPES_QUERY_FILE = "findFormTypes.rq";
-    private String findFormTypesQuery;
+    private static final String FIND_FORM_TEMPLATES_QUERY_FILE = "findFormTemplates.rq";
+    private String findFormTemplatesQuery;
 
     // environment variables
     private String serviceUrl;
@@ -62,7 +61,7 @@ public class FormGenService {
         serviceUrl = environment.getProperty(ConfigParam.FORM_GEN_SERVICE_URL.toString(), "");
         repoUrl = environment.getProperty(ConfigParam.REPOSITORY_URL.toString(), "");
         formGenRepoUrl = environment.getProperty(ConfigParam.FORM_GEN_REPOSITORY_URL.toString(), "");
-        this.findFormTypesQuery = Utils.loadQuery(FIND_FORM_TYPES_QUERY_FILE);
+        this.findFormTemplatesQuery = Utils.loadQuery(FIND_FORM_TEMPLATES_QUERY_FILE);
     }
 
     /**
@@ -104,9 +103,9 @@ public class FormGenService {
         return new RawJson(dataLoader.loadData(query, Collections.emptyMap()));
     }
 
-    public RawJson getFormTypes() {
-        Objects.requireNonNull(this.findFormTypesQuery);
-        String queryUrl = formGenRepoUrl + "?query=" + RestUtils.encodeUrl(this.findFormTypesQuery);
+    public RawJson getFormTemplates() {
+        Objects.requireNonNull(this.findFormTemplatesQuery);
+        String queryUrl = formGenRepoUrl + "?query=" + RestUtils.encodeUrl(this.findFormTemplatesQuery);
         return new RawJson(dataLoader.loadData(queryUrl, Collections.emptyMap()));
     }
 }
