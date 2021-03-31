@@ -12,7 +12,8 @@ public class Validator {
                 "|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$");
         Matcher m = p.matcher(email);
         if (!m.find()) {
-            throw new ValidationException("Email is not valid.");
+            throw new ValidationException("error.email.validation.emailIsNotValid",
+                    "Email is not valid.");
         }
     }
 
@@ -20,7 +21,8 @@ public class Validator {
         Pattern p = Pattern.compile("[^A-Za-z0-9]");
         Matcher m = p.matcher(username);
         if (m.find()) {
-            throw new ValidationException("Username cannot contain special characters.");
+            throw new ValidationException("error.username.validation.usernameCannotContainSpecialCharacters",
+                    "Username cannot contain special characters.");
         }
     }
 }

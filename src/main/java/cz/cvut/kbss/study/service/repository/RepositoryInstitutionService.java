@@ -41,7 +41,9 @@ public class RepositoryInstitutionService extends KeySupportingRepositoryService
     @Override
     protected void preRemove(Institution instance) {
         if (!userDao.findByInstitution(instance).isEmpty() || !patientRecordDao.findByInstitution(instance).isEmpty()) {
-            throw new ValidationException("Institution with members or patient records cannot be deleted.");
+            throw new ValidationException(
+                    "error.institution.remove.institutionWithMembersOrPatientRecordsCannotBeDeleted",
+                    "Institution with members or patient records cannot be deleted.");
         }
     }
 

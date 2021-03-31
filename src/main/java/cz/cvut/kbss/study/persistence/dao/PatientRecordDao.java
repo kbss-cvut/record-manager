@@ -3,6 +3,7 @@ package cz.cvut.kbss.study.persistence.dao;
 import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.exception.PersistenceException;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
@@ -24,7 +25,6 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     @Override
     protected void persist(PatientRecord entity, EntityManager em) {
         assert entity != null;
-        requireUniqueLocalName(entity);
         super.persist(entity, em);
         final QuestionSaver questionSaver = new QuestionSaver();
         questionSaver.persistIfNecessary(entity.getQuestion(), em);
@@ -34,7 +34,6 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     protected void update(PatientRecord entity, EntityManager em) {
         final PatientRecord orig = em.find(PatientRecord.class, entity.getUri());
         assert orig != null;
-        requireUniqueLocalName(orig);
         orig.setQuestion(null);
         em.merge(entity);
     }
@@ -110,14 +109,16 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
      * @param entity The local name to be checked for uniqueness
      * @return Local names of matching records
      */
-    private void requireUniqueLocalName(PatientRecord entity) {
+    public void requireUniqueLocalName(PatientRecord entity) {
         Objects.requireNonNull(entity.getInstitution());
         boolean unique = findByInstitution(entity.getInstitution()).stream()
+                .filter(pr -> (entity.getFormTemplate()  != null) && entity.getFormTemplate().equals(pr.getFormTemplate()))
                 .filter(pr -> pr.getLocalName()
                         .equals(entity.getLocalName()))
                 .noneMatch(pr -> ! pr.getUri().equals(entity.getUri()));
         if (! unique) {
-            throw new PersistenceException("Local name of record is not unique for entity " + entity);
+            throw new ValidationException("error.record.localNameOfRecordIsNotUnique",
+                    "Local name of record is not unique for entity " + entity);
         }
     }
 

@@ -56,11 +56,13 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         instance.setDateCreated(new Date());
         instance.setInstitution(author.getInstitution());
         instance.setKey(IdentificationUtils.generateKey());
+        recordDao.requireUniqueLocalName(instance);
     }
 
     @Override
     protected void preUpdate(PatientRecord instance) {
         instance.setLastModifiedBy(securityUtils.getCurrentUser());
         instance.setLastModified(new Date());
+        recordDao.requireUniqueLocalName(instance);
     }
 }

@@ -124,7 +124,8 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     public void changePassword(User user, String newPassword, String currentPassword, boolean sendEmail) {
         final User currentUser = securityUtils.getCurrentUser();
         if (currentUser.getUsername().equals(user.getUsername()) && !passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new ValidationException("The passed user's current password is different from the specified one.");
+            throw new ValidationException("error.password.validation.thePassedUsersCurrentPasswordIsDifferentFromTheSpecifiedOne",
+                    "The passed user's current password is different from the specified one.");
         }
         user.setPassword(newPassword);
         user.encodePassword(passwordEncoder);
