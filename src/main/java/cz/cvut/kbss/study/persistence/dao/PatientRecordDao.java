@@ -109,8 +109,12 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
      * @param entity The local name to be checked for uniqueness
      * @return Local names of matching records
      */
-    public void requireUniqueLocalName(PatientRecord entity) {
+    public void requireUniqueNonEmptyLocalName(PatientRecord entity) {
         Objects.requireNonNull(entity.getInstitution());
+        if (entity.getLocalName() == null || entity.getLocalName().isEmpty()) {
+            throw new ValidationException("error.record.localNameOfRecordIsEmpty",
+                    "Local name of record is empty for entity " + entity);
+        }
         boolean unique = findByInstitution(entity.getInstitution()).stream()
                 .filter(pr -> (entity.getFormTemplate()  != null) && entity.getFormTemplate().equals(pr.getFormTemplate()))
                 .filter(pr -> pr.getLocalName()

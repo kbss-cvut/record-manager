@@ -9,7 +9,6 @@ import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.IdentificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -56,13 +55,13 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         instance.setDateCreated(new Date());
         instance.setInstitution(author.getInstitution());
         instance.setKey(IdentificationUtils.generateKey());
-        recordDao.requireUniqueLocalName(instance);
+        recordDao.requireUniqueNonEmptyLocalName(instance);
     }
 
     @Override
     protected void preUpdate(PatientRecord instance) {
         instance.setLastModifiedBy(securityUtils.getCurrentUser());
         instance.setLastModified(new Date());
-        recordDao.requireUniqueLocalName(instance);
+        recordDao.requireUniqueNonEmptyLocalName(instance);
     }
 }
