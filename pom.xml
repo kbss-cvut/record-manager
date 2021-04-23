@@ -246,20 +246,20 @@
                                     </arguments>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>ui-test</id>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <phase>test</phase>
-                                <configuration>
-                                    <workingDirectory>src/main/webapp</workingDirectory>
-                                    <executable>npm</executable>
-                                    <arguments>
-                                        <argument>test</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
+<!--                            <execution>-->
+<!--                                <id>ui-test</id>-->
+<!--                                <goals>-->
+<!--                                    <goal>exec</goal>-->
+<!--                                </goals>-->
+<!--                                <phase>test</phase>-->
+<!--                                <configuration>-->
+<!--                                    <workingDirectory>src/main/webapp</workingDirectory>-->
+<!--                                    <executable>npm</executable>-->
+<!--                                    <arguments>-->
+<!--                                        <argument>test</argument>-->
+<!--                                    </arguments>-->
+<!--                                </configuration>-->
+<!--                            </execution>-->
                         </executions>
                     </plugin>
                 </plugins>
