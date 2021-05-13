@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Contains exception handlers for REST controllers.
+ * Exception handlers for REST controllers.
+ * <p>
+ * The general pattern should be that unless an exception can be handled in a more appropriate place it bubbles up to a
+ * REST controller which originally received the request. There, it is caught by this handler, logged and a reasonable
+ * error message is returned to the user.
  */
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -26,7 +30,14 @@ public class RestExceptionHandler {
     }
 
     private ErrorInfo errorInfo(HttpServletRequest request, Throwable e) {
-        return new ErrorInfo(e.getMessage(), request.getRequestURI());
+        return ErrorInfo.createWithMessage(e.getMessage(), request.getRequestURI());
+    }
+
+    private ErrorInfo errorInfo(HttpServletRequest request, ValidationException e) {
+        return ErrorInfo.createWithMessageAndMessageId(
+                e.getMessageId(),
+                e.getMessage(),
+                request.getRequestURI());
     }
 
     @ExceptionHandler(ValidationException.class)

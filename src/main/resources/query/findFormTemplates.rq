@@ -1,7 +1,7 @@
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#>
-prefix fm: <http://onto.fel.cvut.cz/ontologies/form-metadata/>
-prefix dcterms: <http://purl.org/dc/terms/>
+prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/>
+prefix dc: <http://purl.org/dc/terms/>
 
 CONSTRUCT {
       ?formGraph rdfs:label ?label .
@@ -9,7 +9,7 @@ CONSTRUCT {
 }
 WHERE {
     GRAPH ?formGraph {
-       ?formRoot a fm:root-entity .
+       ?formRoot a ft:root-entity .
        OPTIONAL {
             ?formGraph skos:prefLabel ?formLabel .
        }
@@ -17,7 +17,7 @@ WHERE {
     SERVICE <https://onto.fel.cvut.cz:7200/repositories/kodi-slovnik-gov-cz> {
       ?formRoot skos:prefLabel ?entityLabel .
       OPTIONAL {
-         ?formRoot dcterms:description ?explanation .
+         ?formRoot dc:description ?explanation .
       }
    }
    BIND(COALESCE(?formLabel, ?entityLabel) as ?label)

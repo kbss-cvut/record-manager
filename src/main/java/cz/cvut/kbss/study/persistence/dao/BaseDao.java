@@ -70,7 +70,7 @@ public abstract class BaseDao<T> implements GenericDao<T> {
             em.getTransaction().begin();
             persist(entity, em);
             em.getTransaction().commit();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             LOG.error("Error when persisting entity.", e);
             throw new PersistenceException(e);
         } finally {
@@ -93,7 +93,7 @@ public abstract class BaseDao<T> implements GenericDao<T> {
             em.getTransaction().begin();
             entities.forEach(e -> persist(e, em));
             em.getTransaction().commit();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             LOG.error("Error when persisting entities.", e);
             throw new PersistenceException(e);
         } finally {
@@ -109,7 +109,7 @@ public abstract class BaseDao<T> implements GenericDao<T> {
             em.getTransaction().begin();
             update(entity, em);
             em.getTransaction().commit();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             LOG.error("Error when updating entity.", e);
             throw new PersistenceException(e);
         } finally {
@@ -129,7 +129,7 @@ public abstract class BaseDao<T> implements GenericDao<T> {
             em.getTransaction().begin();
             remove(entity, em);
             em.getTransaction().commit();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             LOG.error("Error when removing entity.", e);
             throw new PersistenceException(e);
         } finally {
@@ -157,7 +157,7 @@ public abstract class BaseDao<T> implements GenericDao<T> {
                 em.remove(toRemove);
             });
             em.getTransaction().commit();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             LOG.error("Error when removing entities.", e);
             throw new PersistenceException(e);
         } finally {

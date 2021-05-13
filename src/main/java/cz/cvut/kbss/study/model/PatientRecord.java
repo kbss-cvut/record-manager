@@ -118,7 +118,7 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
     public String toString() {
         return "PatientRecord{" +
                 "localName=" + localName +
-                "dateCreated=" + dateCreated +
+                ", dateCreated=" + dateCreated +
                 ", institution=" + institution +
                 "} " + super.toString();
     }

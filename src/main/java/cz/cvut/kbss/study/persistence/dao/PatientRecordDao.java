@@ -2,6 +2,8 @@ package cz.cvut.kbss.study.persistence.dao;
 
 import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.exception.PersistenceException;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
@@ -99,6 +101,29 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         return em.createNativeQuery("SELECT ?x WHERE { ?x a ?type . }", PatientRecordDto.class)
             .setParameter("type", typeUri)
             .getResultList();
+    }
+
+    /**
+     * Ensure that local name of provided record is unique within its organization.
+     *
+     * @param entity The local name to be checked for uniqueness
+     * @return Local names of matching records
+     */
+    public void requireUniqueNonEmptyLocalName(PatientRecord entity) {
+        Objects.requireNonNull(entity.getInstitution());
+        if (entity.getLocalName() == null || entity.getLocalName().isEmpty()) {
+            throw new ValidationException("error.record.localNameOfRecordIsEmpty",
+                    "Local name of record is empty for entity " + entity);
+        }
+        boolean unique = findByInstitution(entity.getInstitution()).stream()
+                .filter(pr -> (entity.getFormTemplate()  != null) && entity.getFormTemplate().equals(pr.getFormTemplate()))
+                .filter(pr -> pr.getLocalName()
+                        .equals(entity.getLocalName()))
+                .noneMatch(pr -> ! pr.getUri().equals(entity.getUri()));
+        if (! unique) {
+            throw new ValidationException("error.record.localNameOfRecordIsNotUnique",
+                    "Local name of record is not unique for entity " + entity);
+        }
     }
 
 }
