@@ -10,7 +10,7 @@
         <version>0.0.8</version>
     </parent>
 
-    <artifactId>study-manager</artifactId>
+    <artifactId>record-manager</artifactId>
     <version>0.2.1</version>
     <name>OFN Record Manager</name>
     <packaging>war</packaging>
