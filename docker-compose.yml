@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:
+  dm-record-manager:
+    image: 'ofn-record-manager:latest'
+    container_name: dm-record-manager
+    ports:
+      - '4000:80'
+    depends_on:
+      - dm-record-manager-server
+    environment:
+      API_URL: "http://localhost:3000/ofn-record-manager"
+
+  dm-record-manager-server:
+    image: 'ofn-record-manager-server:latest'
+    container_name: dm-record-manager-server
+    ports:
+      - '3000:8080'
+    depends_on:
+      - dm-s-pipes-engine
+      - dm-rdf4j
+    environment:
+      repositoryUrl: "http://dm-rdf4j:8080/rdf4j-server/repositories/ofn-form-manager-app"
+      formGenRepositoryUrl: "http://dm-rdf4j:8080/rdf4j-server/repositories/ofn-form-manager-formgen"
+      formGenServiceUrl: "http://dm-s-pipes-engine:8080/s-pipes/service?_pId=clone&sgovRepositoryUrl=https%3A%2F%2Fgraphdb.onto.fel.cvut.cz%2Frepositories%2Fkodi-slovnik-gov-cz"
+
+  dm-s-pipes-engine:
+    image: 's-pipes-engine:latest'
+    container_name: dm-s-pipes-engine
+    ports:
+      - "8081:8080"
+    depends_on:
+      - dm-rdf4j
+    environment:
+      - CONTEXTS_SCRIPTPATHS=/scripts
+    volumes:
+      - ./scripts:/scripts
+
+  dm-rdf4j:
+    image: 'eclipse/rdf4j-workbench:amd64-3.5.0'
+    container_name: dm-rdf4j
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Xms1g -Xmx4g
+    volumes:
+      - data:/var/rdf4j
+      - logs:/usr/local/tomcat/logs
+
+volumes:
+  data:
+  logs:
