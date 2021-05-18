@@ -81,6 +81,17 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+
 
         <!-- Spring Security -->
         <dependency>
@@ -332,6 +343,10 @@
                             <groupId>cz.cvut.kbss.jopa</groupId>
                             <artifactId>jopa-impl</artifactId>
                         </aspectLibrary>
+                        <aspectLibrary>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-aspects</artifactId>
+                        </aspectLibrary>
                     </aspectLibraries>
                 </configuration>
                 <dependencies>
@@ -372,6 +387,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!-- https://stackoverflow.com/questions/53319466/spring-boot-build-fails-error-when-starting-fork-exit-code-134 -->
+                <configuration>
+                    <forkCount>0</forkCount>
+                </configuration>
             </plugin>
             <plugin>
                 <!-- Generate entity classes from OWL integrity constraints -->
