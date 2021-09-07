@@ -6,7 +6,7 @@
 
     <appender name="LOGFILE"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/s-pipes.log</file>
+        <file>${LOG_PATH}/record-manager.log</file>
         <!-- By default, encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
         <encoder>
             <pattern>%date{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{30} - %msg%n</pattern>
@@ -18,7 +18,7 @@
             <!-- each file should be at most [maxFileSize], keep [maxHistory] days worth of history, but at most [totalSizeCap] -->
             <maxFileSize>100MB</maxFileSize>
             <fileNamePattern>
-                ${LOG_PATH}/archived/s-pipes.%d{yyyy-MM-dd}.%i.log
+                ${LOG_PATH}/archived/record-manager.%d{yyyy-MM-dd}.%i.log
             </fileNamePattern>
             <maxHistory>30</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
