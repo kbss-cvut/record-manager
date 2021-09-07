@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <!-- ################# LOGFILE ####################### -->
+    <property name="LOG_PATH" value="logs"/>
+
+    <appender name="LOGFILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/s-pipes.log</file>
+        <!-- By default, encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+        <encoder>
+            <pattern>%date{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{30} - %msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- the rollover occurs when the active log file reaches the maximum file size before the end of the time period. -->
+            <!-- The rollover period is inferred from the smallest date unit value of fileNamePattern -->
+            <!-- each file should be at most [maxFileSize], keep [maxHistory] days worth of history, but at most [totalSizeCap] -->
+            <maxFileSize>100MB</maxFileSize>
+            <fileNamePattern>
+                ${LOG_PATH}/archived/s-pipes.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- ################# STDOUT ####################### -->
+
     <!-- Send debug messages to System.out -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- By default, encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
@@ -12,30 +38,37 @@
     <!-- Just INFO for JOPA -->
     <logger name="cz.cvut.kbss.jopa" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
     </logger>
 
     <!-- and OntoDriver -->
     <logger name="cz.cvut.kbss.ontodriver" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
     </logger>
 
     <!-- Logger for our app -->
     <logger name="cz.cvut.kbss" level="TRACE" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
     </logger>
 
     <!-- Restrict logging of the Sesame HTTP client (used to connect to remote repositories -->
     <logger name="org.openrdf.http" level="WARN" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
     </logger>
 
     <!-- Restrict logging of Spring -->
     <logger name="org.springframework" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
     </logger>
 
     <!-- By default, the level of the root level is set to INFO -->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
     </root>
+
 </configuration>
