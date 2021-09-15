@@ -14,7 +14,8 @@ The system can be split into two parts. __Main application__ provides management
 
 ## Documentation
 
-Build configuration and deployment is described in [setup.md](doc/setup.md).
+Build configuration and deployment is described in [Setup Guide](doc/setup.md).
+Development is described in [Development notes](doc/development.md).
 
 -----
 

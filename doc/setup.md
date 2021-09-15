@@ -11,7 +11,7 @@
 
 #### Maven Profiles
 
-To build TermIt for **non**-development deployment, use Maven and select the `production` profile.
+To build the application for **non**-development deployment, use Maven and select the `production` profile.
 
 ### Application Configuration
 
