@@ -6,7 +6,7 @@ public final class Constants {
         throw new AssertionError();
     }
 
-    public static final String BASE_URI = "http://vfn.cz/ontologies/study-manager/";
+    public static final String BASE_URI = "http://onto.fel.cvut.cz/ontologies/record-manager/";
 
     /**
      * Language used by the persistence unit.
@@ -16,7 +16,7 @@ public final class Constants {
     /**
      * Base URI for temporary contexts used by the form generation.
      */
-    public static final String FORM_GEN_CONTEXT_BASE = "http://vfn.cz/ontologies/study-manager/formGen";
+    public static final String FORM_GEN_CONTEXT_BASE = "http://onto.fel.cvut.cz/ontologies/record-manager/formGen";
 
     /**
      * UTF-8 encoding identifier.

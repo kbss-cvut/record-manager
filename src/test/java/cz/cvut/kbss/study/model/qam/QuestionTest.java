@@ -13,7 +13,7 @@ public class QuestionTest {
     public void copyConstructorCopiesSubQuestions() {
         final Question q = new Question();
         q.setUri(Generator.generateUri());
-        q.getTypes().add(Vocabulary.ONTOLOGY_IRI_study_manager + "/infectious-disease/");
+        q.getTypes().add(Vocabulary.ONTOLOGY_IRI_record_manager + "/infectious-disease/");
         for (int i = 0; i < Generator.randomInt(10); i++) {
             final Question child = new Question();
             child.setUri(Generator.generateUri());

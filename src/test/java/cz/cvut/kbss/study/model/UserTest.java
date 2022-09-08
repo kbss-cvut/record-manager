@@ -88,7 +88,7 @@ public class UserTest {
 
     @Test
     public void generateUriDoesNothingIfTheUriIsAlreadySet() {
-        final String uri = Vocabulary.ONTOLOGY_IRI_study_manager + "/test";
+        final String uri = Vocabulary.ONTOLOGY_IRI_record_manager + "/test";
         user.setUri(URI.create(uri));
         user.generateUri();
         assertEquals(uri, user.getUri().toString());

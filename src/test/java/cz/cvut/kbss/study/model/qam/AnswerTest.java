@@ -14,7 +14,7 @@ public class AnswerTest {
         final Answer a = new Answer();
         a.setTextValue("Cough");
         a.setCodeValue(Generator.generateUri());
-        a.getTypes().add(Vocabulary.ONTOLOGY_IRI_study_manager + "/infectious-disease/");
+        a.getTypes().add(Vocabulary.ONTOLOGY_IRI_record_manager + "/infectious-disease/");
 
         final Answer res = new Answer(a);
         assertNull(res.getUri());
