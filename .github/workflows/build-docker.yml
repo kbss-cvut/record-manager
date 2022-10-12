@@ -4,7 +4,7 @@ on:
     branches: [ main ]
   workflow_dispatch:
 env:
-  IMAGE_NAME: ofn-record-manager
+  IMAGE_NAME: record-manager
   USERNAME: ${{ github.actor }}
   TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
