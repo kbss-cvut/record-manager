@@ -1,7 +1,7 @@
 name: Build UI docker
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 env:
   IMAGE_NAME: record-manager
