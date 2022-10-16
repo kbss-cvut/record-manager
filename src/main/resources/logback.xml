@@ -65,6 +65,12 @@
         <appender-ref ref="LOGFILE"/>
     </logger>
 
+    <!-- Restrict logging of Spring security -->
+    <logger name="org.springframework.security" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
+    </logger>
+
     <!-- By default, the level of the root level is set to INFO -->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
