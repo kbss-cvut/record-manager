@@ -4,21 +4,7 @@ prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/>
 prefix dc: <http://purl.org/dc/terms/>
 
 CONSTRUCT {
-      ?formGraph rdfs:label ?label .
-      ?formGraph rdfs:comment ?explanation .
-}
-WHERE {
-    GRAPH ?formGraph {
-       ?formRoot a ft:root-entity .
-       OPTIONAL {
-            ?formGraph skos:prefLabel ?formLabel .
-       }
-    }
-    SERVICE <https://graphdb.onto.fel.cvut.cz/repositories/kodi-slovnik-gov-cz> {
-      ?formRoot skos:prefLabel ?entityLabel .
-      OPTIONAL {
-         ?formRoot dc:description ?explanation .
-      }
-   }
-   BIND(COALESCE(?formLabel, ?entityLabel) as ?label)
+      <http://onto.fel.cvut.cz/ontologies/form-template/vita-study-main> rdfs:label "Evaluation" .
+      <http://onto.fel.cvut.cz/ontologies/form-template/vita-study-main> rdfs:comment "Vita Study Evaluation" .
+} WHERE {
 }
