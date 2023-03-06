@@ -26,7 +26,7 @@ public class UserInvite extends BaseEmailTemplate {
 
     @Override
     public String getHTMLContent() {
-        String link = config.getConfig(ConfigParam.APP_CONTEXT) + "#/login/password-reset/" + this.token;
+        String link = config.getConfig(ConfigParam.APP_CONTEXT) + "login/password-reset/" + this.token;
         Map<String, String> params = new HashMap<>();
         params.put("username", username);
         params.put("link", link);
