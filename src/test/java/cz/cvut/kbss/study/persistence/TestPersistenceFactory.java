@@ -7,7 +7,7 @@ import cz.cvut.kbss.jopa.model.JOPAPersistenceProvider;
 import cz.cvut.kbss.ontodriver.config.OntoDriverProperties;
 import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_PASSWORD;
 import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_USERNAME;
-import cz.cvut.kbss.ontodriver.sesame.config.SesameOntoDriverProperties;
+import cz.cvut.kbss.ontodriver.rdf4j.config.Rdf4jOntoDriverProperties;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Constants;
 import java.util.HashMap;
@@ -64,8 +64,8 @@ public class TestPersistenceFactory {
         final Map<String, String> properties = new HashMap<>();
         properties.put(OntoDriverProperties.ONTOLOGY_LANGUAGE, Constants.PU_LANGUAGE);
         properties.put(JOPAPersistenceProperties.SCAN_PACKAGE, "cz.cvut.kbss.study");
-        properties.put(SesameOntoDriverProperties.SESAME_USE_VOLATILE_STORAGE, Boolean.TRUE.toString());
-        properties.put(SesameOntoDriverProperties.SESAME_USE_INFERENCE, Boolean.FALSE.toString());
+        properties.put(Rdf4jOntoDriverProperties.USE_VOLATILE_STORAGE, Boolean.TRUE.toString());
+        properties.put(Rdf4jOntoDriverProperties.USE_INFERENCE, Boolean.FALSE.toString());
         properties.put(JOPAPersistenceProperties.JPA_PERSISTENCE_PROVIDER, JOPAPersistenceProvider.class.getName());
         return properties;
     }
