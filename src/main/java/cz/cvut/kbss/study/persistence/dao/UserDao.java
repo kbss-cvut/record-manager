@@ -6,6 +6,7 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.util.Constants;
+import java.math.BigInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -99,10 +100,11 @@ public class UserDao extends DerivableUriDao<User> {
     public int getNumberOfInvestigators() {
         final EntityManager em = entityManager();
         try {
-            return (int)em.createNativeQuery(
+            return ((BigInteger) em.createNativeQuery(
                     "SELECT (count(?p) as ?investigatorCount) WHERE { ?p a ?typeDoctor . MINUS {?p a ?typeAdmin}}")
                     .setParameter("typeDoctor", URI.create(Vocabulary.s_c_doctor))
-                    .setParameter("typeAdmin", URI.create(Vocabulary.s_c_administrator)).getSingleResult();
+                    .setParameter("typeAdmin", URI.create(Vocabulary.s_c_administrator)).getSingleResult()
+            ).intValue();
         } finally {
             em.close();
         }

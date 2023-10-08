@@ -9,6 +9,7 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
+import java.math.BigInteger;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
@@ -89,9 +90,11 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     public int getNumberOfProcessedRecords() {
         final EntityManager em = entityManager();
         try {
-            return (int) em.createNativeQuery(
+            return ((BigInteger) em.createNativeQuery(
                     "SELECT (count(?p) as ?patientRecordsCount) WHERE { ?p a ?record . }")
-                    .setParameter("record", URI.create(Vocabulary.s_c_patient_record)).getSingleResult();
+                    .setParameter("record", URI.create(Vocabulary.s_c_patient_record))
+                .getSingleResult()
+            ).intValue();
         } finally {
             em.close();
         }
