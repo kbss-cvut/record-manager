@@ -33,7 +33,6 @@ Deployment requires 4 steps:
 ### System Requirements
 
 - JDK 17
-- Apache Tomcat 10 or any Jakarta Servlet API-compatible application server
 
 ### Record Manager RDF4J Repository
  

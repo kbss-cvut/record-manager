@@ -6,7 +6,6 @@ Manager of records based on OFN (https://opendata.gov.cz/otevřené-formální-n
 
 - JDK 17
 - Apache Maven 3.5.x
-- Apache Tomcat 10 or newer
 
 ## System Architecture
 
