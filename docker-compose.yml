@@ -37,7 +37,7 @@ services:
       - ./scripts:/scripts
 
   dm-rdf4j:
-    image: 'eclipse/rdf4j-workbench:amd64-3.5.0'
+    image: 'eclipse/rdf4j-workbench:4.3.7'
     container_name: dm-rdf4j
     ports:
       - "8080:8080"
