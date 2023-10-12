@@ -7,11 +7,11 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
 import java.util.List;
-import java.util.UUID;
-import static junit.framework.TestCase.assertEquals;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
@@ -25,7 +25,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     private InstitutionDao institutionDao;
 
     @Test
-    public void findByInstitutionReturnsMatchingRecords() throws Exception {
+    public void findByInstitutionReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
         Institution institutionOther = Generator.generateInstitution();
         institutionDao.persist(institution);
@@ -54,7 +54,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllRecordsReturnAllRecords() throws Exception {
+    public void findAllRecordsReturnAllRecords() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
         institutionDao.persist(institution1);
@@ -81,7 +81,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void getNumberOfProcessedRecords() throws Exception {
+    public void getNumberOfProcessedRecords() {
         Institution institution = Generator.generateInstitution();
         institutionDao.persist(institution);
 
@@ -101,7 +101,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findByAuthorReturnsMatchingRecords() throws Exception {
+    public void findByAuthorReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
         institutionDao.persist(institution);
 

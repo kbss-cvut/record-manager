@@ -7,17 +7,14 @@ import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import static org.junit.Assert.*;
-
 import cz.cvut.kbss.study.service.ActionHistoryService;
 import cz.cvut.kbss.study.service.UserService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -26,9 +23,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-
+@ExtendWith(MockitoExtension.class)
 public class ActionHistoryControllerTest extends BaseControllerTestRunner {
 
     @Mock
@@ -40,9 +42,8 @@ public class ActionHistoryControllerTest extends BaseControllerTestRunner {
     @InjectMocks
     private ActionHistoryController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
         User user = Generator.generateUser(institution);
@@ -117,9 +118,8 @@ public class ActionHistoryControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    public void getActionsByAuthorReturnsEmptyList() throws Exception {
+    public void getActionsByUnknownAuthorReturnsEmptyList() throws Exception {
         String username = "Tom";
-        when(actionHistoryServiceMock.findAllWithParams(null, null, 1)).thenReturn(Collections.emptyList());
         when(userServiceMock.findByUsername(username)).thenThrow(NotFoundException.create("User", username));
 
         final MvcResult result = mockMvc.perform(get("/history/")

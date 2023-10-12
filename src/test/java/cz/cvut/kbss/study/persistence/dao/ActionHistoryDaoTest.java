@@ -5,13 +5,13 @@ import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ActionHistoryDaoTest extends BaseDaoTestRunner {
 
@@ -29,7 +29,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     private final String LOAD_PENDING = "LOAD_PENDING";
 
     @Test
-    public void findByKeyReturnsActionWithPayload() throws Exception {
+    public void findByKeyReturnsActionWithPayload() {
         Institution institution = Generator.generateInstitution();
         institutionDao.persist(institution);
 
@@ -46,7 +46,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsWithoutParamsReturnsAllActions() throws Exception {
+    public void findAllWithParamsWithoutParamsReturnsAllActions() {
         Institution institution = Generator.generateInstitution();
         institutionDao.persist(institution);
 
@@ -68,7 +68,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsWithAuthorReturnsAuthorsActions() throws Exception {
+    public void findAllWithParamsWithAuthorReturnsAuthorsActions() {
         Institution institution = Generator.generateInstitution();
         institutionDao.persist(institution);
 
@@ -96,7 +96,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsWithTypeReturnsActionsWithExactType() throws Exception {
+    public void findAllWithParamsWithTypeReturnsActionsWithExactType() {
         Institution institution = Generator.generateInstitution();
         institutionDao.persist(institution);
 
@@ -123,7 +123,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsWithTypeReturnsActionsWithTypeContained() throws Exception {
+    public void findAllWithParamsWithTypeReturnsActionsWithTypeContained() {
         Institution institution = Generator.generateInstitution();
         institutionDao.persist(institution);
 
@@ -146,7 +146,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsReturnsMatchingActions() throws Exception {
+    public void findAllWithParamsReturnsMatchingActions() {
         Institution institution = Generator.generateInstitution();
         institutionDao.persist(institution);
 

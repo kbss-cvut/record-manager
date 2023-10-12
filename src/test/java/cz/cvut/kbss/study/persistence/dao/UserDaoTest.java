@@ -5,13 +5,16 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UserDaoTest extends BaseDaoTestRunner {
 

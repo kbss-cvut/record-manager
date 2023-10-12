@@ -4,21 +4,21 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import static org.junit.Assert.*;
-
 import cz.cvut.kbss.study.service.StatisticsService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-
+@ExtendWith(MockitoExtension.class)
 public class StatisticsControllerTest extends BaseControllerTestRunner {
 
     @Mock
@@ -27,9 +27,8 @@ public class StatisticsControllerTest extends BaseControllerTestRunner {
     @InjectMocks
     private StatisticsController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
         User user = Generator.generateUser(institution);

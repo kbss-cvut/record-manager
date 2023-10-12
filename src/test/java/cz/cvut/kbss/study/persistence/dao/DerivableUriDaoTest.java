@@ -4,10 +4,10 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DerivableUriDaoTest extends BaseDaoTestRunner {
 

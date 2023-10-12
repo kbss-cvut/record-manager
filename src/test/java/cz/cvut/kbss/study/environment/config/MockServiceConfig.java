@@ -1,17 +1,22 @@
 package cz.cvut.kbss.study.environment.config;
 
 import cz.cvut.kbss.study.persistence.dao.ActionHistoryDao;
-import cz.cvut.kbss.study.service.*;
+import cz.cvut.kbss.study.service.ActionHistoryService;
+import cz.cvut.kbss.study.service.ConfigReader;
+import cz.cvut.kbss.study.service.InstitutionService;
+import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.service.StatisticsService;
+import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.UserDetailsService;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.mockito.Mockito.mock;
 
-@Configuration
+@TestConfiguration
 @ComponentScan(basePackages = "cz.cvut.kbss.study.service")
 public class MockServiceConfig {
 

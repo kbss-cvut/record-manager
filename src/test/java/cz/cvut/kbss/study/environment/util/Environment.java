@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.security.model.AuthenticationToken;
 import cz.cvut.kbss.study.security.model.UserDetails;
-import cz.cvut.kbss.study.util.Constants;
-import java.nio.charset.Charset;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -14,6 +12,8 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
+
+import java.nio.charset.StandardCharsets;
 
 public class Environment {
 
@@ -65,7 +65,7 @@ public class Environment {
     }
 
     public static HttpMessageConverter<?> createStringEncodingMessageConverter() {
-        return new StringHttpMessageConverter(Charset.forName(Constants.UTF_8_ENCODING));
+        return new StringHttpMessageConverter(StandardCharsets.UTF_8);
     }
 
     public static HttpMessageConverter<?> createResourceMessageConverter() {
