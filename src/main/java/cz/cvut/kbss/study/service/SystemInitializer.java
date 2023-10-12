@@ -3,11 +3,10 @@ package cz.cvut.kbss.study.service;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 
 @Service
 public class SystemInitializer {

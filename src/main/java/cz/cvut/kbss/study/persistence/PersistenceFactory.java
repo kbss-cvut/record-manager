@@ -3,22 +3,24 @@ package cz.cvut.kbss.study.persistence;
 import cz.cvut.kbss.jopa.Persistence;
 import cz.cvut.kbss.jopa.model.EntityManagerFactory;
 import cz.cvut.kbss.jopa.model.JOPAPersistenceProvider;
-import cz.cvut.kbss.ontodriver.config.OntoDriverProperties;
 import cz.cvut.kbss.study.util.Constants;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.*;
+import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.DATA_SOURCE_CLASS;
+import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.JPA_PERSISTENCE_PROVIDER;
+import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.LANG;
+import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.ONTOLOGY_PHYSICAL_URI_KEY;
+import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.SCAN_PACKAGE;
 import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_PASSWORD;
 import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_USERNAME;
 import static cz.cvut.kbss.study.util.ConfigParam.DRIVER;
@@ -69,7 +71,7 @@ public class PersistenceFactory {
 
     private static Map<String, String> initParams() {
         final Map<String, String> map = new HashMap<>();
-        map.put(OntoDriverProperties.ONTOLOGY_LANGUAGE, Constants.PU_LANGUAGE);
+        map.put(LANG, Constants.PU_LANGUAGE);
         map.put(SCAN_PACKAGE, "cz.cvut.kbss.study");
         map.put(JPA_PERSISTENCE_PROVIDER, JOPAPersistenceProvider.class.getName());
         return map;

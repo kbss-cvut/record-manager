@@ -3,19 +3,20 @@ package cz.cvut.kbss.study.config;
 import cz.cvut.kbss.study.security.CsrfHeaderFilter;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -26,17 +27,14 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
-@ComponentScan(basePackages = "cz.cvut.kbss.study.security")
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+public class SecurityConfig {
 
     private static final String[] COOKIES_TO_DESTROY = {
             SecurityConstants.SESSION_COOKIE_NAME,
             SecurityConstants.REMEMBER_ME_COOKIE_NAME,
             SecurityConstants.CSRF_COOKIE_NAME
     };
-
-    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
 
@@ -46,46 +44,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationProvider ontologyAuthenticationProvider;
 
-    public SecurityConfig(AuthenticationEntryPoint authenticationEntryPoint,
-                          AuthenticationFailureHandler authenticationFailureHandler,
+    public SecurityConfig(AuthenticationFailureHandler authenticationFailureHandler,
                           AuthenticationSuccessHandler authenticationSuccessHandler,
                           LogoutSuccessHandler logoutSuccessHandler,
                           AuthenticationProvider ontologyAuthenticationProvider) {
-        this.authenticationEntryPoint = authenticationEntryPoint;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.logoutSuccessHandler = logoutSuccessHandler;
         this.ontologyAuthenticationProvider = ontologyAuthenticationProvider;
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(ontologyAuthenticationProvider);
-    }
-
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        final AuthenticationManager authManager = buildAuthenticationManager(http);
+        http.authorizeHttpRequests((auth) -> auth.anyRequest().permitAll())
+            .cors((auth) -> auth.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
+            .addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class)
+            .exceptionHandling(ehc -> ehc.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+            .formLogin((form) -> form.successHandler(authenticationSuccessHandler)
+                                     .failureHandler(authenticationFailureHandler))
+            .logout((auth) -> auth.logoutUrl(SecurityConstants.LOGOUT_URI)
+                                  .logoutSuccessHandler(logoutSuccessHandler)
+                                  .invalidateHttpSession(true).deleteCookies(COOKIES_TO_DESTROY))
+            .authenticationManager(authManager);
+        return http.build();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().permitAll().and()
-            .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-            .and().cors().configurationSource(corsConfigurationSource())
-            .and()
-            .authenticationProvider(ontologyAuthenticationProvider)
-            .addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class)
-            .csrf().disable()
-            .formLogin().successHandler(authenticationSuccessHandler)
-            .failureHandler(authenticationFailureHandler)
-            .loginProcessingUrl(SecurityConstants.SECURITY_CHECK_URI)
-            .usernameParameter(SecurityConstants.USERNAME_PARAM).passwordParameter(SecurityConstants.PASSWORD_PARAM)
-            .and()
-            .logout().invalidateHttpSession(true).deleteCookies(COOKIES_TO_DESTROY)
-            .logoutUrl(SecurityConstants.LOGOUT_URI).logoutSuccessHandler(logoutSuccessHandler)
-            .and().sessionManagement().maximumSessions(1);
+    private AuthenticationManager buildAuthenticationManager(HttpSecurity http) throws Exception {
+        final AuthenticationManagerBuilder ab = http.getSharedObject(AuthenticationManagerBuilder.class);
+        ab.authenticationProvider(ontologyAuthenticationProvider);
+        return ab.build();
     }
 
     @Bean

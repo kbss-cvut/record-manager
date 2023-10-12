@@ -5,131 +5,56 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>cz.cvut.kbss</groupId>
-        <artifactId>kbss-project-parent</artifactId>
-        <version>0.0.8</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.4</version>
     </parent>
 
     <artifactId>record-manager</artifactId>
     <version>0.2.1</version>
     <name>OFN Record Manager</name>
-    <packaging>war</packaging>
-
-    <!-- Required for the KBSS parent project -->
-    <repositories>
-        <repository>
-            <id>kbss</id>
-            <url>https://kbss.felk.cvut.cz/m2repo</url>
-        </repository>
-    </repositories>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jdk.version>1.8</jdk.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <jdk.version>17</jdk.version>
+        <maven.compiler.source>${jdk.version}</maven.compiler.source>
+        <maven.compiler.target>${jdk.version}</maven.compiler.target>
 
-        <cz.cvut.kbss.jopa.version>0.19.2</cz.cvut.kbss.jopa.version>
-        <org.aspectj.version>1.9.7</org.aspectj.version>
-        <org.springframework.version>5.0.7.RELEASE</org.springframework.version>
-        <org.springframework.security.version>5.0.6.RELEASE</org.springframework.security.version>
-        <com.fasterxml.jackson.version>2.12.1</com.fasterxml.jackson.version>
-        <junit.version>4.12</junit.version>
-        <org.mockito.version>1.10.19</org.mockito.version>
-        <ch.qos.logback.version>1.2.2</ch.qos.logback.version>
-        <org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
+        <cz.cvut.kbss.jopa.version>1.1.3</cz.cvut.kbss.jopa.version>
+        <org.aspectj.version>1.9.20</org.aspectj.version>
+        <org.mockito.version>4.11.0</org.mockito.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     </properties>
-
-    <!-- For the JOPA maven plugin -->
-    <pluginRepositories>
-        <pluginRepository>
-            <id>kbss</id>
-            <name>KBSS Maven 2 Repository</name>
-            <url>http://kbss.felk.cvut.cz/m2repo</url>
-            <snapshots>
-                <checksumPolicy>warn</checksumPolicy>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <dependencies>
         <!-- Spring -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${org.springframework.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${org.springframework.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <version>${org.springframework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${org.springframework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${org.springframework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${org.springframework.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
-            <version>${org.springframework.version}</version>
         </dependency>
 
-
-        <!-- Spring Security -->
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>${org.springframework.security.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>${org.springframework.security.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>${org.springframework.security.version}</version>
-        </dependency>
-
-        <!-- Javax annotations (e.g. PostConstruct) -->
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Jackson for JSON serialization -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${com.fasterxml.jackson.version}</version>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
         </dependency>
 
         <!-- Servlet-API -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -149,23 +74,16 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${ch.qos.logback.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${ch.qos.logback.version}</version>
         </dependency>
 
         <!-- Map Struct for DTO <-> entities mapping -->
         <dependency>
             <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-jdk8</artifactId>
+            <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
         </dependency>
 
@@ -175,35 +93,38 @@
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
+
         <!-- Test dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${org.springframework.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
             <version>${org.mockito.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- Email -->
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>1.5.5</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>1.5.5</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -211,13 +132,25 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.1</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
             <plugin>
-                <groupId>com.nickwongdev</groupId>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>dev.aspectj</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
-                <version>1.12.6</version>
+                <version>1.13.1</version>
                 <configuration>
                     <complianceLevel>${jdk.version}</complianceLevel>
                     <source>${jdk.version}</source>
@@ -237,11 +170,6 @@
                     <dependency>
                         <groupId>org.aspectj</groupId>
                         <artifactId>aspectjtools</artifactId>
-                        <version>${org.aspectj.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjrt</artifactId>
                         <version>${org.aspectj.version}</version>
                     </dependency>
                 </dependencies>
@@ -266,15 +194,7 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <!-- https://stackoverflow.com/questions/53319466/spring-boot-build-fails-error-when-starting-fork-exit-code-134 -->
-                <configuration>
-                    <forkCount>0</forkCount>
-                </configuration>
             </plugin>
             <plugin>
                 <!-- Generate entity classes from OWL integrity constraints -->
@@ -300,45 +220,11 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-                <version>3.3.3</version>
-                <configuration>
-                    <additionalSourceDirectories>
-                        <additionalSourceDirectory>
-                            ${project.basedir}/src/main/generated-sources
-                        </additionalSourceDirectory>
-                    </additionalSourceDirectories>
-                    <defaultOutputDirectory>
-                        ${project.basedir}/src/main/generated-sources
-                    </defaultOutputDirectory>
-                    <processors>
-                        <processor>org.mapstruct.ap.MappingProcessor</processor>
-                    </processors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>process</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.mapstruct</groupId>
-                        <artifactId>mapstruct-processor</artifactId>
-                        <version>${org.mapstruct.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
             <!-- Code coverage plugin -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.5.201505241946</version>
+                <version>0.8.8</version>
                 <executions>
                     <execution>
                         <goals>
@@ -357,7 +243,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.10</version>
                 <executions>
                     <execution>
                         <id>add-source</id>
@@ -375,7 +260,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.0.0</version>
                 <configuration>
                     <filesets>
                         <fileset>
@@ -388,7 +272,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
             </plugin>
         </plugins>
     </build>

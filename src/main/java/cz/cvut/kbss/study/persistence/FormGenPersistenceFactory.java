@@ -2,18 +2,19 @@ package cz.cvut.kbss.study.persistence;
 
 import cz.cvut.kbss.jopa.Persistence;
 import cz.cvut.kbss.jopa.model.EntityManagerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.*;
+import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.CACHE_ENABLED;
+import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.DATA_SOURCE_CLASS;
+import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.ONTOLOGY_PHYSICAL_URI_KEY;
 import static cz.cvut.kbss.study.util.ConfigParam.DRIVER;
 import static cz.cvut.kbss.study.util.ConfigParam.FORM_GEN_REPOSITORY_URL;
 

@@ -9,12 +9,12 @@ import cz.cvut.kbss.study.persistence.data.DataLoader;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Utils;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.*;
 
