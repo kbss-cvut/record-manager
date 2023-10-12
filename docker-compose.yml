@@ -12,8 +12,10 @@ services:
       API_URL: "http://localhost:3000/ofn-record-manager"
 
   dm-record-manager-server:
-    image: 'ofn-record-manager-server:latest'
+    build: .
+    image: record-manager-server
     container_name: dm-record-manager-server
+    restart: always
     ports:
       - '3000:8080'
     depends_on:
