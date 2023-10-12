@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.service.BaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.util.Collection;
@@ -16,6 +17,7 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
 
     protected abstract GenericDao<T> getPrimaryDao();
 
+    @Transactional(readOnly = true)
     @Override
     public List<T> findAll() {
         final List<T> result = getPrimaryDao().findAll();
@@ -23,6 +25,7 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
         return result;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public T find(URI uri) {
         final T result = getPrimaryDao().find(uri);
@@ -30,6 +33,7 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
         return result;
     }
 
+    @Transactional
     @Override
     public void persist(T instance) {
         Objects.requireNonNull(instance);
@@ -37,6 +41,7 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
         getPrimaryDao().persist(instance);
     }
 
+    @Transactional
     @Override
     public void persist(Collection<T> instances) {
         Objects.requireNonNull(instances);
@@ -47,6 +52,7 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
         getPrimaryDao().persist(instances);
     }
 
+    @Transactional
     @Override
     public void update(T instance) {
         Objects.requireNonNull(instance);
@@ -54,6 +60,7 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
         getPrimaryDao().update(instance);
     }
 
+    @Transactional
     @Override
     public void remove(T instance) {
         Objects.requireNonNull(instance);
@@ -61,11 +68,13 @@ public abstract class BaseRepositoryService<T> implements BaseService<T> {
         getPrimaryDao().remove(instance);
     }
 
+    @Transactional
     @Override
     public void remove(Collection<T> instances) {
         getPrimaryDao().remove(instances);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean exists(URI uri) {
         return getPrimaryDao().exists(uri);

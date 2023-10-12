@@ -15,14 +15,14 @@ public class OwlKeySupportingDaoTest extends BaseDaoTestRunner {
     @Test
     public void persistedInstanceHasGeneratedKey() {
         final Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
+        transactional(() -> institutionDao.persist(institution));
         assertNotNull(institution.getKey());
     }
 
     @Test
     public void getInstitutionByKey() {
         final Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
+        transactional(() -> institutionDao.persist(institution));
 
         assertNotNull(institutionDao.findByKey(institution.getKey()));
     }

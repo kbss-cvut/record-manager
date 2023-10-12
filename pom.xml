@@ -65,6 +65,11 @@
             <artifactId>ontodriver-rdf4j</artifactId>
             <version>${cz.cvut.kbss.jopa.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.ledsoft</groupId>
+            <artifactId>jopa-spring-transaction</artifactId>
+            <version>0.2.0</version>
+        </dependency>
 
         <!-- Logging -->
         <dependency>

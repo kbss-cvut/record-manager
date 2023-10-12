@@ -20,12 +20,14 @@ public class DerivableUriDaoTest extends BaseDaoTestRunner {
     @Test
     public void persistedInstanceHasGeneratedUri(){
         final Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
+        final User user = Generator.generateUser(institution);
 
-        institutionDao.persist(institution);
-        userDao.persist(user);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user);
+        });
 
-        user = userDao.findByUsername(user.getUsername());
-        assertNotNull(user.getUri());
+        final User result = userDao.findByUsername(user.getUsername());
+        assertNotNull(result.getUri());
     }
 }

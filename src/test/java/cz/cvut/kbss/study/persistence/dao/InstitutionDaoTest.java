@@ -14,12 +14,14 @@ public class InstitutionDaoTest extends BaseDaoTestRunner {
     private InstitutionDao institutionDao;
 
     @Test
-    public void getInstitutionByName() throws Exception {
+    public void getInstitutionByName() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
 
-        institutionDao.persist(institution1);
-        institutionDao.persist(institution2);
+        transactional(() -> {
+            institutionDao.persist(institution1);
+            institutionDao.persist(institution2);
+        });
 
         assertEquals(institution1.getUri(), institutionDao.findByName(institution1.getName()).getUri());
     }

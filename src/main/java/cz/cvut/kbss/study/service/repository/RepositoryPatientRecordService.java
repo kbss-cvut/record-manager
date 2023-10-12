@@ -10,6 +10,7 @@ import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -33,16 +34,19 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         return recordDao;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<PatientRecordDto> findByInstitution(Institution institution) {
         return recordDao.findByInstitution(institution);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<PatientRecord> findByAuthor(User user) {
         return recordDao.findByAuthor(user);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<PatientRecordDto> findAllRecords() {
         return recordDao.findAllRecords();

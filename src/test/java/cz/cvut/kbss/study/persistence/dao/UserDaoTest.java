@@ -73,18 +73,18 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @Test
     public void getUsersByToken() {
         Institution institution = Generator.generateInstitution();
-
-        institutionDao.persist(institution);
-
         User user = Generator.generateUser(institution);
         user.setToken("Token");
 
-        userDao.persist(user);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user);
+        });
 
-        user = userDao.findByToken("Token");
+        final User result =  userDao.findByToken("Token");
         User userNull = userDao.findByUsername("NotExistingToken");
 
-        assertNotNull(user);
+        assertNotNull(result);
         assertNull(userNull);
     }
 
@@ -92,15 +92,15 @@ public class UserDaoTest extends BaseDaoTestRunner {
     public void getUsersByInstitution() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
-
-        institutionDao.persist(institution1);
-        institutionDao.persist(institution2);
-
         User user1 = Generator.generateUser(institution1);
         User user2 = Generator.generateUser(institution1);
 
-        userDao.persist(user1);
-        userDao.persist(user2);
+        transactional(() -> {
+            institutionDao.persist(institution1);
+            institutionDao.persist(institution2);
+            userDao.persist(user1);
+            userDao.persist(user2);
+        });
 
         List<User> usersList = userDao.findByInstitution(institution1);
         List<User> emptyList = userDao.findByInstitution(institution2);
@@ -117,9 +117,6 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @Test
     public void getNumberOfInvestigators() {
         Institution institution = Generator.generateInstitution();
-
-        institutionDao.persist(institution);
-
         User user1 = Generator.generateUser(institution);
         User user2 = Generator.generateUser(institution);
         User user3 = Generator.generateUser(institution);
@@ -130,9 +127,10 @@ public class UserDaoTest extends BaseDaoTestRunner {
 
         user3.setTypes(types);
 
-        userDao.persist(user1);
-        userDao.persist(user2);
-        userDao.persist(user3);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(List.of(user1, user2, user3));
+        });
 
         int numberOfInvestigators = userDao.getNumberOfInvestigators();
 
@@ -142,10 +140,11 @@ public class UserDaoTest extends BaseDaoTestRunner {
 
     private User getPersistedUser() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         User user = Generator.generateUser(institution);
-        userDao.persist(user);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user);
+        });
         return user;
     }
 

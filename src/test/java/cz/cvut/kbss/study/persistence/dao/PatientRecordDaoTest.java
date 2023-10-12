@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
     @Autowired
-    private PatientRecordDao patienRecordDao;
+    private PatientRecordDao patientRecordDao;
 
     @Autowired
     private UserDao userDao;
@@ -28,25 +28,23 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     public void findByInstitutionReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
         Institution institutionOther = Generator.generateInstitution();
-        institutionDao.persist(institution);
-        institutionDao.persist(institutionOther);
-
         User user1 = Generator.generateUser(institution);
-        userDao.persist(user1);
-        user1 = userDao.findByUsername(user1.getUsername());
         User user2 = Generator.generateUser(institutionOther);
-        userDao.persist(user2);
-        user2 = userDao.findByUsername(user2.getUsername());
-
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord recordOther = Generator.generatePatientRecord(user2);
 
-        patienRecordDao.persist(record1);
-        patienRecordDao.persist(record2);
-        patienRecordDao.persist(recordOther);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            institutionDao.persist(institutionOther);
+            userDao.persist(user1);
+            userDao.persist(user2);
+            patientRecordDao.persist(record1);
+            patientRecordDao.persist(record2);
+            patientRecordDao.persist(recordOther);
+        });
 
-        List<PatientRecordDto> records = patienRecordDao.findByInstitution(institution);
+        List<PatientRecordDto> records = patientRecordDao.findByInstitution(institution);
 
         assertEquals(2, records.size());
         assertEquals(1, records.stream().filter(rs -> record1.getUri().equals(rs.getUri())).count());
@@ -57,25 +55,23 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     public void findAllRecordsReturnAllRecords() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
-        institutionDao.persist(institution1);
-        institutionDao.persist(institution2);
-
         User user1 = Generator.generateUser(institution1);
         User user2 = Generator.generateUser(institution2);
-        userDao.persist(user1);
-        userDao.persist(user2);
-        user1 = userDao.findByUsername(user1.getUsername());
-        user2 = userDao.findByUsername(user2.getUsername());
-
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord record3 = Generator.generatePatientRecord(user2);
 
-        patienRecordDao.persist(record1);
-        patienRecordDao.persist(record2);
-        patienRecordDao.persist(record3);
+        transactional(() -> {
+            institutionDao.persist(institution1);
+            institutionDao.persist(institution2);
+            userDao.persist(user1);
+            userDao.persist(user2);
+            patientRecordDao.persist(record1);
+            patientRecordDao.persist(record2);
+            patientRecordDao.persist(record3);
+        });
 
-        List<PatientRecordDto> records = patienRecordDao.findAllRecords();
+        List<PatientRecordDto> records = patientRecordDao.findAllRecords();
 
         assertEquals(3, records.size());
     }
@@ -83,19 +79,17 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     public void getNumberOfProcessedRecords() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         User user = Generator.generateUser(institution);
-        userDao.persist(user);
-        user = userDao.findByUsername(user.getUsername());
-
         PatientRecord record1 = Generator.generatePatientRecord(user);
         PatientRecord record2 = Generator.generatePatientRecord(user);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user);
+            patientRecordDao.persist(record1);
+            patientRecordDao.persist(record2);
+        });
 
-        patienRecordDao.persist(record1);
-        patienRecordDao.persist(record2);
-
-        int numberOfProcessedRecords = patienRecordDao.getNumberOfProcessedRecords();
+        int numberOfProcessedRecords = patientRecordDao.getNumberOfProcessedRecords();
 
         assertEquals(2, numberOfProcessedRecords);
     }
@@ -103,25 +97,27 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     public void findByAuthorReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
 
         User user1 = Generator.generateUser(institution);
         User user2 = Generator.generateUser(institution);
         userDao.persist(user1);
         userDao.persist(user2);
-        user1 = userDao.findByUsername(user1.getUsername());
-        user2 = userDao.findByUsername(user2.getUsername());
 
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord record3 = Generator.generatePatientRecord(user2);
 
-        patienRecordDao.persist(record1);
-        patienRecordDao.persist(record2);
-        patienRecordDao.persist(record3);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user1);
+            userDao.persist(user2);
+            patientRecordDao.persist(record1);
+            patientRecordDao.persist(record2);
+            patientRecordDao.persist(record3);
+        });
 
-        List<PatientRecord> records1 = patienRecordDao.findByAuthor(user1);
-        List<PatientRecord> records2 = patienRecordDao.findByAuthor(user2);
+        List<PatientRecord> records1 = patientRecordDao.findByAuthor(user1);
+        List<PatientRecord> records2 = patientRecordDao.findByAuthor(user2);
 
         assertEquals(2, records1.size());
         assertEquals(1, records2.size());

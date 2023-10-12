@@ -8,8 +8,8 @@ import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.util.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RepositoryInstitutionService extends KeySupportingRepositoryService<Institution> implements InstitutionService {
@@ -33,6 +33,7 @@ public class RepositoryInstitutionService extends KeySupportingRepositoryService
         return institutionDao;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Institution findByName(String name) {
         return institutionDao.findByName(name);

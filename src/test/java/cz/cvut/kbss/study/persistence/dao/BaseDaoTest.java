@@ -25,7 +25,7 @@ public class BaseDaoTest extends BaseDaoTestRunner{
         institutions.add(i1);
         final Institution i2 = Generator.generateInstitution();
         institutions.add(i2);
-        institutionDao.persist(institutions);
+        transactional(() -> institutionDao.persist(institutions));
 
         final List<Institution> result = institutionDao.findAll();
         assertEquals(institutions.size(), result.size());
@@ -38,12 +38,12 @@ public class BaseDaoTest extends BaseDaoTestRunner{
     @Test
     public void removeInstitution() {
         final Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
+        transactional(() -> institutionDao.persist(institution));
 
         Institution i1 = institutionDao.findByName(institution.getName());
         assertNotNull(i1);
 
-        institutionDao.remove(i1);
+        transactional(() -> institutionDao.remove(i1));
         Institution i2 = institutionDao.findByName(institution.getName());
         assertNull(i2);
     }
@@ -56,12 +56,12 @@ public class BaseDaoTest extends BaseDaoTestRunner{
         institutions.add(i1);
         final Institution i2 = Generator.generateInstitution();
         institutions.add(i2);
-        institutionDao.persist(institutions);
+        transactional(() -> institutionDao.persist(institutions));
 
         final List<Institution> foundInstitutions = institutionDao.findAll();
         assertEquals(institutions.size(), foundInstitutions.size());
 
-        institutionDao.remove(institutions);
+        transactional(() -> institutionDao.remove(institutions));
         final List<Institution> result = institutionDao.findAll();
         assertEquals(0, result.size());
     }
@@ -69,12 +69,12 @@ public class BaseDaoTest extends BaseDaoTestRunner{
     @Test
     public void updateInstitution() {
         final Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
+        transactional(() -> institutionDao.persist(institution));
 
         Institution i1 = institutionDao.findByName(institution.getName());
         assertNotNull(i1);
         i1.setName("Random Gynecology");
-        institutionDao.update(i1);
+        transactional(() -> institutionDao.update(i1));
 
         Institution i2 = institutionDao.findByName(i1.getName());
         assertEquals(institution.getUri(),i2.getUri());
