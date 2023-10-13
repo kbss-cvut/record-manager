@@ -1,7 +1,7 @@
 package cz.cvut.kbss.study.environment.util;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.cvut.kbss.study.config.WebAppConfig;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.security.model.AuthenticationToken;
 import cz.cvut.kbss.study.security.model.UserDetails;
@@ -54,8 +54,7 @@ public class Environment {
      */
     public static ObjectMapper getObjectMapper() {
         if (objectMapper == null) {
-            objectMapper = new ObjectMapper();
-            objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+            objectMapper = WebAppConfig.createJsonObjectMapper();
         }
         return objectMapper;
     }

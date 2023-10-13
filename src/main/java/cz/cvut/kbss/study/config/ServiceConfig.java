@@ -41,7 +41,7 @@ public class ServiceConfig {
         jacksonConverter.setObjectMapper(objectMapper);
         final StringHttpMessageConverter stringConverter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
         restTemplate.setMessageConverters(
-                Arrays.asList(jacksonConverter, stringConverter, new ResourceHttpMessageConverter()));
+                Arrays.asList(stringConverter, jacksonConverter, new ResourceHttpMessageConverter()));
         return restTemplate;
     }
 }

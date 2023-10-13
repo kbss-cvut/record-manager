@@ -2,6 +2,8 @@ package cz.cvut.kbss.study.config;
 
 import cz.cvut.kbss.study.security.CsrfHeaderFilter;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import cz.cvut.kbss.study.service.ConfigReader;
+import cz.cvut.kbss.study.util.ConfigParam;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +26,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -55,10 +58,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, ConfigReader config) throws Exception {
         final AuthenticationManager authManager = buildAuthenticationManager(http);
         http.authorizeHttpRequests((auth) -> auth.anyRequest().permitAll())
-            .cors((auth) -> auth.configurationSource(corsConfigurationSource()))
+            .cors((auth) -> auth.configurationSource(corsConfigurationSource(config)))
             .csrf(AbstractHttpConfigurer::disable)
             .addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class)
             .exceptionHandling(ehc -> ehc.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
@@ -79,13 +82,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        // We're allowing all methods from all origins so that the application API is usable also by other clients
-        // than just the UI.
-        // This behavior can be restricted later.
+    CorsConfigurationSource corsConfigurationSource(ConfigReader config) {
+        // allowCredentials requires allowed origins to be configured (* is not supported)
         final CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-        corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
+        if (!config.getConfig(ConfigParam.APP_CONTEXT, "").isBlank()) {
+            String appUrl = config.getConfig(ConfigParam.APP_CONTEXT);
+            appUrl = appUrl.substring(0, appUrl.lastIndexOf('/'));
+            corsConfiguration.setAllowedOrigins(List.of(appUrl));
+        } else {
+            corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
+        }
         corsConfiguration.addExposedHeader(HttpHeaders.AUTHORIZATION);
         corsConfiguration.addExposedHeader(HttpHeaders.LOCATION);
         corsConfiguration.addExposedHeader(HttpHeaders.CONTENT_DISPOSITION);

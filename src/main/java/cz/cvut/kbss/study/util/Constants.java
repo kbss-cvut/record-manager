@@ -6,6 +6,8 @@ public final class Constants {
         throw new AssertionError();
     }
 
+    public static final String REST_API_REFIX = "/rest";
+
     public static final String BASE_URI = "http://onto.fel.cvut.cz/ontologies/record-manager/";
 
     /**

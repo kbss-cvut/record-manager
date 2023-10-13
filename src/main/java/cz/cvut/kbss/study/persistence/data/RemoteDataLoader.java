@@ -5,7 +5,6 @@ import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -53,14 +52,14 @@ public class RemoteDataLoader implements DataLoader {
         final URI urlWithQuery = Utils.prepareUri(remoteUrl, params);
         final HttpEntity<Object> entity = new HttpEntity<>(null, headers);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Getting remote data using {}", urlWithQuery.toString());
+            LOG.trace("Getting remote data using {}", urlWithQuery);
         }
         try {
-            final ResponseEntity<String> result = restTemplate.exchange(urlWithQuery, HttpMethod.GET, entity,
-                    String.class);
+            final ResponseEntity<String> result =
+                    restTemplate.exchange(urlWithQuery, HttpMethod.GET, entity, String.class);
             return result.getBody();
         } catch (Exception e) {
-            LOG.error("Error when requesting remote data, url: {}.", urlWithQuery.toString(), e);
+            LOG.error("Error when requesting remote data, url: {}.", urlWithQuery, e);
             throw new WebServiceIntegrationException("Unable to fetch remote data.", e);
         }
     }
