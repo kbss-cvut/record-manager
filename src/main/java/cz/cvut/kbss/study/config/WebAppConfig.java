@@ -40,6 +40,9 @@ public class WebAppConfig implements WebMvcConfigurer {
         return new ResourceHttpMessageConverter();
     }
 
+    /**
+     * Registers a filter that allows using current user's username in log pattern.
+     */
     @Bean
     public FilterRegistrationBean<DiagnosticsContextFilter> mdcFilter() {
         FilterRegistrationBean<DiagnosticsContextFilter> registrationBean = new FilterRegistrationBean<>();

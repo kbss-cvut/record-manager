@@ -2,7 +2,6 @@ package cz.cvut.kbss.study.service.security;
 
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
