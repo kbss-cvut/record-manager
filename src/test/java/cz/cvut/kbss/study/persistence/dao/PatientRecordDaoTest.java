@@ -97,12 +97,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     public void findByAuthorReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
-
         User user1 = Generator.generateUser(institution);
         User user2 = Generator.generateUser(institution);
-        userDao.persist(user1);
-        userDao.persist(user2);
-
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord record3 = Generator.generatePatientRecord(user2);

@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.environment.config;
 
+import cz.cvut.kbss.study.config.PersistenceConfig;
 import cz.cvut.kbss.study.persistence.TestFormGenPersistenceFactory;
 import cz.cvut.kbss.study.persistence.TestPersistenceFactory;
 import cz.cvut.kbss.study.persistence.data.RemoteDataLoader;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.mock;
 @TestConfiguration
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @ComponentScan(basePackages = {"cz.cvut.kbss.study.persistence.dao"})
-@Import({TestPersistenceFactory.class, TestFormGenPersistenceFactory.class})
+@Import({PersistenceConfig.class, TestPersistenceFactory.class, TestFormGenPersistenceFactory.class})
 @EnableTransactionManagement
 public class TestPersistenceConfig {
 

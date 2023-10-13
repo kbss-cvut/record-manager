@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.service;
 
-import cz.cvut.kbss.study.config.ServiceConfig;
+import cz.cvut.kbss.study.environment.TransactionalTestRunner;
 import cz.cvut.kbss.study.environment.config.TestPersistenceConfig;
 import cz.cvut.kbss.study.environment.config.TestServiceConfig;
 import cz.cvut.kbss.study.environment.generator.Generator;
@@ -23,7 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {TestServiceConfig.class, TestPersistenceConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public abstract class BaseServiceTestRunner {
+public abstract class BaseServiceTestRunner extends TransactionalTestRunner {
 
     @Autowired
     private UserDao userDao;
@@ -43,12 +43,13 @@ public abstract class BaseServiceTestRunner {
     @BeforeEach
     public void setUp() throws Exception {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         user = Generator.getUser(USERNAME, PASSWORD, "John", "Grant", EMAIL, institution);
-        if (userDao.findByUsername(user.getUsername()) == null) {
-            user.encodePassword(passwordEncoder);
-            userDao.persist(user);
-        }
+        transactional(() -> {
+            institutionDao.persist(institution);
+            if (userDao.findByUsername(user.getUsername()) == null) {
+                user.encodePassword(passwordEncoder);
+                userDao.persist(user);
+            }
+        });
     }
 }

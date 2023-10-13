@@ -108,7 +108,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
         assertEquals(2, usersList.size());
         assertEquals(0, emptyList.size());
 
-        userDao.remove(user1);
+        transactional(() -> userDao.remove(user1));
 
         usersList = userDao.findByInstitution(institution1);
         assertEquals(1, usersList.size());
