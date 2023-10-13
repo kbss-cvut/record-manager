@@ -1,6 +1,6 @@
 # OFN Record Manager
 
-Manager of records based on OFN (https://opendata.gov.cz/otevřené-formální-normy:start).
+Manager of records based on OFN (https://data.gov.cz/ofn/).
 
 ## Required Technologies
 
