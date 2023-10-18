@@ -15,7 +15,6 @@ services:
     build: .
     image: record-manager-server
     container_name: dm-record-manager-server
-    restart: always
     ports:
       - '3000:8080'
     depends_on:
