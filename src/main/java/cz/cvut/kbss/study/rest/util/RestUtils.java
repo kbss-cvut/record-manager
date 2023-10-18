@@ -2,14 +2,15 @@ package cz.cvut.kbss.study.rest.util;
 
 import cz.cvut.kbss.study.exception.WebServiceIntegrationException;
 import cz.cvut.kbss.study.util.Constants;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class RestUtils {
 
@@ -65,11 +66,7 @@ public class RestUtils {
      * @return Encoded string
      */
     public static String encodeUrl(String value) {
-        try {
-            return URLEncoder.encode(value, Constants.UTF_8_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            throw new WebServiceIntegrationException("Encoding not found.", e);
-        }
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     public static String getCookie(HttpServletRequest request, String cookieName) {

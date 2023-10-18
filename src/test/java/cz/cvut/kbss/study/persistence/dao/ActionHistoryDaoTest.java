@@ -5,13 +5,13 @@ import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ActionHistoryDaoTest extends BaseDaoTestRunner {
 
@@ -29,38 +29,37 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     private final String LOAD_PENDING = "LOAD_PENDING";
 
     @Test
-    public void findByKeyReturnsActionWithPayload() throws Exception {
+    public void findByKeyReturnsActionWithPayload() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         User user = Generator.generateUser(institution);
-        userDao.persist(user);
-
         ActionHistory action = Generator.generateActionHistory(user);
-        actionHistoryDao.persist(action);
 
-        action = actionHistoryDao.findByKey(action.getKey());
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user);
+            actionHistoryDao.persist(action);
+        });
 
-        assertNotNull(action);
-        assertNotNull(action.getPayload());
+        final ActionHistory result = actionHistoryDao.findByKey(action.getKey());
+
+        assertNotNull(result);
+        assertNotNull(result.getPayload());
     }
 
     @Test
-    public void findAllWithParamsWithoutParamsReturnsAllActions() throws Exception {
+    public void findAllWithParamsWithoutParamsReturnsAllActions() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         User user1 = Generator.generateUser(institution);
-        userDao.persist(user1);
         User user2 = Generator.generateUser(institution);
-        userDao.persist(user2);
-
         ActionHistory action1 = Generator.generateActionHistory(user1);
         ActionHistory action2 = Generator.generateActionHistory(user1);
         ActionHistory action3 = Generator.generateActionHistory(user2);
-        actionHistoryDao.persist(action1);
-        actionHistoryDao.persist(action2);
-        actionHistoryDao.persist(action3);
+
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(List.of(user1, user2));
+            actionHistoryDao.persist(List.of(action1, action2, action3));
+        });
 
         List<ActionHistory> actionsList = actionHistoryDao.findAllWithParams(null, null, 1);
 
@@ -68,23 +67,20 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsWithAuthorReturnsAuthorsActions() throws Exception {
+    public void findAllWithParamsWithAuthorReturnsAuthorsActions() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         User user1 = Generator.generateUser(institution);
-        userDao.persist(user1);
         User user2 = Generator.generateUser(institution);
-        userDao.persist(user2);
         User user3 = Generator.generateUser(institution);
-        userDao.persist(user3);
-
         ActionHistory action1 = Generator.generateActionHistory(user1);
         ActionHistory action2 = Generator.generateActionHistory(user1);
         ActionHistory action3 = Generator.generateActionHistory(user2);
-        actionHistoryDao.persist(action1);
-        actionHistoryDao.persist(action2);
-        actionHistoryDao.persist(action3);
+
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(List.of(user1, user2, user3));
+            actionHistoryDao.persist(List.of(action1, action2, action3));
+        });
 
         List<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(null, user1, 1);
         List<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(null, user2, 1);
@@ -96,22 +92,21 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsWithTypeReturnsActionsWithExactType() throws Exception {
+    public void findAllWithParamsWithTypeReturnsActionsWithExactType() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         User user = Generator.generateUser(institution);
-        userDao.persist(user);
-
         ActionHistory action1 = Generator.generateActionHistory(user);
         action1.setType(LOAD_SUCCESS);
         ActionHistory action2 = Generator.generateActionHistory(user);
         action2.setType(LOAD_SUCCESS);
         ActionHistory action3 = Generator.generateActionHistory(user);
         action3.setType(LOAD_ERROR);
-        actionHistoryDao.persist(action1);
-        actionHistoryDao.persist(action2);
-        actionHistoryDao.persist(action3);
+
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user);
+            actionHistoryDao.persist(List.of(action1, action2, action3));
+        });
 
         List<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, null, 1);
         List<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(LOAD_ERROR, null, 1);
@@ -123,22 +118,20 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsWithTypeReturnsActionsWithTypeContained() throws Exception {
+    public void findAllWithParamsWithTypeReturnsActionsWithTypeContained() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         User user = Generator.generateUser(institution);
-        userDao.persist(user);
-
         ActionHistory action1 = Generator.generateActionHistory(user);
         action1.setType(LOAD_SUCCESS);
         ActionHistory action2 = Generator.generateActionHistory(user);
         action2.setType(LOAD_SUCCESS);
         ActionHistory action3 = Generator.generateActionHistory(user);
 
-        actionHistoryDao.persist(action1);
-        actionHistoryDao.persist(action2);
-        actionHistoryDao.persist(action3);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user);
+            actionHistoryDao.persist(List.of(action1, action2, action3));
+        });
 
         List<ActionHistory> actionsList = actionHistoryDao.findAllWithParams("LOAD", null, 1);
 
@@ -146,15 +139,10 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     }
 
     @Test
-    public void findAllWithParamsReturnsMatchingActions() throws Exception {
+    public void findAllWithParamsReturnsMatchingActions() {
         Institution institution = Generator.generateInstitution();
-        institutionDao.persist(institution);
-
         User user1 = Generator.generateUser(institution);
-        userDao.persist(user1);
         User user2 = Generator.generateUser(institution);
-        userDao.persist(user2);
-
         ActionHistory action1 = Generator.generateActionHistory(user1);
         action1.setType(LOAD_SUCCESS);
         ActionHistory action2 = Generator.generateActionHistory(user1);
@@ -162,9 +150,11 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
         ActionHistory action3 = Generator.generateActionHistory(user2);
         action3.setType(LOAD_ERROR);
 
-        actionHistoryDao.persist(action1);
-        actionHistoryDao.persist(action2);
-        actionHistoryDao.persist(action3);
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(List.of(user1, user2));
+            actionHistoryDao.persist(List.of(action1, action2, action3));
+        });
 
         List<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, user1, 1);
         List<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, user2, 1);

@@ -8,24 +8,35 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.service.InstitutionService;
-import static org.junit.Assert.*;
-
 import cz.cvut.kbss.study.service.UserService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+@ExtendWith(MockitoExtension.class)
 public class UserControllerTest extends BaseControllerTestRunner {
 
     @Mock
@@ -37,9 +48,8 @@ public class UserControllerTest extends BaseControllerTestRunner {
     @InjectMocks
     private UserController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
         User user = Generator.generateUser(institution);
@@ -75,7 +85,6 @@ public class UserControllerTest extends BaseControllerTestRunner {
 
         assertEquals(HttpStatus.CREATED, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
-
 
     @Test
     public void getUsersReturnsEmptyListWhenNoUsersAreFound() throws Exception {
@@ -170,12 +179,8 @@ public class UserControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    public void updateUserReturnsResponseStatusBadRequest() throws Exception {
-        final String username = "tom";
-
-        when(userServiceMock.findByUsername(username)).thenReturn(Environment.getCurrentUser());
-
-        final MvcResult result = mockMvc.perform(put("/users/tomas" ).content(toJson(Environment.getCurrentUser()))
+    public void updateUserWithNonMatchingUsernameReturnsResponseStatusBadRequest() throws Exception {
+                final MvcResult result = mockMvc.perform(put("/users/tomas").content(toJson(Environment.getCurrentUser()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
         assertEquals(HttpStatus.BAD_REQUEST, HttpStatus.valueOf(result.getResponse().getStatus()));

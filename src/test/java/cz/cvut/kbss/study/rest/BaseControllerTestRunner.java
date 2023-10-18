@@ -3,16 +3,16 @@ package cz.cvut.kbss.study.rest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.environment.util.Environment;
-import static cz.cvut.kbss.study.environment.util.Environment.createDefaultMessageConverter;
-import static cz.cvut.kbss.study.environment.util.Environment.createResourceMessageConverter;
-import static cz.cvut.kbss.study.environment.util.Environment.createStringEncodingMessageConverter;
 import cz.cvut.kbss.study.rest.handler.RestExceptionHandler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.Assert.assertEquals;
+import static cz.cvut.kbss.study.environment.util.Environment.createDefaultMessageConverter;
+import static cz.cvut.kbss.study.environment.util.Environment.createResourceMessageConverter;
+import static cz.cvut.kbss.study.environment.util.Environment.createStringEncodingMessageConverter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class BaseControllerTestRunner {
 
@@ -26,7 +26,6 @@ public abstract class BaseControllerTestRunner {
             .setMessageConverters(
                 createDefaultMessageConverter(), createStringEncodingMessageConverter(),
                 createResourceMessageConverter())
-            .setUseSuffixPatternMatch(false)
             .build();
     }
 

@@ -1,13 +1,16 @@
 package cz.cvut.kbss.study.persistence;
 
+import cz.cvut.kbss.study.environment.TransactionalTestRunner;
 import cz.cvut.kbss.study.environment.config.TestPersistenceConfig;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestPersistenceConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-abstract public class BaseDaoTestRunner {
+@ActiveProfiles("test")
+abstract public class BaseDaoTestRunner extends TransactionalTestRunner {
 }

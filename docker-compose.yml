@@ -12,7 +12,8 @@ services:
       API_URL: "http://localhost:3000/ofn-record-manager"
 
   dm-record-manager-server:
-    image: 'ofn-record-manager-server:latest'
+    build: .
+    image: record-manager-server
     container_name: dm-record-manager-server
     ports:
       - '3000:8080'
@@ -37,7 +38,7 @@ services:
       - ./scripts:/scripts
 
   dm-rdf4j:
-    image: 'eclipse/rdf4j-workbench:amd64-3.5.0'
+    image: 'eclipse/rdf4j-workbench:4.3.7'
     container_name: dm-rdf4j
     ports:
       - "8080:8080"

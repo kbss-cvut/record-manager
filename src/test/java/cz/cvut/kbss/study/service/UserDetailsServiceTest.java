@@ -4,12 +4,14 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.service.security.UserDetailsService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 public class UserDetailsServiceTest extends BaseServiceTestRunner {
     @Autowired
@@ -22,7 +24,7 @@ public class UserDetailsServiceTest extends BaseServiceTestRunner {
     private InstitutionService institutionService;
 
     @Test
-    public void loadUserByUsername() throws Exception {
+    public void loadUserByUsername() {
         Institution institution = Generator.generateInstitution();
         institutionService.persist(institution);
 
@@ -33,8 +35,8 @@ public class UserDetailsServiceTest extends BaseServiceTestRunner {
         assertEquals(userDetails.getUsername(), user.getUsername());
     }
 
-    @Test(expected = UsernameNotFoundException.class)
-    public void loadUserByUsernameExpectException() throws Exception {
-        userDetailsService.loadUserByUsername("CarolansRoyal12");
+    @Test
+    public void loadUserByUsernameExpectException() {
+        assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername("CarolansRoyal12"));
     }
 }

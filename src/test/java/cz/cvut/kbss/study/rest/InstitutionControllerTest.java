@@ -6,18 +6,14 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import static org.junit.Assert.*;
-
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -26,9 +22,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-
+@ExtendWith(MockitoExtension.class)
 public class InstitutionControllerTest extends BaseControllerTestRunner {
     @Mock
     private InstitutionService institutionServiceMock;
@@ -39,9 +42,8 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
     @InjectMocks
     private InstitutionController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
         User user = Generator.generateUser(institution);
@@ -167,13 +169,11 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    public void updateInstitutionReturnsResponseStatusBadRequest() throws Exception {
+    public void updateInstitutionWithNonMatchingKeyReturnsResponseStatusBadRequest() throws Exception {
         final String key = "12345";
 
         Institution institution = Generator.generateInstitution();
         institution.setKey(key);
-
-        when(institutionServiceMock.findByKey(key)).thenReturn(institution);
 
         final MvcResult result = mockMvc.perform(put("/institutions/123456" ).content(toJson(institution))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();

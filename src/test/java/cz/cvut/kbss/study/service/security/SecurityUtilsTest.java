@@ -5,22 +5,23 @@ import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.BaseServiceTestRunner;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.UserService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.HashSet;
-import java.util.Set;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.Assert.*;
 
 public class SecurityUtilsTest extends BaseServiceTestRunner {
 
@@ -40,7 +41,7 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
     public static final String USERNAME = "halsey";
     public static final String PASSWORD = "john117";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Institution institution = Generator.generateInstitution();
         institutionService.persist(institution);
@@ -49,7 +50,7 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
         userService.persist(user);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         SecurityContextHolder.clearContext();
     }

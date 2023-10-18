@@ -1,7 +1,18 @@
-FROM tomcat:9.0-jdk8-slim
+FROM maven:3-eclipse-temurin-17 as build
+
+WORKDIR /record-manager
+
+COPY pom.xml pom.xml
+
+RUN mvn -B de.qaware.maven:go-offline-maven-plugin:resolve-dependencies
+
+COPY src src
+
+RUN mvn package -B -DskipTests=true
+
+FROM eclipse-temurin:17-jdk-alpine as runtime
+COPY --from=build  /record-manager/target/record-manager.jar record-manager.jar
 
 EXPOSE 8080
 
-COPY /target/record-manager-0.*.war /usr/local/tomcat/webapps/record-manager.war
-
-CMD ["catalina.sh","run"]
+ENTRYPOINT ["java","-jar","/record-manager.jar"]

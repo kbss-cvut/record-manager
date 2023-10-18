@@ -17,21 +17,20 @@ import java.util.Objects;
  */
 public abstract class OwlKeySupportingDao<T extends HasOwlKey> extends BaseDao<T> {
 
-    protected OwlKeySupportingDao(Class<T> type) {
-        super(type);
+    protected OwlKeySupportingDao(Class<T> type, EntityManager em) {
+        super(type, em);
     }
 
     /**
      * Generates key and then calls persist.
      *
      * @param entity The instance to persist
-     * @param em     Current EntityManager
      */
     @Override
-    protected void persist(T entity, EntityManager em) {
-        assert entity != null;
+    public void persist(T entity) {
+        Objects.requireNonNull(entity);
         entity.setKey(IdentificationUtils.generateKey());
-        super.persist(entity, em);
+        super.persist(entity);
     }
 
     /**
@@ -42,18 +41,9 @@ public abstract class OwlKeySupportingDao<T extends HasOwlKey> extends BaseDao<T
      */
     public T findByKey(String key) {
         Objects.requireNonNull(key);
-        final EntityManager em = entityManager();
-        try {
-            return findByKey(key, em);
-        } finally {
-            em.close();
-        }
-    }
-
-    protected T findByKey(String key, EntityManager em) {
         try {
             return em.createNativeQuery("SELECT ?x WHERE { ?x ?hasKey ?key ;" +
-                    "a ?type }", type)
+                                                "a ?type }", type)
                      .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
                      .setParameter("key", key, Constants.PU_LANGUAGE).setParameter("type", typeUri).getSingleResult();
         } catch (NoResultException e) {

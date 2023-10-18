@@ -5,8 +5,8 @@ import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.ActionHistoryDao;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.service.ActionHistoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,11 +24,13 @@ public class RepositoryActionHistoryService extends BaseRepositoryService<Action
         return actionHistoryDao;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ActionHistory findByKey(String key) {
         return actionHistoryDao.findByKey(key);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ActionHistory> findAllWithParams(String type, User author, int pageNumber) {
         return actionHistoryDao.findAllWithParams(type, author, pageNumber);

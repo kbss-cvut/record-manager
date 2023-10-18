@@ -12,8 +12,8 @@ import java.net.URI;
 @Repository
 public class InstitutionDao extends OwlKeySupportingDao<Institution> {
 
-    public InstitutionDao() {
-        super(Institution.class);
+    public InstitutionDao(EntityManager em) {
+        super(Institution.class, em);
     }
 
     /**
@@ -26,15 +26,12 @@ public class InstitutionDao extends OwlKeySupportingDao<Institution> {
         if (name == null) {
             return null;
         }
-        final EntityManager em = entityManager();
         try {
             return em.createNativeQuery("SELECT ?x WHERE { ?x ?hasName ?name . }", Institution.class)
                      .setParameter("hasName", URI.create(Vocabulary.s_p_label))
                      .setParameter("name", name, Constants.PU_LANGUAGE).getSingleResult();
         } catch (NoResultException e) {
             return null;
-        } finally {
-            em.close();
         }
     }
 }

@@ -15,12 +15,16 @@ import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import cz.cvut.kbss.study.util.Validator;
-import cz.cvut.kbss.study.util.etemplates.*;
+import cz.cvut.kbss.study.util.etemplates.BaseEmailTemplate;
+import cz.cvut.kbss.study.util.etemplates.PasswordChange;
+import cz.cvut.kbss.study.util.etemplates.PasswordReset;
+import cz.cvut.kbss.study.util.etemplates.ProfileUpdate;
+import cz.cvut.kbss.study.util.etemplates.UserInvite;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -61,18 +65,20 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         return userDao;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User findByUsername(String username) {
-        User user = userDao.findByUsername(username);
-        return user;
+        return userDao.findByUsername(username);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<User> findByInstitution(Institution institution) {
         Objects.requireNonNull(institution);
         return userDao.findByInstitution(institution);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User findByEmail(String email) {
         return Optional.ofNullable(userDao.findByEmail(email))
@@ -90,6 +96,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             );
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User findByToken(String token) {
         return userDao.findByToken(token);
@@ -101,11 +108,12 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             .filter(u -> u.getUsername().startsWith(usernamePrefix))
             .map(u -> u.getUsername().replaceFirst(usernamePrefix, ""))
             .filter(s -> StringUtils.isNotBlank(s) && StringUtils.isNumeric(s))
-            .map(s -> Integer.parseInt(s))
+            .map(Integer::parseInt)
             .max(Comparator.naturalOrder())
             .orElse(0) + 1);
     }
 
+    @Transactional
     @Override
     public void update(User user, boolean sendEmail, String emailType) {
         final User currentUser = securityUtils.getCurrentUser();
@@ -120,6 +128,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
     }
 
+    @Transactional
     @Override
     public void changePassword(User user, String newPassword, String currentPassword, boolean sendEmail) {
         final User currentUser = securityUtils.getCurrentUser();
@@ -132,6 +141,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         this.update(user, sendEmail, "passwordChange");
     }
 
+    @Transactional
     @Override
     public void changePasswordByToken(User user, String password) {
         Objects.requireNonNull(user);
@@ -141,6 +151,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         userDao.update(user);
     }
 
+    @Transactional
     @Override
     public void resetPassword(User user, String recipientEmail) {
         Objects.requireNonNull(user);
@@ -150,6 +161,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         userDao.update(user);
     }
 
+    @Transactional
     @Override
     public void sendInvitation(User user) {
         final User currentUser = securityUtils.getCurrentUser();

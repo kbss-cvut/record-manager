@@ -2,10 +2,10 @@ package cz.cvut.kbss.study.model.qam;
 
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Vocabulary;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class AnswerTest {
 

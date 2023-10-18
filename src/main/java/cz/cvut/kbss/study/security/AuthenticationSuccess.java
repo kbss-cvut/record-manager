@@ -6,6 +6,8 @@ import cz.cvut.kbss.study.security.model.LoginStatus;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -14,9 +16,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,8 +33,7 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
 
     private final ConfigReader config;
 
-    public AuthenticationSuccess(ObjectMapper mapper,
-                                 ConfigReader config) {
+    public AuthenticationSuccess(ObjectMapper mapper, ConfigReader config) {
         this.mapper = mapper;
         this.config = config;
     }
@@ -120,13 +118,11 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
         // there can be multiple Set-Cookie attributes
         for (String header : headers) {
             if (firstHeader) {
-                response.setHeader(HttpHeaders.SET_COOKIE,
-                        String.format("%s; %s", header, headerValues.toString()));
+                response.setHeader(HttpHeaders.SET_COOKIE, String.format("%s; %s", header, headerValues));
                 firstHeader = false;
                 continue;
             }
-            response.addHeader(HttpHeaders.SET_COOKIE,
-                    String.format("%s; %s", header, headerValues.toString()));
+            response.addHeader(HttpHeaders.SET_COOKIE, String.format("%s; %s", header, headerValues));
         }
     }
 

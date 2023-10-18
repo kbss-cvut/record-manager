@@ -3,6 +3,8 @@ package cz.cvut.kbss.study.persistence.dao;
 import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 
+import java.util.Objects;
+
 /**
  * Data access object for classes with derivable URI.
  * <p>
@@ -12,20 +14,19 @@ import cz.cvut.kbss.study.model.util.HasDerivableUri;
  */
 abstract class DerivableUriDao<T extends HasDerivableUri> extends BaseDao<T> {
 
-    protected DerivableUriDao(Class<T> type) {
-        super(type);
+    protected DerivableUriDao(Class<T> type, EntityManager em) {
+        super(type, em);
     }
 
     /**
      * Generates URI and then calls persist.
      *
      * @param entity Entity to persist
-     * @param em     Current entity manager
      */
     @Override
-    protected void persist(T entity, EntityManager em) {
-        assert entity != null;
+    public void persist(T entity) {
+        Objects.requireNonNull(entity);
         entity.generateUri();
-        super.persist(entity, em);
+        super.persist(entity);
     }
 }

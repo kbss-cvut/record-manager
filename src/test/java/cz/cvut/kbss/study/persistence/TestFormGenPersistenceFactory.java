@@ -5,20 +5,23 @@ import cz.cvut.kbss.jopa.model.EntityManagerFactory;
 import cz.cvut.kbss.jopa.model.JOPAPersistenceProperties;
 import cz.cvut.kbss.study.util.ConfigParam;
 import java.util.Map;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 @Configuration
 @PropertySource("classpath:config.properties")
+@Profile("test")
 public class TestFormGenPersistenceFactory {
 
-    private static final String URL_PROPERTY = "test." + ConfigParam.FORM_GEN_REPOSITORY_URL.toString();
-    private static final String DRIVER_PROPERTY = "test." + ConfigParam.DRIVER.toString();
+    private static final String URL_PROPERTY = "test." + ConfigParam.FORM_GEN_REPOSITORY_URL;
+    private static final String DRIVER_PROPERTY = "test." + ConfigParam.DRIVER;
 
     @Autowired
     private Environment environment;

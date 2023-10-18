@@ -6,6 +6,8 @@ public final class Constants {
         throw new AssertionError();
     }
 
+    public static final String REST_API_REFIX = "/rest";
+
     public static final String BASE_URI = "http://onto.fel.cvut.cz/ontologies/record-manager/";
 
     /**
@@ -19,19 +21,9 @@ public final class Constants {
     public static final String FORM_GEN_CONTEXT_BASE = "http://onto.fel.cvut.cz/ontologies/record-manager/formGen";
 
     /**
-     * UTF-8 encoding identifier.
-     */
-    public static final String UTF_8_ENCODING = "UTF-8";
-
-    /**
      * JSON-LD MIME type.
      */
     public static final String APPLICATION_JSON_LD_TYPE = "application/ld+json";
-
-    /**
-     * Prefix for basic authentication for the Authorization HTTP header.
-     */
-    public static final String BASIC_AUTHORIZATION_PREFIX = "Basic ";
 
     /**
      * Number of history actions fetched from database. Needs to be changes also in front-end.

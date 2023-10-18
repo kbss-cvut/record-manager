@@ -1,23 +1,22 @@
 package cz.cvut.kbss.study.model;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.net.URI;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private User user;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.user = new User();
     }
@@ -29,15 +28,14 @@ public class UserTest {
 
     @Test
     public void encodePasswordThrowsIllegalStateForNullPassword() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Cannot encode an empty password.");
-        user.encodePassword(new StandardPasswordEncoder());
+        final IllegalStateException ex = assertThrows(IllegalStateException.class, () -> user.encodePassword(new BCryptPasswordEncoder()));
+        assertEquals("Cannot encode an empty password.", ex.getMessage());
     }
 
     @Test
     public void encodePasswordChangesPassword() {
         user.setPassword("password");
-        user.encodePassword(new StandardPasswordEncoder());
+        user.encodePassword(new BCryptPasswordEncoder());
         assertFalse(user.getPassword().contains("password"));
     }
 
@@ -54,36 +52,32 @@ public class UserTest {
 
     @Test
     public void generateUriThrowsIllegalStateForMissingFirstName() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Cannot generate Person URI without first name.");
         user.setLastName("b");
-        user.generateUri();
+        final IllegalStateException ex = assertThrows(IllegalStateException.class, () -> user.generateUri());
+        assertEquals("Cannot generate Person URI without first name.", ex.getMessage());
     }
 
     @Test
     public void generateUriThrowsIllegalStateForEmptyFirstName() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Cannot generate Person URI without first name.");
         user.setFirstName("");
         user.setLastName("b");
-        user.generateUri();
+        final IllegalStateException ex = assertThrows(IllegalStateException.class, () -> user.generateUri());
+        assertEquals("Cannot generate Person URI without first name.", ex.getMessage());
     }
 
     @Test
     public void generateUriThrowsIllegalStateForMissingLastName() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Cannot generate Person URI without last name.");
         user.setFirstName("John");
-        user.generateUri();
+        final IllegalStateException ex = assertThrows(IllegalStateException.class, () -> user.generateUri());
+        assertEquals("Cannot generate Person URI without last name.", ex.getMessage());
     }
 
     @Test
     public void generateUriThrowsIllegalStateForEmptyLastName() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Cannot generate Person URI without last name.");
         user.setFirstName("John");
         user.setLastName("");
-        user.generateUri();
+        final IllegalStateException ex = assertThrows(IllegalStateException.class, () -> user.generateUri());
+        assertEquals("Cannot generate Person URI without last name.", ex.getMessage());
     }
 
     @Test
@@ -95,7 +89,7 @@ public class UserTest {
     }
 
     @Test
-    public void generateUriEncodesUsersWithComplexName() throws Exception {
+    public void generateUriEncodesUsersWithComplexName() {
         User user = new User();
 
         user.setFirstName("Mike John");
@@ -109,7 +103,7 @@ public class UserTest {
     }
 
     @Test
-    public void newUserHasRoleDoctor() throws Exception {
+    public void newUserHasRoleDoctor() {
         User user = new User();
         assertTrue(user.getTypes().toString().contains(Vocabulary.s_c_doctor));
     }
