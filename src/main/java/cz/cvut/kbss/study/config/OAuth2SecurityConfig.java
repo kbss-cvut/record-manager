@@ -3,8 +3,7 @@ package cz.cvut.kbss.study.config;
 import cz.cvut.kbss.study.security.AuthenticationSuccess;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
-import cz.cvut.kbss.study.util.ConfigParam;
-import cz.cvut.kbss.study.util.Constants;
+import cz.cvut.kbss.study.util.oidc.OidcGrantedAuthoritiesExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,6 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 
 @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "oidc")
 @Configuration
@@ -72,23 +69,9 @@ public class OAuth2SecurityConfig {
 
     private Converter<Jwt, AbstractAuthenticationToken> grantedAuthoritiesExtractor() {
         return source -> {
-            final Collection<SimpleGrantedAuthority> authorities = new GrantedAuthoritiesExtractor().convert(source);
+            final Collection<SimpleGrantedAuthority> authorities =
+                    new OidcGrantedAuthoritiesExtractor(config).convert(source);
             return new JwtAuthenticationToken(source, authorities);
         };
-    }
-
-    private class GrantedAuthoritiesExtractor implements Converter<Jwt, Collection<SimpleGrantedAuthority>> {
-
-        public Collection<SimpleGrantedAuthority> convert(Jwt jwt) {
-            return (
-                    (Map<String, Collection<?>>) jwt.getClaims().getOrDefault(
-                            OAuth2SecurityConfig.this.config.getConfig(ConfigParam.OIDC_ROLE_CLAIM,
-                                                                       Constants.DEFAULT_OIDC_ROLE_CLAIM),
-                            Collections.emptyMap())
-            ).getOrDefault("roles", Collections.emptyList())
-             .stream()
-             .map(Object::toString)
-             .map(SimpleGrantedAuthority::new).toList();
-        }
     }
 }
