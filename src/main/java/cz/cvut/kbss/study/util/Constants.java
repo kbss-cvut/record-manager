@@ -37,4 +37,11 @@ public final class Constants {
      * ClassLoader#getResourceAsStream(String)}.
      */
     public static final String QUERY_DIRECTORY = "query";
+
+    /**
+     * Default OIDC token claim containing roles.
+     *
+     * This value is used by Keycloak by default.
+     */
+    public static final String DEFAULT_OIDC_ROLE_CLAIM = "realm_access";
 }

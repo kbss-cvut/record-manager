@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.security.CsrfHeaderFilter;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Collections;
 import java.util.List;
 
+@ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal", matchIfMissing = true)
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -83,11 +85,15 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource(ConfigReader config) {
+        return createCorsConfiguration(config);
+    }
+
+    static CorsConfigurationSource createCorsConfiguration(ConfigReader configReader) {
         // allowCredentials requires allowed origins to be configured (* is not supported)
         final CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-        if (!config.getConfig(ConfigParam.APP_CONTEXT, "").isBlank()) {
-            String appUrl = config.getConfig(ConfigParam.APP_CONTEXT);
+        if (!configReader.getConfig(ConfigParam.APP_CONTEXT, "").isBlank()) {
+            String appUrl = configReader.getConfig(ConfigParam.APP_CONTEXT);
             appUrl = appUrl.substring(0, appUrl.lastIndexOf('/'));
             corsConfiguration.setAllowedOrigins(List.of(appUrl));
         } else {
