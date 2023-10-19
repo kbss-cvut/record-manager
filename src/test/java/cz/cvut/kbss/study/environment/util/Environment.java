@@ -3,12 +3,12 @@ package cz.cvut.kbss.study.environment.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.config.WebAppConfig;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.security.model.AuthenticationToken;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -34,7 +34,9 @@ public class Environment {
         currentUser = user;
         final UserDetails userDetails = new UserDetails(user);
         SecurityContext context = new SecurityContextImpl();
-        context.setAuthentication(new AuthenticationToken(userDetails.getAuthorities(), userDetails));
+        context.setAuthentication(
+                new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(),
+                                                        userDetails.getAuthorities()));
         SecurityContextHolder.setContext(context);
     }
 

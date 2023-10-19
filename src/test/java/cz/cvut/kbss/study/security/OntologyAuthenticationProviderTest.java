@@ -1,7 +1,6 @@
 package cz.cvut.kbss.study.security;
 
 import cz.cvut.kbss.study.environment.config.TestSecurityConfig;
-import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.BaseServiceTestRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,10 +48,9 @@ public class OntologyAuthenticationProviderTest extends BaseServiceTestRunner {
         final SecurityContext context = SecurityContextHolder.getContext();
         assertNull(context.getAuthentication());
         final Authentication result = provider.authenticate(auth);
-        assertNotNull(SecurityContextHolder.getContext());
-        final UserDetails details = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
-        assertEquals(BaseServiceTestRunner.USERNAME, details.getUsername());
         assertTrue(result.isAuthenticated());
+        assertNotNull(SecurityContextHolder.getContext());
+        assertEquals(BaseServiceTestRunner.USERNAME, SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 
     @Test

@@ -5,7 +5,6 @@ import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.BaseServiceTestRunner;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
@@ -18,8 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -60,20 +57,6 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
         Environment.setCurrentUser(user);
         final User result = securityUtils.getCurrentUser();
         assertEquals(user, result);
-    }
-
-    @Test
-    public void getCurrentUserDetailsReturnsUserDetailsOfCurrentlyLoggedInUser() {
-        Environment.setCurrentUser(user);
-        final UserDetails result = securityUtils.getCurrentUserDetails();
-        assertNotNull(result);
-        assertTrue(result.isEnabled());
-        assertEquals(user, result.getUser());
-    }
-
-    @Test
-    public void getCurrentUserDetailsReturnsNullIfNoUserIsLoggedIn() {
-        assertNull(securityUtils.getCurrentUserDetails());
     }
 
     @Test

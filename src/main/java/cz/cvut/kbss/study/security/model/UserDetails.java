@@ -6,14 +6,19 @@ import cz.cvut.kbss.study.security.SecurityConstants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
 
     private static final Map<String, String> ROLE_MAPPING = initRoleMapping();
 
-    private User user;
+    private final User user;
 
     private final Set<GrantedAuthority> authorities;
 
@@ -42,8 +47,7 @@ public class UserDetails implements org.springframework.security.core.userdetail
 
     private void resolveRoles() {
         authorities.addAll(ROLE_MAPPING.entrySet().stream().filter(e -> user.getTypes().contains(e.getKey()))
-                                       .map(e -> new SimpleGrantedAuthority(e.getValue()))
-                                       .collect(Collectors.toList()));
+                                       .map(e -> new SimpleGrantedAuthority(e.getValue())).toList());
         authorities.add(new SimpleGrantedAuthority(SecurityConstants.ROLE_USER));
     }
 

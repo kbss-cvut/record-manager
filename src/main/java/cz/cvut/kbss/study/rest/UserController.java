@@ -10,16 +10,22 @@ import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cz.cvut.kbss.study.service.security.SecurityUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
@@ -207,10 +213,8 @@ public class UserController extends BaseController {
         if (user.getTypes().contains(Vocabulary.s_c_administrator)) {
             throw new BadRequestException("Cannot impersonate admin.");
         }
-        final SecurityContext context = SecurityContextHolder.getContext();
         UserDetails ud = new UserDetails(user);
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities());
-        context.setAuthentication(auth);
+        SecurityUtils.setCurrentUser(ud);
         if (LOG.isTraceEnabled()) {
             LOG.trace("User {} impersonated.", user.getUsername());
         }
