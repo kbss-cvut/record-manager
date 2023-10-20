@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +31,8 @@ public class SecurityUtils {
      * Sets the current security context to the user represented by the provided user details.
      * <p>
      * Note that this method erases credentials from the provided user details for security reasons.
+     *
+     * This method should be used only when internal authentication is used.
      *
      * @param userDetails User details
      */
@@ -54,7 +57,18 @@ public class SecurityUtils {
     public User getCurrentUser() {
         final SecurityContext context = SecurityContextHolder.getContext();
         assert context != null;
-        final String username = context.getAuthentication().getPrincipal().toString();
+        final Object principal = context.getAuthentication().getPrincipal();
+        if (principal instanceof Jwt) {
+            return resolveAccountFromOAuthPrincipal((Jwt) principal);
+        } else {
+            assert principal instanceof String;
+            final String username = context.getAuthentication().getPrincipal().toString();
+            return userDao.findByUsername(username);
+        }
+    }
+
+    private User resolveAccountFromOAuthPrincipal(Jwt principal) {
+        final String username = principal.getSubject();
         return userDao.findByUsername(username);
     }
 

@@ -7,6 +7,7 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
+import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +16,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,6 +65,25 @@ public class SecurityUtilsTest {
     public void getCurrentUserReturnsCurrentlyLoggedInUser() {
         Environment.setCurrentUser(user);
         when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        final User result = sut.getCurrentUser();
+        assertEquals(user, result);
+    }
+
+    @Test
+    void getCurrentUserRetrievesCurrentUserForOauthJwtAccessToken() {
+        final Jwt token = Jwt.withTokenValue("abcdef12345")
+                             .header("alg", "RS256")
+                             .header("typ", "JWT")
+                             .claim("roles", List.of(SecurityConstants.ROLE_USER))
+                             .issuer("http://localhost:8080/termit")
+                             .subject(USERNAME)
+                             .expiresAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(300))
+                             .build();
+        SecurityContext context = new SecurityContextImpl();
+        context.setAuthentication(new JwtAuthenticationToken(token));
+        SecurityContextHolder.setContext(context);
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+
         final User result = sut.getCurrentUser();
         assertEquals(user, result);
     }
