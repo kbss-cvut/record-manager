@@ -71,6 +71,11 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         return userDao.findByUsername(username);
     }
 
+    @Override
+    public User getCurrentUser() {
+        return securityUtils.getCurrentUser();
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<User> findByInstitution(Institution institution) {

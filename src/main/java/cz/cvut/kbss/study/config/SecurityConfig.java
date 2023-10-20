@@ -4,6 +4,8 @@ import cz.cvut.kbss.study.security.CsrfHeaderFilter;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +37,8 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
+
     private static final String[] COOKIES_TO_DESTROY = {
             SecurityConstants.SESSION_COOKIE_NAME,
             SecurityConstants.REMEMBER_ME_COOKIE_NAME,
@@ -61,6 +65,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, ConfigReader config) throws Exception {
+        LOG.debug("Using internal security mechanisms.");
         final AuthenticationManager authManager = buildAuthenticationManager(http);
         http.authorizeHttpRequests((auth) -> auth.anyRequest().permitAll())
             .cors((auth) -> auth.configurationSource(corsConfigurationSource(config)))

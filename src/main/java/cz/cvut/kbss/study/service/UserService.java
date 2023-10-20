@@ -9,6 +9,8 @@ public interface UserService extends BaseService<User> {
 
     User findByUsername(String username);
 
+    User getCurrentUser();
+
     User findByEmail(String email);
 
     User findByToken(String token);
