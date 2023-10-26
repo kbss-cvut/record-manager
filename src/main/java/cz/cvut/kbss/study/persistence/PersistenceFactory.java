@@ -9,7 +9,6 @@ import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 import java.util.Collections;
@@ -30,7 +29,6 @@ import static cz.cvut.kbss.study.util.ConfigParam.REPOSITORY_URL;
  * Sets up persistence and provides {@link EntityManagerFactory} as Spring bean.
  */
 @Configuration
-@PropertySource("classpath:config.properties")
 public class PersistenceFactory {
 
     private static final String USERNAME_PROPERTY = "username";
