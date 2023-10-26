@@ -77,6 +77,7 @@ public class SecurityUtilsTest {
                              .claim("roles", List.of(SecurityConstants.ROLE_USER))
                              .issuer("http://localhost:8080/termit")
                              .subject(USERNAME)
+                             .claim("preferred_username", USERNAME)
                              .expiresAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(300))
                              .build();
         SecurityContext context = new SecurityContextImpl();

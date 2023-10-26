@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -68,8 +69,8 @@ public class SecurityUtils {
     }
 
     private User resolveAccountFromOAuthPrincipal(Jwt principal) {
-        final String username = principal.getSubject();
-        return userDao.findByUsername(username);
+        final OidcUserInfo userInfo = new OidcUserInfo(principal.getClaims());
+        return userDao.findByUsername(userInfo.getPreferredUsername());
     }
 
     /**
