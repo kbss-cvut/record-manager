@@ -10,21 +10,33 @@ import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cz.cvut.kbss.study.service.security.SecurityUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * User management API.
+ *
+ * Enabled when internal security is used.
+ */
+@ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal", matchIfMissing = true)
 @RestController
 @RequestMapping("/users")
 public class UserController extends BaseController {
@@ -51,9 +63,8 @@ public class UserController extends BaseController {
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
     @GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User getCurrent(Principal principal) {
-        final String username = principal.getName();
-        return getByUsername(username);
+    public User getCurrent() {
+        return userService.getCurrentUser();
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
@@ -73,8 +84,7 @@ public class UserController extends BaseController {
                     "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> getUsers(@RequestParam(value = "institution", required = false) String institutionKey) {
-        final List<User> users = institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
-        return users;
+        return institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
     }
 
     private List<User> getByInstitution(String institutionKey) {
@@ -207,10 +217,8 @@ public class UserController extends BaseController {
         if (user.getTypes().contains(Vocabulary.s_c_administrator)) {
             throw new BadRequestException("Cannot impersonate admin.");
         }
-        final SecurityContext context = SecurityContextHolder.getContext();
         UserDetails ud = new UserDetails(user);
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities());
-        context.setAuthentication(auth);
+        SecurityUtils.setCurrentUser(ud);
         if (LOG.isTraceEnabled()) {
             LOG.trace("User {} impersonated.", user.getUsername());
         }

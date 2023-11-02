@@ -3,7 +3,6 @@ package cz.cvut.kbss.study.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.exception.FormManagerException;
 import cz.cvut.kbss.study.security.model.LoginStatus;
-import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,7 +53,7 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
         if (authentication == null) {
             return "";
         }
-        return ((UserDetails) authentication.getPrincipal()).getUsername();
+        return authentication.getName();
     }
 
     @Override

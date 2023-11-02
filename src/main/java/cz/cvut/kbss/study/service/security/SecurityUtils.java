@@ -5,9 +5,13 @@ import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.model.UserDetails;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +29,28 @@ public class SecurityUtils {
     }
 
     /**
+     * Sets the current security context to the user represented by the provided user details.
+     * <p>
+     * Note that this method erases credentials from the provided user details for security reasons.
+     *
+     * This method should be used only when internal authentication is used.
+     *
+     * @param userDetails User details
+     */
+    public static AbstractAuthenticationToken setCurrentUser(UserDetails userDetails) {
+        final UsernamePasswordAuthenticationToken
+                token = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(),
+                                                                userDetails.getAuthorities());
+        token.setDetails(userDetails);
+        token.eraseCredentials();   // Do not pass credentials around
+
+        final SecurityContext context = new SecurityContextImpl();
+        context.setAuthentication(token);
+        SecurityContextHolder.setContext(context);
+        return token;
+    }
+
+    /**
      * Gets the currently authenticated user.
      *
      * @return Current user
@@ -32,22 +58,19 @@ public class SecurityUtils {
     public User getCurrentUser() {
         final SecurityContext context = SecurityContextHolder.getContext();
         assert context != null;
-        final UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
-        return userDao.findByUsername(userDetails.getUser().getUsername());
+        final Object principal = context.getAuthentication().getPrincipal();
+        if (principal instanceof Jwt) {
+            return resolveAccountFromOAuthPrincipal((Jwt) principal);
+        } else {
+            assert principal instanceof String;
+            final String username = context.getAuthentication().getPrincipal().toString();
+            return userDao.findByUsername(username);
+        }
     }
 
-    /**
-     * Gets details of the currently authenticated user.
-     *
-     * @return Currently authenticated user details or null, if no one is currently authenticated
-     */
-    public UserDetails getCurrentUserDetails() {
-        final SecurityContext context = SecurityContextHolder.getContext();
-        if (context.getAuthentication() != null && context.getAuthentication().getDetails() instanceof UserDetails) {
-            return (UserDetails) context.getAuthentication().getDetails();
-        } else {
-            return null;
-        }
+    private User resolveAccountFromOAuthPrincipal(Jwt principal) {
+        final OidcUserInfo userInfo = new OidcUserInfo(principal.getClaims());
+        return userDao.findByUsername(userInfo.getPreferredUsername());
     }
 
     /**

@@ -1,7 +1,7 @@
 package cz.cvut.kbss.study.security;
 
-import cz.cvut.kbss.study.security.model.AuthenticationToken;
 import cz.cvut.kbss.study.security.model.UserDetails;
+import cz.cvut.kbss.study.service.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -9,9 +9,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,20 +41,11 @@ public class OntologyAuthenticationProvider implements AuthenticationProvider {
             LOG.trace("Provided password for username '" + username + "' doesn't match.");
             throw new BadCredentialsException("Provided password for username '" + username + "' doesn't match.");
         }
-        userDetails.eraseCredentials(); // Don't pass credentials around in the user details object
-        final AuthenticationToken token = new AuthenticationToken(userDetails.getAuthorities(), userDetails);
-        token.setAuthenticated(true);
-        token.setDetails(userDetails);
-
-        final SecurityContext context = new SecurityContextImpl();
-        context.setAuthentication(token);
-        SecurityContextHolder.setContext(context);
-        return token;
+        return SecurityUtils.setCurrentUser(userDetails);
     }
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(aClass) ||
-                AuthenticationToken.class.isAssignableFrom(aClass);
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(aClass);
     }
 }

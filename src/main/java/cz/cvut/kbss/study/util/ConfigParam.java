@@ -31,7 +31,9 @@ public enum ConfigParam {
     E_PASSWORD_CHANGE_CONTENT("email.passwordChangeContent"),
 
     E_PROFILE_UPDATE_SUBJECT("email.profileUpdateSubject"),
-    E_PROFILE_UPDATE_CONTENT("email.profileUpdateContent");
+    E_PROFILE_UPDATE_CONTENT("email.profileUpdateContent"),
+
+    OIDC_ROLE_CLAIM("oidc.roleClaim");
 
     private final String name;
 
