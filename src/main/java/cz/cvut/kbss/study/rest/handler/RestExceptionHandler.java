@@ -87,7 +87,7 @@ public class RestExceptionHandler {
         LOG.debug(
             String.format(
                 "Request to '%s' failed due to error: %s",
-                request.getPathInfo(),
+                request.getRequestURI(),
                 e.getMessage()
             )
         );
