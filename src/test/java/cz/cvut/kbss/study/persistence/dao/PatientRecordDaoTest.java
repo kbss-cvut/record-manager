@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.persistence.dao;
 
+import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
@@ -8,12 +9,17 @@ import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
 import java.util.List;
 
+import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PatientRecordDaoTest extends BaseDaoTestRunner {
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private PatientRecordDao patientRecordDao;
@@ -117,5 +123,25 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
         assertEquals(2, records1.size());
         assertEquals(1, records2.size());
+    }
+
+    @Test
+    void persistGeneratesIdentifierBeforeSavingRecord() {
+        final Institution institution = Generator.generateInstitution();
+        institution.setKey(IdentificationUtils.generateKey());
+        final User author = Generator.generateUser(institution);
+        author.generateUri();
+        transactional(() -> {
+            em.persist(author);
+            em.persist(institution);
+        });
+
+        final PatientRecord record = Generator.generatePatientRecord(author);
+        record.setUri(null);
+
+        transactional(() -> patientRecordDao.persist(record));
+        assertNotNull(record.getUri());
+        final PatientRecord result = em.find(PatientRecord.class, record.getUri());
+        assertNotNull(result);
     }
 }

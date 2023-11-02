@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class Generator {
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     private Generator() {
         throw new AssertionError();
@@ -149,7 +149,7 @@ public class Generator {
      */
     public static Institution generateInstitution() {
         final Institution org = new Institution();
-        org.setName("RandomInstitution" + Integer.toString(randomInt()));
+        org.setName("RandomInstitution" + randomInt());
         org.setUri(generateUri());
         return org;
     }
@@ -163,7 +163,7 @@ public class Generator {
     public static PatientRecord generatePatientRecord(User author) {
         final PatientRecord rec = new PatientRecord();
         rec.setAuthor(author);
-        rec.setLocalName("RandomRecord" + Integer.toString(randomInt()));
+        rec.setLocalName("RandomRecord" + randomInt());
         rec.setUri(generateUri());
         rec.setInstitution(author.getInstitution());
         return rec;
@@ -177,7 +177,7 @@ public class Generator {
      */
     public static PatientRecordDto generatePatientRecordDto(User author) {
         final PatientRecordDto rec = new PatientRecordDto();
-        rec.setLocalName("RandomRecordDto" + Integer.toString(randomInt()));
+        rec.setLocalName("RandomRecordDto" + randomInt());
         rec.setAuthor(author);
         rec.setUri(generateUri());
         rec.setInstitution(author.getInstitution());
@@ -193,8 +193,8 @@ public class Generator {
         final ActionHistory action = new ActionHistory();
         action.setAuthor(author);
         action.setTimestamp(randomDate());
-        action.setType("RANDOM_TYPE_" + Integer.toString(randomInt()));
-        action.setPayload("RandomPayload" + Integer.toString(randomInt()));
+        action.setType("RANDOM_TYPE_" + randomInt());
+        action.setPayload("RandomPayload" + randomInt());
         return action;
     }
 }

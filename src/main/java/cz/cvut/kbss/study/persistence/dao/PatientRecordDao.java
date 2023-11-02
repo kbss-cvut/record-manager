@@ -8,6 +8,7 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
+import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
@@ -24,6 +25,8 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
 
     @Override
     public void persist(PatientRecord entity) {
+        Objects.requireNonNull(entity);
+        entity.setUri(IdentificationUtils.generateUri(Vocabulary.s_c_patient_record));
         super.persist(entity);
         final QuestionSaver questionSaver = new QuestionSaver();
         questionSaver.persistIfNecessary(entity.getQuestion(), em);

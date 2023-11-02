@@ -4,10 +4,15 @@ import cz.cvut.kbss.jopa.model.annotations.*;
 import cz.cvut.kbss.study.model.qam.Question;
 import cz.cvut.kbss.study.model.util.HasOwlKey;
 
+import java.io.Serializable;
+import java.net.URI;
 import java.util.Date;
 
 @OWLClass(iri = Vocabulary.s_c_patient_record)
-public class PatientRecord extends AbstractEntity implements HasOwlKey {
+public class PatientRecord implements Serializable, HasOwlKey {
+
+    @Id
+    private URI uri;
 
     @ParticipationConstraints(nonEmpty = true)
     @OWLDataProperty(iri = Vocabulary.s_p_key)
@@ -39,6 +44,14 @@ public class PatientRecord extends AbstractEntity implements HasOwlKey {
     @OWLObjectProperty(iri = Vocabulary.s_p_has_question, cascade = {CascadeType.MERGE,
             CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private Question question;
+
+    public URI getUri() {
+        return uri;
+    }
+
+    public void setUri(URI uri) {
+        this.uri = uri;
+    }
 
     @Override
     public String getKey() {

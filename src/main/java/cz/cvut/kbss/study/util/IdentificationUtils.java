@@ -1,8 +1,11 @@
 package cz.cvut.kbss.study.util;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.SecureRandom;
+import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 
 public class IdentificationUtils {
 
@@ -44,5 +47,20 @@ public class IdentificationUtils {
         int length = 20;
         return String.format("%"+length+"s", new BigInteger(length*5/*base 32,2^5*/, SECURE_RANDOM)
                 .toString(32)).replace('\u0020', '0');
+    }
+
+    /**
+     * Generates a URI for the specified base.
+     *
+     * The URI consists of the base to which a generated UUID is appended.
+     * @param base Base for the URI
+     * @return Generated URI
+     */
+    public static URI generateUri(String base) {
+        Objects.requireNonNull(base);
+        if (base.charAt(base.length() - 1) != '/') {
+            base += '/';
+        }
+        return URI.create(base + UUID.randomUUID());
     }
 }
