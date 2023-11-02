@@ -80,8 +80,8 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         return descriptor;
     }
 
-    static URI generateRecordUriFromKey(String recordKey) {
-        return URI.create(Vocabulary.s_c_patient_record + "/" + recordKey);
+    public static URI generateRecordUriFromKey(String recordKey) {
+        return URI.create(Vocabulary.s_c_patient_record + "/" + Objects.requireNonNull(recordKey));
     }
 
     @Override
