@@ -1,13 +1,19 @@
 package cz.cvut.kbss.study.persistence.dao;
 
+import cz.cvut.kbss.jopa.exceptions.NoResultException;
 import cz.cvut.kbss.jopa.model.EntityManager;
+import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
+import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
+import cz.cvut.kbss.jopa.model.metamodel.EntityType;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.exception.PersistenceException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
+import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.stereotype.Repository;
 
@@ -24,21 +30,71 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     }
 
     @Override
+    public PatientRecord find(URI uri) {
+        Objects.requireNonNull(uri);
+        try {
+            return em.find(PatientRecord.class, uri, getDescriptor(uri));
+        } catch (RuntimeException e) {
+            throw new PersistenceException(e);
+        }
+    }
+
+    @Override
+    public PatientRecord findByKey(String key) {
+        Objects.requireNonNull(key);
+        try {
+            return em.createQuery("SELECT r FROM " + PatientRecord.class.getSimpleName() + " r WHERE r.key = :key",
+                                  type)
+                     .setParameter("key", key, Constants.PU_LANGUAGE)
+                     .setDescriptor(getDescriptor(key)).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
     public void persist(PatientRecord entity) {
         Objects.requireNonNull(entity);
-        entity.setUri(IdentificationUtils.generateUri(Vocabulary.s_c_patient_record));
-        super.persist(entity);
-        final QuestionSaver questionSaver = new QuestionSaver();
-        questionSaver.persistIfNecessary(entity.getQuestion(), em);
+        entity.setKey(IdentificationUtils.generateKey());
+        entity.setUri(generateRecordUriFromKey(entity.getKey()));
+        try {
+            final Descriptor descriptor = getDescriptor(entity.getUri());
+            em.persist(entity, descriptor);
+            final QuestionSaver questionSaver = new QuestionSaver(descriptor);
+            questionSaver.persistIfNecessary(entity.getQuestion(), em);
+        } catch (RuntimeException e) {
+            throw new PersistenceException(e);
+        }
+    }
+
+    private Descriptor getDescriptor(String recordKey) {
+        return getDescriptor(generateRecordUriFromKey(recordKey));
+    }
+
+    private Descriptor getDescriptor(URI ctx) {
+        final EntityDescriptor descriptor = new EntityDescriptor(ctx);
+        final EntityType<PatientRecord> et = em.getMetamodel().entity(PatientRecord.class);
+        descriptor.addAttributeContext(et.getAttribute("author"), null);
+        descriptor.addAttributeContext(et.getAttribute("lastModifiedBy"), null);
+        descriptor.addAttributeContext(et.getAttribute("institution"), null);
+        return descriptor;
+    }
+
+    static URI generateRecordUriFromKey(String recordKey) {
+        return URI.create(Vocabulary.s_c_patient_record + "/" + recordKey);
     }
 
     @Override
     public void update(PatientRecord entity) {
         Objects.requireNonNull(entity);
-        final PatientRecord orig = em.find(PatientRecord.class, entity.getUri());
+        final Descriptor descriptor = getDescriptor(entity.getUri());
+        final PatientRecord orig = em.find(PatientRecord.class, entity.getUri(), descriptor);
         assert orig != null;
         orig.setQuestion(null);
-        em.merge(entity);
+        em.merge(entity, descriptor);
+        // Evict cached instances loaded from the default context
+        em.getEntityManagerFactory().getCache().evict(PatientRecord.class, entity.getUri(), null);
+        em.getEntityManagerFactory().getCache().evict(PatientRecordDto.class, entity.getUri(), null);
     }
 
     public List<PatientRecordDto> findAllRecords() {
@@ -107,5 +163,4 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
                                           "Local name of record is not unique for entity " + entity);
         }
     }
-
 }
