@@ -1,52 +1,52 @@
 version: '3.9'
 
 services:
-  dm-record-manager:
-    image: 'ofn-record-manager:latest'
-    container_name: dm-record-manager
+  record-manager-ui:
+    image: 'ghcr.io/kbss-cvut/kbss-cvut/record-manager-ui:latest'
     ports:
-      - '4000:80'
+      - '127.0.0.1:3000:80'
     depends_on:
-      - dm-record-manager-server
+      - record-manager
     environment:
-      API_URL: "http://localhost:3000/ofn-record-manager"
+      APP_TITLE: "Record Manager"
+      BASENAME: "./"
+      LANGUAGE: "en"
+      NAVIGATOR_LANGUAGE: "true"
+      API_URL: "http://localhost:8080/record-manager"
+      APP_INFO: "<a href=\"https://github.com/kbss-cvut\" target=\"_blank\" rel=\"noopener noreferrer\" title=\"KBSS CVUT v Praze\">© KBSS CVUT v Praze, 2023</a>"
 
-  dm-record-manager-server:
+  record-manager:
     build: .
-    image: record-manager-server
-    container_name: dm-record-manager-server
+    image: record-manager
+    container_name: record-manager
     ports:
-      - '3000:8080'
+      - '127.0.0.1:8080:8080'
     depends_on:
-      - dm-s-pipes-engine
-      - dm-rdf4j
+      - s-pipes-engine
+      - db-server
     environment:
-      repositoryUrl: "http://dm-rdf4j:8080/rdf4j-server/repositories/ofn-form-manager-app"
-      formGenRepositoryUrl: "http://dm-rdf4j:8080/rdf4j-server/repositories/ofn-form-manager-formgen"
-      formGenServiceUrl: "http://dm-s-pipes-engine:8080/s-pipes/service?_pId=clone&sgovRepositoryUrl=https%3A%2F%2Fgraphdb.onto.fel.cvut.cz%2Frepositories%2Fkodi-slovnik-gov-cz"
+      REPOSITORYURL: "http://db-server:7200/repositories/record-manager"
+      FORMGENREPOSITORYURL: "http://db-server:7200/repositories/record-manager-formgen"
+      FORMGENSERVICEURL: "http://s-pipes-engine:8080/s-pipes/service?_pId=clone&sgovRepositoryUrl=https%3A%2F%2Fgraphdb.onto.fel.cvut.cz%2Frepositories%2Fkodi-slovnik-gov-cz"
 
-  dm-s-pipes-engine:
-    image: 's-pipes-engine:latest'
-    container_name: dm-s-pipes-engine
+  s-pipes-engine:
+    image: 'ghcr.io/kbss-cvut/s-pipes/s-pipes-engine:latest'
     ports:
-      - "8081:8080"
+      - "127.0.0.1:8081:8080"
     depends_on:
-      - dm-rdf4j
+      - db-server
     environment:
       - CONTEXTS_SCRIPTPATHS=/scripts
-    volumes:
-      - ./scripts:/scripts
 
-  dm-rdf4j:
-    image: 'eclipse/rdf4j-workbench:4.3.7'
-    container_name: dm-rdf4j
-    ports:
-      - "8080:8080"
+  db-server:
+    build:
+      context: db-server
     environment:
-      - JAVA_OPTS=-Xms1g -Xmx4g
+      GDB_JAVA_OPTS: -Ddefault.min.distinct.threshold=67108864
+    ports:
+      - "127.0.0.1:7200:7200"
     volumes:
-      - data:/var/rdf4j
-      - logs:/usr/local/tomcat/logs
+      - data:/opt/graphdb/home
 
 volumes:
   data:
