@@ -5,9 +5,12 @@ import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import cz.cvut.kbss.study.service.ConfigReader;
+import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +29,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,6 +44,9 @@ public class SecurityUtilsTest {
 
     @Mock
     private PatientRecordDao patientRecordDao;
+
+    @Mock
+    private ConfigReader config;
 
     @InjectMocks
     private SecurityUtils sut;
@@ -71,6 +79,7 @@ public class SecurityUtilsTest {
 
     @Test
     void getCurrentUserRetrievesCurrentUserForOauthJwtAccessToken() {
+        when(config.getConfig(ConfigParam.OIDC_ROLE_CLAIM)).thenReturn("roles");
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")
@@ -152,5 +161,26 @@ public class SecurityUtilsTest {
         when(patientRecordDao.findByKey(record.getKey())).thenReturn(record);
 
         assertFalse(sut.isRecordInUsersInstitution(record.getKey()));
+    }
+
+    @Test
+    void getCurrentUserEnhancesRetrievedUserWithTypesCorrespondingToRolesSpecifiedInJwtClaim() {
+        when(config.getConfig(ConfigParam.OIDC_ROLE_CLAIM)).thenReturn("roles");
+        final Jwt token = Jwt.withTokenValue("abcdef12345")
+                             .header("alg", "RS256")
+                             .header("typ", "JWT")
+                             .claim("roles", List.of(SecurityConstants.ROLE_ADMIN))
+                             .issuer("http://localhost:8080/termit")
+                             .subject(USERNAME)
+                             .claim("preferred_username", USERNAME)
+                             .expiresAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(300))
+                             .build();
+        SecurityContext context = new SecurityContextImpl();
+        context.setAuthentication(new JwtAuthenticationToken(token));
+        SecurityContextHolder.setContext(context);
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+
+        final User result = sut.getCurrentUser();
+        assertThat(result.getTypes(), hasItem(Vocabulary.s_c_administrator));
     }
 }

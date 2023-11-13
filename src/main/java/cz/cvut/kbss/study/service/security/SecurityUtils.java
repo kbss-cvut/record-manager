@@ -1,10 +1,14 @@
 package cz.cvut.kbss.study.service.security;
 
+import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
+import cz.cvut.kbss.study.security.model.Role;
 import cz.cvut.kbss.study.security.model.UserDetails;
+import cz.cvut.kbss.study.service.ConfigReader;
+import cz.cvut.kbss.study.util.oidc.OidcGrantedAuthoritiesExtractor;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -15,6 +19,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SecurityUtils {
@@ -23,9 +28,12 @@ public class SecurityUtils {
 
     private final PatientRecordDao patientRecordDao;
 
-    public SecurityUtils(UserDao userDao, PatientRecordDao patientRecordDao) {
+    private final ConfigReader config;
+
+    public SecurityUtils(UserDao userDao, PatientRecordDao patientRecordDao, ConfigReader config) {
         this.userDao = userDao;
         this.patientRecordDao = patientRecordDao;
+        this.config = config;
     }
 
     /**
@@ -70,7 +78,13 @@ public class SecurityUtils {
 
     private User resolveAccountFromOAuthPrincipal(Jwt principal) {
         final OidcUserInfo userInfo = new OidcUserInfo(principal.getClaims());
-        return userDao.findByUsername(userInfo.getPreferredUsername());
+        final List<String> roles = new OidcGrantedAuthoritiesExtractor(config).extractRoles(principal);
+        final User user = userDao.findByUsername(userInfo.getPreferredUsername());
+        if (user == null) {
+            throw new NotFoundException("User with username '" + userInfo.getPreferredUsername() + "' not found in repository.");
+        }
+        roles.stream().map(Role::forName).filter(Optional::isPresent).forEach(r -> user.addType(r.get().getType()));
+        return user;
     }
 
     /**
