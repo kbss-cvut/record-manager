@@ -1,4 +1,4 @@
-Development Notes
+# Development Notes
 
 Frontend of the application is developed separately.
 

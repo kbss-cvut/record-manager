@@ -144,6 +144,11 @@ public class User implements HasDerivableUri, Serializable {
         this.types = types;
     }
 
+    public void addType(String type) {
+        assert types != null;
+        getTypes().add(type);
+    }
+
     public String getToken() { return token; }
 
     public void setToken(String token) { this.token = token; }
