@@ -6,7 +6,7 @@
 
 SOURCE_DIR=$1
 GRAPHDB_HOME=$2
-REPOSITORIES=("record-manager" "record-manager-formgen")
+REPOSITORIES=("record-manager-app" "record-manager-formgen")
 SHOULD_WAIT=true
 
 echo "Running repository initializer..."
