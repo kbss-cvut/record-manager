@@ -1,5 +1,5 @@
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
+prefix form: <http://onto.fel.cvut.cz/ontologies/form/>
 
 CONSTRUCT {
     ?formTemplate a form:form-template .
