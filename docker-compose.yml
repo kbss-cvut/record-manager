@@ -21,7 +21,7 @@ services:
 
   record-manager-server:
     build: .
-    image: record-manager
+    image: record-manager-server
     container_name: record-manager
     ports:
       - "127.0.0.1:8080:8080"
