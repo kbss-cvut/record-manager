@@ -1,10 +1,12 @@
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix skos: <http://www.w3.org/2004/02/skos/core#>
-prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/>
-prefix dc: <http://purl.org/dc/terms/>
+prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
 
 CONSTRUCT {
-      <http://onto.fel.cvut.cz/ontologies/form-template/vita-study-main> rdfs:label "Evaluation" .
-      <http://onto.fel.cvut.cz/ontologies/form-template/vita-study-main> rdfs:comment "Vita Study Evaluation" .
+    ?formTemplate a form:form-template .
+    ?formTemplate rdfs:label ?formTemplateLabel .
+    ?formTemplate rdfs:comment ?formTemplateComment .
 } WHERE {
+    ?formTemplate a form:form-template .
+    ?formTemplate rdfs:label ?formTemplateLabel .
+    ?formTemplate rdfs:comment ?formTemplateComment .
 }
