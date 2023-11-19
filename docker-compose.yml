@@ -1,18 +1,18 @@
 version: '3.9'
 
 services:
-  record-manager-ui:
+  record-manager:
     image: 'ghcr.io/kbss-cvut/kbss-cvut/record-manager-ui:latest'
     ports:
       - "127.0.0.1:3000:80"
     depends_on:
-      - record-manager
+      - record-manager-server
     environment:
       APP_TITLE: "Record Manager"
       BASENAME: "./"
       LANGUAGE: "cs"
       NAVIGATOR_LANGUAGE: "true"
-      API_URL: "http://localhost:8080/record-manager"
+      API_URL: "http://localhost:8080/record-manager-server"
       APP_INFO: "<a href=\"https://github.com/kbss-cvut\" target=\"_blank\" rel=\"noopener noreferrer\" title=\"KBSS CVUT v Praze\">© KBSS CVUT v Praze, 2023</a>"
       AUTHENTICATION: "oidc"
       AUTH_SERVER_URL: "http://localhost:8088/realms/record-manager"
@@ -22,7 +22,7 @@ services:
   record-manager-server:
     build: .
     image: record-manager-server
-    container_name: record-manager
+    container_name: record-manager-server
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
@@ -30,7 +30,7 @@ services:
       - db-server
       - auth-server
     environment:
-      REPOSITORYURL: "http://db-server:7200/repositories/record-manager"
+      REPOSITORYURL: "http://db-server:7200/repositories/record-manager-app"
       FORMGENREPOSITORYURL: "http://db-server:7200/repositories/record-manager-formgen"
       FORMGENSERVICEURL: "http://s-pipes-engine:8080/s-pipes/service?_pId=clone&sgovRepositoryUrl=https%3A%2F%2Fgraphdb.onto.fel.cvut.cz%2Frepositories%2Fkodi-slovnik-gov-cz"
       SECURITY_PROVIDER: "oidc"

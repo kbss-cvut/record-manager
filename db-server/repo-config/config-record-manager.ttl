@@ -4,7 +4,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix graphdb: <http://www.ontotext.com/config/graphdb#>.
 
-<#termit> a rep:Repository;
+<#record-manager-app> a rep:Repository;
   rep:repositoryID "record-manager-app";
   rep:repositoryImpl [
       rep:repositoryType "graphdb:SailRepository";
