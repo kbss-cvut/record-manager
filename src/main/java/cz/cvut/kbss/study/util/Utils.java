@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.util;
 
-import cz.cvut.kbss.study.exception.FormManagerException;
+import cz.cvut.kbss.study.exception.RecordManagerException;
 
 import java.io.*;
 import java.net.URI;
@@ -22,14 +22,14 @@ public class Utils {
         final InputStream is = Utils.class.getClassLoader().getResourceAsStream(
                 Constants.QUERY_DIRECTORY + File.separator + queryFileName);
         if (is == null) {
-            throw new FormManagerException(
+            throw new RecordManagerException(
                     "Initialization exception. Query file not found in " + Constants.QUERY_DIRECTORY +
                             File.separator + queryFileName);
         }
         try (final BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             return in.lines().collect(Collectors.joining("\n"));
         } catch (IOException e) {
-            throw new FormManagerException("Initialization exception. Unable to load query!", e);
+            throw new RecordManagerException("Initialization exception. Unable to load query!", e);
         }
     }
 

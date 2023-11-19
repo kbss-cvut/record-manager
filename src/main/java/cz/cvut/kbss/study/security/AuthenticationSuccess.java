@@ -1,7 +1,7 @@
 package cz.cvut.kbss.study.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.cvut.kbss.study.exception.FormManagerException;
+import cz.cvut.kbss.study.exception.RecordManagerException;
 import cz.cvut.kbss.study.security.model.LoginStatus;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
@@ -99,7 +99,7 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
 
         SameSiteValue sameSiteValue = SameSiteValue.getValue(configValue)
                 .orElseThrow(
-                        () -> new FormManagerException(
+                        () -> new RecordManagerException(
                                 "Could not recognize " + ConfigParam.SECURITY_SAME_SITE + " parameter value '"
                                         + configValue + "', as it is not one of the values "
                                         + Arrays.toString(SameSiteValue.values()) + "."
