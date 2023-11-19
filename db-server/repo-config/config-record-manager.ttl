@@ -5,7 +5,7 @@
 @prefix graphdb: <http://www.ontotext.com/config/graphdb#>.
 
 <#termit> a rep:Repository;
-  rep:repositoryID "record-manager";
+  rep:repositoryID "record-manager-app";
   rep:repositoryImpl [
       rep:repositoryType "graphdb:SailRepository";
       <http://www.openrdf.org/config/repository/sail#sailImpl> [
