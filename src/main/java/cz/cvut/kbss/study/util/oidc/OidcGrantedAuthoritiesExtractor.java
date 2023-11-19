@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.ClaimAccessor;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.Collection;
@@ -21,6 +22,10 @@ public class OidcGrantedAuthoritiesExtractor implements Converter<Jwt, Collectio
 
     @Override
     public Collection<SimpleGrantedAuthority> convert(Jwt source) {
+        return extractRoles(source).stream().map(SimpleGrantedAuthority::new).toList();
+    }
+
+    public List<String> extractRoles(ClaimAccessor source) {
         final String rolesClaim = config.getConfig(ConfigParam.OIDC_ROLE_CLAIM);
         final String[] parts = rolesClaim.split("\\.");
         assert parts.length > 0;
@@ -40,6 +45,6 @@ public class OidcGrantedAuthoritiesExtractor implements Converter<Jwt, Collectio
             }
             roles = (List<String>) map.getOrDefault(parts[parts.length - 1], Collections.emptyList());
         }
-        return roles.stream().map(SimpleGrantedAuthority::new).toList();
+        return roles;
     }
 }

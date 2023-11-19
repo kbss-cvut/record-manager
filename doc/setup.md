@@ -65,4 +65,28 @@ default role mapping in Keycloak. Record Manager will assign `ROLE_USER` to auth
 must be available in the token.
 
 Note also that it is expected that user metadata corresponding to the user extracted from the access token exist in the
-repository. They are paired via the `prefferred_username` claim value (see `SecurityUtils`).
+repository. They are paired via the `preferred_username` claim value (see `SecurityUtils`).
+
+## Docker Compose Deployment
+
+This repo contains an example Docker Compose configuration that can be used to quickly spin up Record Manager with its frontend,
+a GraphDB repository, S-pipes form generator and Keycloak as the authentication service. The configuration uses the Record Manager
+code from this repository. Published frontend image is used.
+
+The deployment is pretty much self-contained, it sets up the corresponding repositories, imports a realm where clients
+are configured for both the Record Manager backend and frontend. All the services (except PostgreSQL used by Keycloak) 
+in the deployment export their ports to the host system, so ensure the following ports are available on your system: 
+3000, 8080, 8081, 8088.
+
+To run the deployment for the first time, follow these steps:
+
+1. Create the `.env` file and set the following variables in it: `KC_ADMIN_USER`, `KC_ADMIN_PASSWORD`.
+2. Run `docker compose up -d db-server` first. It uses a script that creates GraphDB repositories needed by the system.
+3. Wait approximately 20s (check the log and wait for GraphDB to be fully up).
+4. Start the rest of the system by running `docker compose up -d --build` (`--build` is used because Record Manager backend needs to be build)
+5. Go to [http://localhost:8088](http://localhost:8088), login to the Keycloak admin console using `KC_ADMIN_USER` and `KC_ADMIN_PASSWORD`.
+6. Select realm `record-manager`.
+7. Add user accounts as necessary. Do not forget to assign them one of `ROLE_ADMIN` or `ROLE_USER` roles.
+8. Go to [http://localhost:3000](http://localhost:3000) and log in using one of the created user accounts.
+
+When running the deployment next time, just execute `docker compose up -d --build` and go to [http://localhost:3000](http://localhost:3000).

@@ -1,22 +1,33 @@
 package cz.cvut.kbss.study.persistence.dao;
 
+import cz.cvut.kbss.jopa.model.EntityManager;
+import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
+import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
+import cz.cvut.kbss.jopa.model.metamodel.EntityType;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.qam.Answer;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
-import java.util.List;
-
+import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
+import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
     @Autowired
-    private PatientRecordDao patientRecordDao;
+    private EntityManager em;
+
+    @Autowired
+    private PatientRecordDao sut;
 
     @Autowired
     private UserDao userDao;
@@ -39,12 +50,12 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             institutionDao.persist(institutionOther);
             userDao.persist(user1);
             userDao.persist(user2);
-            patientRecordDao.persist(record1);
-            patientRecordDao.persist(record2);
-            patientRecordDao.persist(recordOther);
+            sut.persist(record1);
+            sut.persist(record2);
+            sut.persist(recordOther);
         });
 
-        List<PatientRecordDto> records = patientRecordDao.findByInstitution(institution);
+        List<PatientRecordDto> records = sut.findByInstitution(institution);
 
         assertEquals(2, records.size());
         assertEquals(1, records.stream().filter(rs -> record1.getUri().equals(rs.getUri())).count());
@@ -66,12 +77,12 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             institutionDao.persist(institution2);
             userDao.persist(user1);
             userDao.persist(user2);
-            patientRecordDao.persist(record1);
-            patientRecordDao.persist(record2);
-            patientRecordDao.persist(record3);
+            sut.persist(record1);
+            sut.persist(record2);
+            sut.persist(record3);
         });
 
-        List<PatientRecordDto> records = patientRecordDao.findAllRecords();
+        List<PatientRecordDto> records = sut.findAllRecords();
 
         assertEquals(3, records.size());
     }
@@ -85,11 +96,11 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         transactional(() -> {
             institutionDao.persist(institution);
             userDao.persist(user);
-            patientRecordDao.persist(record1);
-            patientRecordDao.persist(record2);
+            sut.persist(record1);
+            sut.persist(record2);
         });
 
-        int numberOfProcessedRecords = patientRecordDao.getNumberOfProcessedRecords();
+        int numberOfProcessedRecords = sut.getNumberOfProcessedRecords();
 
         assertEquals(2, numberOfProcessedRecords);
     }
@@ -107,15 +118,117 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             institutionDao.persist(institution);
             userDao.persist(user1);
             userDao.persist(user2);
-            patientRecordDao.persist(record1);
-            patientRecordDao.persist(record2);
-            patientRecordDao.persist(record3);
+            sut.persist(record1);
+            sut.persist(record2);
+            sut.persist(record3);
         });
 
-        List<PatientRecord> records1 = patientRecordDao.findByAuthor(user1);
-        List<PatientRecord> records2 = patientRecordDao.findByAuthor(user2);
+        List<PatientRecord> records1 = sut.findByAuthor(user1);
+        List<PatientRecord> records2 = sut.findByAuthor(user2);
 
         assertEquals(2, records1.size());
         assertEquals(1, records2.size());
+    }
+
+    @Test
+    void persistGeneratesIdentifierBeforeSavingRecord() {
+        final Institution institution = Generator.generateInstitution();
+        institution.setKey(IdentificationUtils.generateKey());
+        final User author = Generator.generateUser(institution);
+        author.generateUri();
+        transactional(() -> {
+            em.persist(author);
+            em.persist(institution);
+        });
+
+        final PatientRecord record = Generator.generatePatientRecord(author);
+        record.setUri(null);
+
+        transactional(() -> sut.persist(record));
+        assertNotNull(record.getUri());
+        final PatientRecord result = em.find(PatientRecord.class, record.getUri());
+        assertNotNull(result);
+    }
+
+    private User generateAuthorWithInstitution() {
+        final Institution institution = Generator.generateInstitution();
+        institution.setKey(IdentificationUtils.generateKey());
+        final User author = Generator.generateUser(institution);
+        author.generateUri();
+        transactional(() -> {
+            em.persist(author);
+            em.persist(institution);
+        });
+        return author;
+    }
+
+    @Test
+    void persistSavesRecordWithQuestionAnswerTreeIntoSeparateContext() {
+        final User author = generateAuthorWithInstitution();
+        final PatientRecord record = Generator.generatePatientRecord(author);
+        record.setUri(null);
+        record.setQuestion(Generator.generateQuestionAnswerTree());
+
+        transactional(() -> sut.persist(record));
+
+        final Descriptor descriptor = getDescriptor(record);
+        final PatientRecord result = em.find(PatientRecord.class, record.getUri(), descriptor);
+        assertNotNull(result);
+        assertNotNull(result.getQuestion());
+    }
+
+    private Descriptor getDescriptor(PatientRecord record) {
+        final EntityType<PatientRecord> et = em.getMetamodel().entity(PatientRecord.class);
+        final Descriptor descriptor = new EntityDescriptor(PatientRecordDao.generateRecordUriFromKey(record.getKey()));
+        descriptor.addAttributeContext(et.getAttribute("author"), null);
+        descriptor.addAttributeContext(et.getAttribute("lastModifiedBy"), null);
+        descriptor.addAttributeContext(et.getAttribute("institution"), null);
+        return descriptor;
+    }
+
+    @Test
+    void updateUpdatesRecordInContext() {
+        final User author = generateAuthorWithInstitution();
+        final PatientRecord record = Generator.generatePatientRecord(author);
+        record.setKey(IdentificationUtils.generateKey());
+        record.setUri(PatientRecordDao.generateRecordUriFromKey(record.getKey()));
+        record.setQuestion(Generator.generateQuestionAnswerTree());
+        final Descriptor descriptor = getDescriptor(record);
+        transactional(() -> {
+            em.persist(record, descriptor);
+            new QuestionSaver(descriptor).persistIfNecessary(record.getQuestion(), em);
+        });
+
+        final String updatedName = "Updated name";
+        record.setLocalName(updatedName);
+        final Answer answer = record.getQuestion().getSubQuestions().iterator().next().getAnswers().iterator().next();
+        final String updatedAnswer = "Updated answer";
+        answer.setTextValue(updatedAnswer);
+
+        transactional(() -> sut.update(record));
+
+        final PatientRecord result = em.find(PatientRecord.class, record.getUri(), descriptor);
+        assertEquals(updatedName, result.getLocalName());
+        final Answer resultAnswer = em.find(Answer.class, answer.getUri(), descriptor);
+        assertNotNull(resultAnswer);
+        assertEquals(updatedAnswer, resultAnswer.getTextValue());
+    }
+
+    @Test
+    void findByKeyLoadsRecordByKey() {
+        final User author = generateAuthorWithInstitution();
+        final PatientRecord record = Generator.generatePatientRecord(author);
+        record.setKey(IdentificationUtils.generateKey());
+        record.setQuestion(Generator.generateQuestionAnswerTree());
+        final Descriptor descriptor = getDescriptor(record);
+        transactional(() -> {
+            em.persist(record, descriptor);
+            new QuestionSaver(descriptor).persistIfNecessary(record.getQuestion(), em);
+        });
+
+        final PatientRecord result = sut.findByKey(record.getKey());
+        assertNotNull(result);
+        assertEquals(record.getUri(), result.getUri());
+        assertNotNull(result.getQuestion());
     }
 }

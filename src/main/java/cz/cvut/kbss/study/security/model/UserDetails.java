@@ -1,33 +1,22 @@
 package cz.cvut.kbss.study.security.model;
 
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
 
-    private static final Map<String, String> ROLE_MAPPING = initRoleMapping();
-
     private final User user;
 
     private final Set<GrantedAuthority> authorities;
-
-    private static Map<String, String> initRoleMapping() {
-        final Map<String, String> result = new HashMap<>();
-        result.put(Vocabulary.s_c_administrator, SecurityConstants.ROLE_ADMIN);
-        result.put(Vocabulary.s_c_doctor, SecurityConstants.ROLE_USER);
-        return result;
-    }
 
     public UserDetails(User user) {
         Objects.requireNonNull(user);
@@ -46,8 +35,12 @@ public class UserDetails implements org.springframework.security.core.userdetail
     }
 
     private void resolveRoles() {
-        authorities.addAll(ROLE_MAPPING.entrySet().stream().filter(e -> user.getTypes().contains(e.getKey()))
-                                       .map(e -> new SimpleGrantedAuthority(e.getValue())).toList());
+        authorities.addAll(
+                user.getTypes().stream()
+                    .map(Role::forType)
+                    .filter(Optional::isPresent)
+                    .map(r -> new SimpleGrantedAuthority(r.get().getName()))
+                    .toList());
         authorities.add(new SimpleGrantedAuthority(SecurityConstants.ROLE_USER));
     }
 

@@ -6,6 +6,7 @@ import cz.cvut.kbss.study.model.qam.Question;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -16,14 +17,10 @@ import java.util.Set;
 public class QuestionSaver {
 
     private final Descriptor descriptor;
-    private Set<URI> visited = new HashSet<>();
-
-    public QuestionSaver() {
-        this.descriptor = null;
-    }
+    private final Set<URI> visited = new HashSet<>();
 
     public QuestionSaver(Descriptor descriptor) {
-        this.descriptor = descriptor;
+        this.descriptor = Objects.requireNonNull(descriptor);
     }
 
     public void persistIfNecessary(Question root, EntityManager em) {
@@ -33,24 +30,16 @@ public class QuestionSaver {
         if (visited.contains(root.getUri())) {
             return;
         }
-        persist(root, em);
+        em.persist(root, descriptor);
         visited.add(root.getUri());
         root.getSubQuestions().forEach(q -> this.persistSubQuestionIfNecessary(q, em));
-    }
-
-    private void persist(Question question, EntityManager em) {
-        if (descriptor != null) {
-            em.persist(question, descriptor);
-        } else {
-            em.persist(question);
-        }
     }
 
     private void persistSubQuestionIfNecessary(Question question, EntityManager em) {
         if (visited.contains(question.getUri())) {
             return;
         }
-        persist(question, em);
+        em.persist(question, descriptor);
         visited.add(question.getUri());
         question.getSubQuestions().forEach(q -> persistSubQuestionIfNecessary(q, em));
     }

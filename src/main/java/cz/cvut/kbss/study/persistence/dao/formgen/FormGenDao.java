@@ -5,6 +5,7 @@ import cz.cvut.kbss.jopa.model.EntityManagerFactory;
 import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
 import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
@@ -60,6 +61,7 @@ public class FormGenDao {
     private void initRequiredFieldsIfNecessary(PatientRecord record) {
         if (record.getKey() == null) {  // Happens for unpersisted records
             record.setKey(IdentificationUtils.generateKey());
+            record.setUri(PatientRecordDao.generateRecordUriFromKey(record.getKey()));
         }
     }
 

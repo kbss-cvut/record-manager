@@ -2,15 +2,19 @@ package cz.cvut.kbss.study.environment.generator;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.model.*;
+import cz.cvut.kbss.study.model.qam.Answer;
+import cz.cvut.kbss.study.model.qam.Question;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class Generator {
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     private Generator() {
         throw new AssertionError();
@@ -133,11 +137,11 @@ public class Generator {
      */
     public static User generateUser(Institution institution){
         final User person = new User();
-        person.setUsername("RandomUsername" + Integer.toString(randomInt()));
-        person.setPassword("RandomPassword" + Integer.toString(randomInt()));
-        person.setFirstName("RandomFirstName" + Integer.toString(randomInt()));
-        person.setLastName("RandomLastName" + Integer.toString(randomInt()));
-        person.setEmailAddress("RandomEmail" + Integer.toString(randomInt()) + "@random.rand");
+        person.setUsername("RandomUsername" + randomInt());
+        person.setPassword("RandomPassword" + randomInt());
+        person.setFirstName("RandomFirstName" + randomInt());
+        person.setLastName("RandomLastName" + randomInt());
+        person.setEmailAddress("RandomEmail" + randomInt() + "@random.rand");
         person.setInstitution(institution);
         return person;
     }
@@ -149,7 +153,7 @@ public class Generator {
      */
     public static Institution generateInstitution() {
         final Institution org = new Institution();
-        org.setName("RandomInstitution" + Integer.toString(randomInt()));
+        org.setName("RandomInstitution" + randomInt());
         org.setUri(generateUri());
         return org;
     }
@@ -163,7 +167,7 @@ public class Generator {
     public static PatientRecord generatePatientRecord(User author) {
         final PatientRecord rec = new PatientRecord();
         rec.setAuthor(author);
-        rec.setLocalName("RandomRecord" + Integer.toString(randomInt()));
+        rec.setLocalName("RandomRecord" + randomInt());
         rec.setUri(generateUri());
         rec.setInstitution(author.getInstitution());
         return rec;
@@ -177,7 +181,7 @@ public class Generator {
      */
     public static PatientRecordDto generatePatientRecordDto(User author) {
         final PatientRecordDto rec = new PatientRecordDto();
-        rec.setLocalName("RandomRecordDto" + Integer.toString(randomInt()));
+        rec.setLocalName("RandomRecordDto" + randomInt());
         rec.setAuthor(author);
         rec.setUri(generateUri());
         rec.setInstitution(author.getInstitution());
@@ -193,8 +197,32 @@ public class Generator {
         final ActionHistory action = new ActionHistory();
         action.setAuthor(author);
         action.setTimestamp(randomDate());
-        action.setType("RANDOM_TYPE_" + Integer.toString(randomInt()));
-        action.setPayload("RandomPayload" + Integer.toString(randomInt()));
+        action.setType("RANDOM_TYPE_" + randomInt());
+        action.setPayload("RandomPayload" + randomInt());
         return action;
+    }
+
+    public static Question generateQuestionAnswerTree() {
+        final Question root = new Question();
+        root.setOrigin(Generator.generateUri());
+        final Question childOne = new Question();
+        childOne.setOrigin(Generator.generateUri());
+        childOne.setAnswers(Set.of(generateAnswer()));
+        root.setSubQuestions(new HashSet<>(Set.of(childOne)));
+        final Question childTwo = new Question();
+        childTwo.setOrigin(Generator.generateUri());
+        childTwo.setAnswers(Set.of(generateAnswer()));
+        root.getSubQuestions().add(childTwo);
+        return root;
+    }
+
+    private static Answer generateAnswer() {
+        final Answer childOneAnswer = new Answer();
+        if (randomBoolean()) {
+            childOneAnswer.setCodeValue(Generator.generateUri());
+        } else {
+            childOneAnswer.setTextValue("Child one answer");
+        }
+        return childOneAnswer;
     }
 }
