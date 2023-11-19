@@ -19,7 +19,7 @@ services:
       AUTH_CLIENT_ID: "record-manager-ui"
       FORCE_BASENAME: "true"
 
-  record-manager:
+  record-manager-server:
     build: .
     image: record-manager
     container_name: record-manager
