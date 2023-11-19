@@ -1,9 +1,12 @@
 package cz.cvut.kbss.study.config;
 
+import cz.cvut.kbss.study.exception.RecordManagerException;
 import cz.cvut.kbss.study.security.CsrfHeaderFilter;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -94,23 +97,39 @@ public class SecurityConfig {
     }
 
     static CorsConfigurationSource createCorsConfiguration(ConfigReader configReader) {
-        // allowCredentials requires allowed origins to be configured (* is not supported)
         final CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-        if (!configReader.getConfig(ConfigParam.APP_CONTEXT, "").isBlank()) {
-            String appUrl = configReader.getConfig(ConfigParam.APP_CONTEXT);
-            appUrl = appUrl.substring(0, appUrl.lastIndexOf('/'));
-            corsConfiguration.setAllowedOrigins(List.of(appUrl));
-        } else {
-            corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
+        URL appUrl = getApplicationContext(configReader);
+        if (appUrl != null) {
+            corsConfiguration.setAllowedOrigins(List.of(parseOrigin(appUrl)));
+            corsConfiguration.setAllowCredentials(true);
         }
         corsConfiguration.addExposedHeader(HttpHeaders.AUTHORIZATION);
         corsConfiguration.addExposedHeader(HttpHeaders.LOCATION);
         corsConfiguration.addExposedHeader(HttpHeaders.CONTENT_DISPOSITION);
-        corsConfiguration.setAllowCredentials(true);
 
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
+    }
+
+    private static URL getApplicationContext(ConfigReader configReader) {
+        String appUrl = configReader.getConfig(ConfigParam.APP_CONTEXT);
+
+        if (appUrl.isBlank()) {
+            return null;
+        }
+        try {
+            return new URL(appUrl);
+        } catch (MalformedURLException e) {
+            throw new RecordManagerException(
+                "Invalid configuration parameter " + ConfigParam.APP_CONTEXT + ".",
+                e);
+        }
+    }
+
+    private static String parseOrigin(URL url) {
+        return url.getProtocol() + "://" + url.getHost()
+            + (url.getPort() != -1 ? ":" + url.getPort() : "");
     }
 }

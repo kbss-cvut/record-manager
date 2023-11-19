@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.exception;
 
-public class NotFoundException extends FormManagerException {
+public class NotFoundException extends RecordManagerException {
 
     public NotFoundException(String message) {
         super(message);

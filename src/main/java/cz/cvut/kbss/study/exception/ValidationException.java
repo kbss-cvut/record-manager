@@ -3,7 +3,7 @@ package cz.cvut.kbss.study.exception;
 /**
  * High-level exception marking a validated object invalid.
  */
-public class ValidationException extends FormManagerException {
+public class ValidationException extends RecordManagerException {
 
     private final String messageId;
 
