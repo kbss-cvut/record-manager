@@ -50,7 +50,7 @@ public class OntologyAuthenticationProviderTest extends BaseServiceTestRunner {
         final Authentication result = provider.authenticate(auth);
         assertTrue(result.isAuthenticated());
         assertNotNull(SecurityContextHolder.getContext());
-        assertEquals(BaseServiceTestRunner.USERNAME, SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        assertEquals(BaseServiceTestRunner.USERNAME, SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
     @Test

@@ -3,14 +3,11 @@ package cz.cvut.kbss.study.rest;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
-import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.UserService;
-import cz.cvut.kbss.study.service.security.SecurityUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -207,20 +204,5 @@ public class UserController extends BaseController {
     private User getByToken(String token) {
         assert token != null;
         return userService.findByToken(token);
-    }
-
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
-    @PostMapping(value = "/impersonate", consumes = MediaType.TEXT_PLAIN_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void impersonate(@RequestBody String username) {
-        User user = getByUsername(username);
-        if (user.getTypes().contains(Vocabulary.s_c_administrator)) {
-            throw new BadRequestException("Cannot impersonate admin.");
-        }
-        UserDetails ud = new UserDetails(user);
-        SecurityUtils.setCurrentUser(ud);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("User {} impersonated.", user.getUsername());
-        }
     }
 }
