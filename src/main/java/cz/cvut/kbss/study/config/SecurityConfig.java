@@ -5,8 +5,6 @@ import cz.cvut.kbss.study.security.CsrfHeaderFilter;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
-import java.net.MalformedURLException;
-import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,8 +29,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Collections;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal", matchIfMissing = true)
 @Configuration
@@ -99,11 +98,7 @@ public class SecurityConfig {
     static CorsConfigurationSource createCorsConfiguration(ConfigReader configReader) {
         final CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-        URL appUrl = getApplicationContext(configReader);
-        if (appUrl != null) {
-            corsConfiguration.setAllowedOrigins(List.of(parseOrigin(appUrl)));
-            corsConfiguration.setAllowCredentials(true);
-        }
+        configureAllowedOrigins(corsConfiguration, configReader);
         corsConfiguration.addExposedHeader(HttpHeaders.AUTHORIZATION);
         corsConfiguration.addExposedHeader(HttpHeaders.LOCATION);
         corsConfiguration.addExposedHeader(HttpHeaders.CONTENT_DISPOSITION);
@@ -113,23 +108,29 @@ public class SecurityConfig {
         return source;
     }
 
-    private static URL getApplicationContext(ConfigReader configReader) {
-        String appUrl = configReader.getConfig(ConfigParam.APP_CONTEXT);
-
-        if (appUrl.isBlank()) {
-            return null;
-        }
-        try {
-            return new URL(appUrl);
-        } catch (MalformedURLException e) {
-            throw new RecordManagerException(
-                "Invalid configuration parameter " + ConfigParam.APP_CONTEXT + ".",
-                e);
+    private static void configureAllowedOrigins(CorsConfiguration corsConfig, ConfigReader config) {
+        final Optional<String> appUrlOrigin = getApplicationUrlOrigin(config);
+        final List<String> allowedOrigins = new ArrayList<>();
+        appUrlOrigin.ifPresent(allowedOrigins::add);
+        final String allowedOriginsConfig = config.getConfig(ConfigParam.CORS_ALLOWED_ORIGINS);
+        allowedOrigins.addAll(Arrays.asList(allowedOriginsConfig.split(",")));
+        if (!allowedOrigins.isEmpty()) {
+            corsConfig.setAllowedOrigins(allowedOrigins);
+            corsConfig.setAllowCredentials(true);
         }
     }
 
-    private static String parseOrigin(URL url) {
-        return url.getProtocol() + "://" + url.getHost()
-            + (url.getPort() != -1 ? ":" + url.getPort() : "");
+    private static Optional<String> getApplicationUrlOrigin(ConfigReader configReader) {
+        String appUrlConfig = configReader.getConfig(ConfigParam.APP_CONTEXT);
+
+        if (appUrlConfig.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            final URL appUrl = new URL(appUrlConfig);
+            return Optional.of(appUrl.getProtocol() + "://" + appUrl.getAuthority());
+        } catch (MalformedURLException e) {
+            throw new RecordManagerException("Invalid configuration parameter " + ConfigParam.APP_CONTEXT + ".", e);
+        }
     }
 }

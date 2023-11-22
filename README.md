@@ -5,7 +5,7 @@ Manager of records based on OFN (https://data.gov.cz/ofn/).
 ## Required Technologies
 
 - JDK 17
-- Apache Maven 3.5.x
+- Apache Maven 3.5.x or later
 
 ## System Architecture
 
