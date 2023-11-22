@@ -9,6 +9,7 @@ import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.IdentificationUtils;
@@ -19,15 +20,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -182,5 +186,16 @@ public class SecurityUtilsTest {
 
         final User result = sut.getCurrentUser();
         assertThat(result.getTypes(), hasItem(Vocabulary.s_c_administrator));
+    }
+
+    @Test
+    void getCurrentUserEnhancesRetrievedUserWithImpersonatorTypeWhenItHasSwitchAuthorityRole() {
+        final UserDetails userDetails =
+                new UserDetails(user, Set.of(new SimpleGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)));
+        SecurityUtils.setCurrentUser(userDetails);
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        final User result = sut.getCurrentUser();
+        assertEquals(user, result);
+        assertThat(result.getTypes(), hasItem(Vocabulary.s_c_impersonator));
     }
 }

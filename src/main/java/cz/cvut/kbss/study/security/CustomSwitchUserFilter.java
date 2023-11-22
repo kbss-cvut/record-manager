@@ -6,6 +6,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
+/**
+ * Extends default user switching logic by preventing switching to an admin account.
+ */
 public class CustomSwitchUserFilter extends SwitchUserFilter {
 
     @Override

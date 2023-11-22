@@ -3,6 +3,7 @@ package cz.cvut.kbss.study.service.security;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.model.Role;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.web.server.authentication.SwitchUserWebFilter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -70,9 +72,13 @@ public class SecurityUtils {
         if (principal instanceof Jwt) {
             return resolveAccountFromOAuthPrincipal((Jwt) principal);
         } else {
-            assert principal instanceof UserDetails;
             final String username = context.getAuthentication().getName();
-            return userDao.findByUsername(username);
+            final User user = userDao.findByUsername(username);
+            if (context.getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(
+                    SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR))) {
+                user.addType(Vocabulary.s_c_impersonator);
+            }
+            return user;
         }
     }
 
