@@ -128,7 +128,7 @@ public class SecurityConfig {
         }
         try {
             final URL appUrl = new URL(appUrlConfig);
-            return Optional.of(appUrl.getProtocol() + "://" + appUrl.getHost() + (appUrl.getPort() != -1 ? ":" + appUrl.getPort() : ""));
+            return Optional.of(appUrl.getProtocol() + "://" + appUrl.getAuthority());
         } catch (MalformedURLException e) {
             throw new RecordManagerException("Invalid configuration parameter " + ConfigParam.APP_CONTEXT + ".", e);
         }
