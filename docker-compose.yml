@@ -34,6 +34,7 @@ services:
       FORMGENREPOSITORYURL: "http://db-server:7200/repositories/record-manager-formgen"
       FORMGENSERVICEURL: "http://s-pipes-engine:8080/s-pipes/service?_pId=clone&sgovRepositoryUrl=https%3A%2F%2Fgraphdb.onto.fel.cvut.cz%2Frepositories%2Fkodi-slovnik-gov-cz"
       SECURITY_PROVIDER: "oidc"
+      SERVER_SERVLET_CONTEXTPATH: "/record-manager-server"
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI: "http://localhost:8088/realms/record-manager"
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: "http://auth-server:8080/realms/record-manager/protocol/openid-connect/certs"
 
@@ -79,7 +80,7 @@ services:
       DB_PASSWORD: keycloak
       DB_SCHEMA: "public"
       DB_SERVER_URL: "http://db-server:7200"
-      DB_SERVER_REPOSITORY_ID: "record-manager"
+      DB_SERVER_REPOSITORY_ID: "record-manager-app"
       REPOSITORY_LANGUAGE: "en"
       VOCABULARY_USER_TYPE: "http://onto.fel.cvut.cz/ontologies/record-manager/user"
       VOCABULARY_USER_FIRST_NAME: "http://xmlns.com/foaf/0.1/firstName"
