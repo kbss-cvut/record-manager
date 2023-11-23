@@ -2,7 +2,9 @@ version: '3.9'
 
 services:
   record-manager:
-    image: 'ghcr.io/kbss-cvut/kbss-cvut/record-manager-ui:latest'
+    build: /home/kidney/Development/Javascript/Projects/AKAENE/record-manager-ui
+    image: record-manager-ui
+    container_name: record-manager
     ports:
       - "127.0.0.1:3000:80"
     depends_on:
@@ -64,7 +66,7 @@ services:
   auth-server:
     image: "ghcr.io/kbss-cvut/keycloak-graphdb-user-replicator/keycloak-graphdb:latest"
     command:
-      - start --import-realm
+      - start --import-realm --features="token-exchange,admin-fine-grained-authz"
     environment:
       KC_IMPORT: realm-export.json
       KC_HOSTNAME_URL: "http://localhost:8088"
