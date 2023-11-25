@@ -30,4 +30,4 @@
           sail:sailType "graphdb:Sail"
         ]
     ];
-  rdfs:label "Record Manager Form generator Repository" .
+  rdfs:label "Record manager form generation repository" .

@@ -30,4 +30,4 @@
           sail:sailType "graphdb:Sail"
         ]
     ];
-  rdfs:label "Record Manager Repository" .
+  rdfs:label "Record manager application repository" .
