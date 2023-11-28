@@ -113,15 +113,17 @@ public class SecurityConfig {
         final List<String> allowedOrigins = new ArrayList<>();
         appUrlOrigin.ifPresent(allowedOrigins::add);
         final String allowedOriginsConfig = config.getConfig(ConfigParam.CORS_ALLOWED_ORIGINS);
-        allowedOrigins.addAll(Arrays.asList(allowedOriginsConfig.split(",")));
+        Arrays.stream(allowedOriginsConfig.split(",")).filter(s -> !s.isBlank()).forEach(allowedOrigins::add);
         if (!allowedOrigins.isEmpty()) {
             corsConfig.setAllowedOrigins(allowedOrigins);
             corsConfig.setAllowCredentials(true);
-            LOG.debug(
-                "Using response header Access-Control-Allow-Origin with value {}.",
-                corsConfig.getAllowedOrigins()
-            );
+        } else {
+            corsConfig.setAllowedOrigins(null);
         }
+        LOG.debug(
+            "Using response header Access-Control-Allow-Origin with value {}.",
+            corsConfig.getAllowedOrigins()
+        );
     }
 
     private static Optional<String> getApplicationUrlOrigin(ConfigReader configReader) {
