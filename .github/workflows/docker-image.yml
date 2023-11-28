@@ -21,6 +21,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Print more info
+        env:  
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       - name: Exit if pull request is from a fork
         run: |
           if [ "${{ github.event_name }}" == "pull_request_target" ] && [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.event.repository.full_name }}" ]; then
