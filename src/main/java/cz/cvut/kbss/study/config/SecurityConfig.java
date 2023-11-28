@@ -117,11 +117,13 @@ public class SecurityConfig {
         if (!allowedOrigins.isEmpty()) {
             corsConfig.setAllowedOrigins(allowedOrigins);
             corsConfig.setAllowCredentials(true);
-            LOG.debug(
-                "Using response header Access-Control-Allow-Origin with value {}.",
-                corsConfig.getAllowedOrigins()
-            );
+        } else {
+            corsConfig.setAllowedOrigins(null);
         }
+        LOG.debug(
+            "Using response header Access-Control-Allow-Origin with value {}.",
+            corsConfig.getAllowedOrigins()
+        );
     }
 
     private static Optional<String> getApplicationUrlOrigin(ConfigReader configReader) {
