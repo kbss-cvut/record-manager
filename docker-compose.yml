@@ -2,9 +2,7 @@ version: '3.9'
 
 services:
   record-manager:
-    build: /home/kidney/Development/Javascript/Projects/AKAENE/record-manager-ui
-    image: record-manager-ui
-    container_name: record-manager
+    image: 'ghcr.io/kbss-cvut/kbss-cvut/record-manager-ui:latest'
     ports:
       - "127.0.0.1:3000:80"
     depends_on:
