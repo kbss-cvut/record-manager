@@ -15,16 +15,11 @@ env:
 
 jobs:
   build-and-publish:
-
+    # Skip if PR is from a fork
+    if: github.event_name != 'pull_request' || github.event.repository.full_name == github.event.pull_request.head.repo.full_name
     runs-on: ubuntu-latest
 
     steps:
-      - name: Exit if pull request is from a fork
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ] && [ "${{ github.event.pull_request.head.repo.name }}" != "${{ github.event.repository.name }}" ]; then
-            echo "Skiping workflow as this pull request is from a fork."
-            exit 78
-          fi
       - uses: actions/checkout@v2
 
       - name: Build docker image

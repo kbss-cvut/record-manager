@@ -4,8 +4,8 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix graphdb: <http://www.ontotext.com/config/graphdb#>.
 
-<#record-manager-formgen> a rep:Repository;
-  rep:repositoryID "record-manager-formgen";
+<#record-manager-app> a rep:Repository;
+  rep:repositoryID "record-manager-app";
   rep:repositoryImpl [
       rep:repositoryType "graphdb:SailRepository";
       <http://www.openrdf.org/config/repository/sail#sailImpl> [
@@ -30,4 +30,4 @@
           sail:sailType "graphdb:Sail"
         ]
     ];
-  rdfs:label "Record Manager Form generator Repository" .
+  rdfs:label "Record manager application repository" .

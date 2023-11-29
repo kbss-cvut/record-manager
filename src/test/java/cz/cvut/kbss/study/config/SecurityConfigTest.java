@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.config;
 
+import cz.cvut.kbss.study.exception.RecordManagerException;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SecurityConfigTest {
 
@@ -54,5 +57,15 @@ class SecurityConfigTest {
         assertNotNull(result.getCorsConfiguration(new MockHttpServletRequest()));
         assertThat(result.getCorsConfiguration(new MockHttpServletRequest()).getAllowedOrigins(),
                    hasItems(originOne, originTwo, originThree));
+    }
+
+    @Test
+    void createCorsConfigurationDoNotSetAllowedOriginsWhenAppContextAndAllowedOriginsAreNotSet() {
+        environment.setProperty(ConfigParam.APP_CONTEXT.toString(), "");
+        environment.setProperty(ConfigParam.CORS_ALLOWED_ORIGINS.toString(),"");
+
+        final CorsConfigurationSource result = SecurityConfig.createCorsConfiguration(config);
+        assertNotNull(result.getCorsConfiguration(new MockHttpServletRequest()));
+        assertNull(result.getCorsConfiguration(new MockHttpServletRequest()).getAllowedOrigins());
     }
 }
