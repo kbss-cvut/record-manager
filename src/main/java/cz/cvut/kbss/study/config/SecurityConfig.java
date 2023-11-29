@@ -2,8 +2,10 @@ package cz.cvut.kbss.study.config;
 
 import cz.cvut.kbss.study.exception.RecordManagerException;
 import cz.cvut.kbss.study.security.CsrfHeaderFilter;
+import cz.cvut.kbss.study.security.CustomSwitchUserFilter;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
+import cz.cvut.kbss.study.service.security.UserDetailsService;
 import cz.cvut.kbss.study.util.ConfigParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +22,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -31,7 +35,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal", matchIfMissing = true)
 @Configuration
@@ -66,10 +74,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, ConfigReader config) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, ConfigReader config,
+                                           UserDetailsService userDetailsService) throws Exception {
         LOG.debug("Using internal security mechanisms.");
         final AuthenticationManager authManager = buildAuthenticationManager(http);
-        http.authorizeHttpRequests((auth) -> auth.anyRequest().permitAll())
+        http.authorizeHttpRequests(
+                    (auth) -> auth.requestMatchers("/rest/users/impersonate").hasAuthority(SecurityConstants.ROLE_ADMIN)
+                                  .anyRequest().permitAll())
             .cors((auth) -> auth.configurationSource(corsConfigurationSource(config)))
             .csrf(AbstractHttpConfigurer::disable)
             .addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class)
@@ -80,6 +91,8 @@ public class SecurityConfig {
             .logout((auth) -> auth.logoutUrl(SecurityConstants.LOGOUT_URI)
                                   .logoutSuccessHandler(logoutSuccessHandler)
                                   .invalidateHttpSession(true).deleteCookies(COOKIES_TO_DESTROY))
+            .sessionManagement((auth) -> auth.maximumSessions(1))
+            .addFilterAfter(switchUserFilter(userDetailsService), AuthorizationFilter.class)
             .authenticationManager(authManager);
         return http.build();
     }
@@ -138,5 +151,16 @@ public class SecurityConfig {
         } catch (MalformedURLException e) {
             throw new RecordManagerException("Invalid configuration parameter " + ConfigParam.APP_CONTEXT + ".", e);
         }
+    }
+
+    @Bean
+    public SwitchUserFilter switchUserFilter(UserDetailsService userDetailsService) {
+        final SwitchUserFilter filter = new CustomSwitchUserFilter();
+        filter.setUserDetailsService(userDetailsService);
+        filter.setUsernameParameter("username");
+        filter.setSwitchUserUrl("/rest/users/impersonate");
+        filter.setExitUserUrl("/rest/users/impersonate/logout");
+        filter.setSuccessHandler(authenticationSuccessHandler);
+        return filter;
     }
 }
