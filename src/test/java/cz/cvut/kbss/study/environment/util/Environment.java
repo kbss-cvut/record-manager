@@ -34,9 +34,11 @@ public class Environment {
         currentUser = user;
         final UserDetails userDetails = new UserDetails(user);
         SecurityContext context = new SecurityContextImpl();
-        context.setAuthentication(
-                new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(),
-                                                        userDetails.getAuthorities()));
+        final UsernamePasswordAuthenticationToken token =
+                UsernamePasswordAuthenticationToken.authenticated(userDetails, userDetails.getPassword(),
+                                                                  userDetails.getAuthorities());
+        token.setDetails(userDetails);
+        context.setAuthentication(token);
         SecurityContextHolder.setContext(context);
     }
 

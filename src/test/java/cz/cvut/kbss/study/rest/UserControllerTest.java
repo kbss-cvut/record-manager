@@ -6,7 +6,6 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,10 +21,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -336,43 +333,6 @@ public class UserControllerTest extends BaseControllerTestRunner {
                 .andReturn();
 
         assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
-        verify(userServiceMock).findByUsername(username);
-    }
-
-    @Test
-    public void impersonateReturnsResponseStatusNoContent() throws Exception {
-        final String username = "tom";
-
-        when(userServiceMock.findByUsername(username)).thenReturn(Environment.getCurrentUser());
-
-        final MvcResult result = mockMvc.perform(post("/users/impersonate/")
-                .content(username)
-                .contentType(MediaType.TEXT_PLAIN_VALUE))
-                .andReturn();
-
-        assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
-        verify(userServiceMock).findByUsername(username);
-    }
-
-    @Test
-    public void impersonateAdministratorReturnsResponseStatusBadRequest() throws Exception {
-        final String username = "tom";
-        final Institution institution = Generator.generateInstitution();
-        final User user = Generator.generateUser(institution);
-
-        Set<String> types = new HashSet<>();
-        types.add(Vocabulary.s_c_administrator);
-        types.add(Vocabulary.s_c_doctor);
-        user.setTypes(types);
-
-        when(userServiceMock.findByUsername(username)).thenReturn(user);
-
-        final MvcResult result = mockMvc.perform(post("/users/impersonate/")
-                .content(username)
-                .contentType(MediaType.TEXT_PLAIN_VALUE))
-                .andReturn();
-
-        assertEquals(HttpStatus.BAD_REQUEST, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(userServiceMock).findByUsername(username);
     }
 }

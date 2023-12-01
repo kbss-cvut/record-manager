@@ -3,6 +3,7 @@ package cz.cvut.kbss.study.service.security;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.model.Role;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.web.server.authentication.SwitchUserWebFilter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,15 +42,15 @@ public class SecurityUtils {
      * Sets the current security context to the user represented by the provided user details.
      * <p>
      * Note that this method erases credentials from the provided user details for security reasons.
-     *
+     * <p>
      * This method should be used only when internal authentication is used.
      *
      * @param userDetails User details
      */
     public static AbstractAuthenticationToken setCurrentUser(UserDetails userDetails) {
-        final UsernamePasswordAuthenticationToken
-                token = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(),
-                                                                userDetails.getAuthorities());
+        final UsernamePasswordAuthenticationToken token =
+                UsernamePasswordAuthenticationToken.authenticated(userDetails, userDetails.getPassword(),
+                                                                  userDetails.getAuthorities());
         token.setDetails(userDetails);
         token.eraseCredentials();   // Do not pass credentials around
 
@@ -70,9 +72,13 @@ public class SecurityUtils {
         if (principal instanceof Jwt) {
             return resolveAccountFromOAuthPrincipal((Jwt) principal);
         } else {
-            assert principal instanceof String;
-            final String username = context.getAuthentication().getPrincipal().toString();
-            return userDao.findByUsername(username);
+            final String username = context.getAuthentication().getName();
+            final User user = userDao.findByUsername(username);
+            if (context.getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(
+                    SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR))) {
+                user.addType(Vocabulary.s_c_impersonator);
+            }
+            return user;
         }
     }
 
@@ -81,7 +87,8 @@ public class SecurityUtils {
         final List<String> roles = new OidcGrantedAuthoritiesExtractor(config).extractRoles(principal);
         final User user = userDao.findByUsername(userInfo.getPreferredUsername());
         if (user == null) {
-            throw new NotFoundException("User with username '" + userInfo.getPreferredUsername() + "' not found in repository.");
+            throw new NotFoundException(
+                    "User with username '" + userInfo.getPreferredUsername() + "' not found in repository.");
         }
         roles.stream().map(Role::forName).filter(Optional::isPresent).forEach(r -> user.addType(r.get().getType()));
         return user;

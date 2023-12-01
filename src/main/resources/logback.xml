@@ -47,6 +47,12 @@
         <appender-ref ref="LOGFILE"/>
     </logger>
 
+    <!-- Restrict logging of Spring bean customization -->
+    <logger name="cz.cvut.kbss.study.security.CustomSwitchUserFilter" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="LOGFILE"/>
+    </logger>
+
     <!-- Logger for our app -->
     <logger name="cz.cvut.kbss" level="TRACE" additivity="false">
         <appender-ref ref="STDOUT"/>
