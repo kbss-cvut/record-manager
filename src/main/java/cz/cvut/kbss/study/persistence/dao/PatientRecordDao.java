@@ -162,5 +162,6 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
             throw new ValidationException("error.record.localNameOfRecordIsNotUnique",
                                           "Local name of record is not unique for entity " + entity);
         }
+        em.clear();
     }
 }
