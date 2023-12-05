@@ -73,7 +73,7 @@ public class SecurityUtils {
             return resolveAccountFromOAuthPrincipal((Jwt) principal);
         } else {
             final String username = context.getAuthentication().getName();
-            final User user = userDao.findByUsername(username);
+            final User user = userDao.findByUsername(username).copy();
             if (context.getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(
                     SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR))) {
                 user.addType(Vocabulary.s_c_impersonator);

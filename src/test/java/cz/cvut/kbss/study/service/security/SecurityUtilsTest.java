@@ -37,6 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -197,5 +198,17 @@ public class SecurityUtilsTest {
         final User result = sut.getCurrentUser();
         assertEquals(user, result);
         assertThat(result.getTypes(), hasItem(Vocabulary.s_c_impersonator));
+    }
+
+    @Test
+    void getCurrentUserReturnsCopyOfInstanceRetrievedFromRepository() {
+        final UserDetails userDetails =
+                new UserDetails(user, Set.of(new SimpleGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)));
+        SecurityUtils.setCurrentUser(userDetails);
+        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        final User result = sut.getCurrentUser();
+
+        assertNotSame(user, result);
+        assertEquals(user, result);
     }
 }

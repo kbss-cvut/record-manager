@@ -56,7 +56,7 @@ public class User implements HasDerivableUri, Serializable {
     @OWLDataProperty(iri = Vocabulary.s_p_created)
     private Date dateCreated;
 
-    @ParticipationConstraints(nonEmpty = true)
+    //    @ParticipationConstraints(nonEmpty = true)
     @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
     private Institution institution;
 
@@ -149,13 +149,21 @@ public class User implements HasDerivableUri, Serializable {
         getTypes().add(type);
     }
 
-    public String getToken() { return token; }
+    public String getToken() {
+        return token;
+    }
 
-    public void setToken(String token) { this.token = token; }
+    public void setToken(String token) {
+        this.token = token;
+    }
 
-    public Boolean getIsInvited() { return isInvited; }
+    public Boolean getIsInvited() {
+        return isInvited;
+    }
 
-    public void setIsInvited(Boolean isInvited) { this.isInvited = isInvited; }
+    public void setIsInvited(Boolean isInvited) {
+        this.isInvited = isInvited;
+    }
 
     /**
      * Encodes password of this person.
@@ -178,6 +186,27 @@ public class User implements HasDerivableUri, Serializable {
         this.password = null;
     }
 
+    /**
+     * Creates a copy of this instance.
+     *
+     * @return New user instance
+     */
+    public User copy() {
+        final User copy = new User();
+        copy.setUri(uri);
+        copy.setFirstName(firstName);
+        copy.setLastName(lastName);
+        copy.setUsername(username);
+        copy.setEmailAddress(emailAddress);
+        copy.setPassword(password);
+        copy.setDateCreated(dateCreated);
+        copy.setInstitution(institution);
+        copy.setIsInvited(isInvited);
+        copy.setToken(token);
+        types.forEach(copy::addType);
+        return copy;
+    }
+
     @Override
     public void generateUri() {
         if (uri != null) {
@@ -191,8 +220,9 @@ public class User implements HasDerivableUri, Serializable {
         }
         try {
             this.uri = URI.create(Constants.BASE_URI +
-                    URLEncoder.encode(firstName + "-" + lastName + "-" + IdentificationUtils.generateRandomURINumber(),
-                    StandardCharsets.UTF_8.toString()));
+                                          URLEncoder.encode(
+                                                  firstName + "-" + lastName + "-" + IdentificationUtils.generateRandomURINumber(),
+                                                  StandardCharsets.UTF_8.toString()));
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("Cannot generate Person URI due to unsupported encoding.", e);
         }
