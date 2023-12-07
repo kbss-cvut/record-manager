@@ -52,6 +52,9 @@ public class PatientRecord implements Serializable, HasOwlKey {
             CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private Question question;
 
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_state)
+    private URI state;
+
     public URI getUri() {
         return uri;
     }
@@ -132,6 +135,14 @@ public class PatientRecord implements Serializable, HasOwlKey {
 
     public void setFormTemplate(String formTemplate) {
         this.formTemplate = formTemplate;
+    }
+
+    public URI getState() {
+        return state;
+    }
+
+    public void setState(URI state) {
+        this.state = state;
     }
 
     @Override
