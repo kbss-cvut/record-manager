@@ -7,6 +7,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ufo: <http://onto.fel.cvut.cz/ontologies/ufo/> .
 @base <http://onto.fel.cvut.cz/ontologies/record-manager> .
 
 <http://onto.fel.cvut.cz/ontologies/record-manager> rdf:type owl:Ontology ;
@@ -76,6 +77,7 @@ rm:was-treated-at rdf:type owl:ObjectProperty ;
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/has-state
 rm:has-state rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf rdf:type ;
                 rdfs:label "has state"@en .
 
 
@@ -169,6 +171,7 @@ rm:impersonator rdf:type owl:Class ;
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/record-state
 rm:record-state rdf:type owl:Class ;
+        rdfs:subClassOf ufo:phase ;
         rdfs:label "record state"@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/open-record-state
