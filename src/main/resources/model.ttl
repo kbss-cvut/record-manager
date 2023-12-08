@@ -76,7 +76,7 @@ rm:was-treated-at rdf:type owl:ObjectProperty ;
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/has-state
 rm:has-state rdf:type owl:ObjectProperty ;
-                rdfs:label "has-state"@en .
+                rdfs:label "has state"@en .
 
 
 #################################################################
