@@ -47,7 +47,7 @@ public class PatientRecord implements Serializable, HasOwlKey {
 
     @Enumerated(EnumType.OBJECT_ONE_OF)
     @OWLObjectProperty(iri = Vocabulary.s_p_has_state)
-    private RecordState state;
+    private RecordPhase phase;
 
     public URI getUri() {
         return uri;
@@ -131,12 +131,12 @@ public class PatientRecord implements Serializable, HasOwlKey {
         this.formTemplate = formTemplate;
     }
 
-    public RecordState getState() {
-        return state;
+    public RecordPhase getPhase() {
+        return phase;
     }
 
-    public void setState(RecordState state) {
-        this.state = state;
+    public void setPhase(RecordPhase phase) {
+        this.phase = phase;
     }
 
     @Override

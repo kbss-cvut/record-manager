@@ -2,7 +2,7 @@ package cz.cvut.kbss.study.model;
 
 import cz.cvut.kbss.jopa.model.annotations.Individual;
 
-public enum RecordState {
+public enum RecordPhase {
     @Individual(iri = Vocabulary.s_c_open_record_state)
     open(Vocabulary.s_c_open_record_state),
     @Individual(iri = Vocabulary.s_c_valid_record_state)
@@ -14,7 +14,7 @@ public enum RecordState {
 
     private final String iri;
 
-    RecordState(String iri) {
+    RecordPhase(String iri) {
         this.iri = iri;
     }
 
