@@ -145,6 +145,7 @@ public class PatientRecord implements Serializable, HasOwlKey {
                 "localName=" + localName +
                 ", dateCreated=" + dateCreated +
                 ", institution=" + institution +
+                ", phase=" + phase +
                 "} " + super.toString();
     }
 }
