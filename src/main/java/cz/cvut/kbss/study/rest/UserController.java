@@ -101,6 +101,25 @@ public class UserController extends BaseController {
         }
     }
 
+    @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "oidc")
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
+    @PutMapping(value = "/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateUserInstitution(@PathVariable("username") String username, @RequestBody User user,
+                           @RequestParam(value = "email", defaultValue = "true") boolean sendEmail) {
+        if (!username.equals(user.getUsername())) {
+            throw new BadRequestException("The passed user's username is different from the specified one.");
+        }
+        final User original = getByUsername(username);
+        original.setInstitution(user.getInstitution());
+        assert original != null;
+        userService.update(original, sendEmail, "profileUpdate");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Added user {} to institution {} successfully.", user, user.getInstitution());
+        }
+    }
+
+    @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal")
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
     @PutMapping(value = "/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
