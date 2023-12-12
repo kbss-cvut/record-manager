@@ -1,10 +1,7 @@
 package cz.cvut.kbss.study.dto;
 
 import cz.cvut.kbss.jopa.model.annotations.*;
-import cz.cvut.kbss.study.model.AbstractEntity;
-import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.model.util.HasOwlKey;
 
 import java.util.Date;
@@ -38,6 +35,10 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
 
     @OWLObjectProperty(iri = Vocabulary.s_p_was_treated_at, fetch = FetchType.EAGER)
     private Institution institution;
+
+    @Enumerated(EnumType.OBJECT_ONE_OF)
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_phase)
+    private RecordPhase phase;
 
     @Override
     public String getKey() {
@@ -105,12 +106,21 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
         this.formTemplate = formTemplate;
     }
 
+    public RecordPhase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(RecordPhase phase) {
+        this.phase = phase;
+    }
+
     @Override
     public String toString() {
         return "PatientRecordDto{" +
                 "localName=" + localName +
                 "dateCreated=" + dateCreated +
                 ", institution=" + institution +
+                ", phase=" + phase +
                 "} " + super.toString();
     }
 }
