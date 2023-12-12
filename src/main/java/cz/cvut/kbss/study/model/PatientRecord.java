@@ -46,7 +46,7 @@ public class PatientRecord implements Serializable, HasOwlKey {
     private Question question;
 
     @Enumerated(EnumType.OBJECT_ONE_OF)
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_state)
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_phase)
     private RecordPhase phase;
 
     public URI getUri() {
