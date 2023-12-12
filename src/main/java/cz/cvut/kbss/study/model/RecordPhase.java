@@ -3,14 +3,14 @@ package cz.cvut.kbss.study.model;
 import cz.cvut.kbss.jopa.model.annotations.Individual;
 
 public enum RecordPhase {
-    @Individual(iri = Vocabulary.s_c_open_record_state)
-    open(Vocabulary.s_c_open_record_state),
-    @Individual(iri = Vocabulary.s_c_valid_record_state)
-    valid(Vocabulary.s_c_valid_record_state),
-    @Individual(iri = Vocabulary.s_c_completed_record_state)
-    completed(Vocabulary.s_c_completed_record_state),
-    @Individual(iri = Vocabulary.s_c_published_record_state)
-    published(Vocabulary.s_c_published_record_state);
+    @Individual(iri = Vocabulary.s_c_open_record_phase)
+    open(Vocabulary.s_c_open_record_phase),
+    @Individual(iri = Vocabulary.s_c_valid_record_phase)
+    valid(Vocabulary.s_c_valid_record_phase),
+    @Individual(iri = Vocabulary.s_c_completed_record_phase)
+    completed(Vocabulary.s_c_completed_record_phase),
+    @Individual(iri = Vocabulary.s_c_published_record_phase)
+    published(Vocabulary.s_c_published_record_phase);
 
     private final String iri;
 
