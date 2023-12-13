@@ -12,6 +12,7 @@ import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -50,6 +51,18 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Override
     public List<PatientRecordDto> findAllRecords() {
         return recordDao.findAllRecords();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<PatientRecord> findAllFull(LocalDate minDate, LocalDate maxDate) {
+        return null;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<PatientRecord> findAllFull(Institution institution, LocalDate minDate, LocalDate maxDate) {
+        return null;
     }
 
     @Override

@@ -10,13 +10,14 @@ import cz.cvut.kbss.jopa.model.annotations.OWLObjectProperty;
 import cz.cvut.kbss.jopa.model.annotations.ParticipationConstraints;
 import cz.cvut.kbss.study.model.qam.Question;
 import cz.cvut.kbss.study.model.util.HasOwlKey;
+import cz.cvut.kbss.study.model.util.HasUri;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Date;
 
 @OWLClass(iri = Vocabulary.s_c_patient_record)
-public class PatientRecord implements Serializable, HasOwlKey {
+public class PatientRecord implements Serializable, HasOwlKey, HasUri {
 
     @Id
     private URI uri;
@@ -49,9 +50,10 @@ public class PatientRecord implements Serializable, HasOwlKey {
     private String formTemplate;
 
     @OWLObjectProperty(iri = Vocabulary.s_p_has_question, cascade = {CascadeType.MERGE,
-            CascadeType.REMOVE}, fetch = FetchType.EAGER)
+                                                                     CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private Question question;
 
+    @Override
     public URI getUri() {
         return uri;
     }
@@ -136,10 +138,10 @@ public class PatientRecord implements Serializable, HasOwlKey {
 
     @Override
     public String toString() {
-        return "PatientRecord{" +
-                "localName=" + localName +
+        return "PatientRecord{<" + uri +
+                ">, localName=" + localName +
                 ", dateCreated=" + dateCreated +
                 ", institution=" + institution +
-                "} " + super.toString();
+                "}";
     }
 }

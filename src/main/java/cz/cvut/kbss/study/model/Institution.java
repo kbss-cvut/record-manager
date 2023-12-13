@@ -88,8 +88,8 @@ public class Institution extends AbstractEntity implements HasOwlKey {
 
     @Override
     public String toString() {
-        return "Institution{" +
-                "name='" + name + '\'' +
-                "} " + super.toString();
+        return "Institution{<" + uri +
+                ">, name='" + name + '\'' +
+                "}";
     }
 }
