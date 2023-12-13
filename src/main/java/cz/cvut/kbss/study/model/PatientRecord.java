@@ -1,6 +1,8 @@
 package cz.cvut.kbss.study.model;
 
 import cz.cvut.kbss.jopa.model.annotations.CascadeType;
+import cz.cvut.kbss.jopa.model.annotations.EnumType;
+import cz.cvut.kbss.jopa.model.annotations.Enumerated;
 import cz.cvut.kbss.jopa.model.annotations.FetchType;
 import cz.cvut.kbss.jopa.model.annotations.Id;
 import cz.cvut.kbss.jopa.model.annotations.OWLAnnotationProperty;
@@ -52,6 +54,10 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
     @OWLObjectProperty(iri = Vocabulary.s_p_has_question, cascade = {CascadeType.MERGE,
                                                                      CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private Question question;
+
+    @Enumerated(EnumType.OBJECT_ONE_OF)
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_phase)
+    private RecordPhase phase;
 
     @Override
     public URI getUri() {
@@ -136,12 +142,21 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
         this.formTemplate = formTemplate;
     }
 
+    public RecordPhase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(RecordPhase phase) {
+        this.phase = phase;
+    }
+
     @Override
     public String toString() {
         return "PatientRecord{<" + uri +
                 ">, localName=" + localName +
                 ", dateCreated=" + dateCreated +
                 ", institution=" + institution +
+                ", phase=" + phase +
                 "}";
     }
 }
