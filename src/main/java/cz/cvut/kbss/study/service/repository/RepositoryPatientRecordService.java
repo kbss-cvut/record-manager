@@ -56,13 +56,13 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Transactional(readOnly = true)
     @Override
     public List<PatientRecord> findAllFull(LocalDate minDate, LocalDate maxDate) {
-        return null;
+        return recordDao.findAllFull(minDate, maxDate);
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<PatientRecord> findAllFull(Institution institution, LocalDate minDate, LocalDate maxDate) {
-        return null;
+        return recordDao.findAllFull(institution, minDate, maxDate);
     }
 
     @Override
