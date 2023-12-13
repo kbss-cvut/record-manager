@@ -9,27 +9,33 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static cz.cvut.kbss.study.environment.util.ContainsSameEntities.containsSameEntities;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @ExtendWith(MockitoExtension.class)
 public class PatientRecordControllerTest extends BaseControllerTestRunner {
@@ -43,11 +49,14 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     @InjectMocks
     private PatientRecordController controller;
 
+    private User user;
+
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
+        institution.setKey(IdentificationUtils.generateKey());
+        this.user = Generator.generateUser(institution);
         Environment.setCurrentUser(user);
     }
 
@@ -64,13 +73,14 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     @Test
     public void getRecordReturnsFoundRecord() throws Exception {
         final String key = "12345";
-        PatientRecord patientRecord = Generator.generatePatientRecord(Environment.getCurrentUser());
+        PatientRecord patientRecord = Generator.generatePatientRecord(user);
         when(patientRecordServiceMock.findByKey(key)).thenReturn(patientRecord);
 
         final MvcResult result = mockMvc.perform(get("/records/" + key)).andReturn();
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
-        final PatientRecord res = objectMapper.readValue(result.getResponse().getContentAsString(), PatientRecord.class);
-        assertEquals(res.getUri(),patientRecord.getUri());
+        final PatientRecord res =
+                objectMapper.readValue(result.getResponse().getContentAsString(), PatientRecord.class);
+        assertEquals(res.getUri(), patientRecord.getUri());
         verify(patientRecordServiceMock).findByKey(key);
     }
 
@@ -82,8 +92,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<PatientRecord> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<PatientRecord>>() {
-                });
+                                                                new TypeReference<>() {
+                                                                });
         assertTrue(body.isEmpty());
     }
 
@@ -108,8 +118,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<PatientRecordDto> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<PatientRecordDto>>() {
-                });
+                                                                   new TypeReference<>() {
+                                                                   });
         assertEquals(3, body.size());
         verify(patientRecordServiceMock).findAllRecords();
     }
@@ -133,12 +143,13 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         when(institutionServiceMock.findByKey(institution.getKey())).thenReturn(institution);
         when(patientRecordServiceMock.findByInstitution(institution)).thenReturn(records);
         System.out.println(institution.getKey());
-        final MvcResult result = mockMvc.perform(get("/records").param("institution", institution.getKey())).andReturn();
+        final MvcResult result =
+                mockMvc.perform(get("/records").param("institution", institution.getKey())).andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<PatientRecordDto> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<PatientRecordDto>>() {
-                });
+                                                                   new TypeReference<>() {
+                                                                   });
         assertEquals(2, body.size());
         verify(institutionServiceMock).findByKey(institution.getKey());
     }
@@ -155,12 +166,11 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     @Test
     public void createRecordReturnsResponseStatusCreated() throws Exception {
-        Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
         PatientRecord record = Generator.generatePatientRecord(user);
 
         final MvcResult result = mockMvc.perform(post("/records").content(toJson(record))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                                                                 .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.CREATED, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
@@ -169,15 +179,14 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     public void updateRecordReturnsResponseStatusNoContent() throws Exception {
         final String key = "12345";
 
-        Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
         PatientRecord record = Generator.generatePatientRecord(user);
         record.setKey(key);
 
         when(patientRecordServiceMock.findByKey(key)).thenReturn(record);
 
         final MvcResult result = mockMvc.perform(put("/records/" + key).content(toJson(record))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                                                                       .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(patientRecordServiceMock).findByKey(key);
@@ -187,13 +196,12 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     public void updateRecordWithNonMatchingKeyReturnsResponseStatusBadRequest() throws Exception {
         final String key = "12345";
 
-        Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
         PatientRecord record = Generator.generatePatientRecord(user);
         record.setKey(key);
 
-        final MvcResult result = mockMvc.perform(put("/records/123456" ).content(toJson(record))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+        final MvcResult result = mockMvc.perform(put("/records/123456").content(toJson(record))
+                                                                       .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.BAD_REQUEST, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
@@ -202,15 +210,14 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     public void updateRecordReturnsResponseStatusNotFound() throws Exception {
         final String key = "12345";
 
-        Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
         PatientRecord record = Generator.generatePatientRecord(user);
         record.setKey(key);
 
         when(patientRecordServiceMock.findByKey(key)).thenReturn(null);
 
         final MvcResult result = mockMvc.perform(put("/records/" + key).content(toJson(record))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                                                                       .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(patientRecordServiceMock).findByKey(key);
@@ -220,17 +227,81 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     public void deleteRecordReturnsResponseStatusNoContent() throws Exception {
         final String key = "12345";
 
-        Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
         PatientRecord record = Generator.generatePatientRecord(user);
         record.setKey(key);
 
         when(patientRecordServiceMock.findByKey(key)).thenReturn(record);
 
-        final MvcResult result = mockMvc.perform(delete("/records/12345" )).andReturn();
+        final MvcResult result = mockMvc.perform(delete("/records/12345")).andReturn();
 
         assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(patientRecordServiceMock).findByKey(key);
     }
 
+    @Test
+    void exportRecordsParsesProvidedDateBoundsAndPassesThemToService() throws Exception {
+        final LocalDate minDate = LocalDate.now().minusDays(35);
+        final LocalDate maxDate = LocalDate.now().minusDays(5);
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        when(patientRecordServiceMock.findAllFull(any(), any())).thenReturn(records);
+
+        final MvcResult mvcResult = mockMvc.perform(get("/records/export")
+                                                            .param("minDate", minDate.toString())
+                                                            .param("maxDate", maxDate.toString()))
+                                           .andReturn();
+        final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
+        });
+        assertThat(result, containsSameEntities(records));
+        verify(patientRecordServiceMock).findAllFull(minDate, maxDate);
+    }
+
+    @Test
+    void exportRecordsUsesDefaultValuesForMinAndMaxDateWhenTheyAreNotProvidedByRequest() throws Exception {
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        when(patientRecordServiceMock.findAllFull(any(), any())).thenReturn(records);
+
+        final MvcResult mvcResult = mockMvc.perform(get("/records/export")).andReturn();
+        final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
+        });
+        assertThat(result, containsSameEntities(records));
+        verify(patientRecordServiceMock).findAllFull(LocalDate.EPOCH, LocalDate.now());
+    }
+
+    @Test
+    void exportRecordsExportsRecordsForProvidedInstitutionForSpecifiedPeriod() throws Exception {
+        final LocalDate minDate = LocalDate.now().minusDays(35);
+        final LocalDate maxDate = LocalDate.now().minusDays(5);
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        when(institutionServiceMock.findByKey(user.getInstitution().getKey())).thenReturn(user.getInstitution());
+        when(patientRecordServiceMock.findAllFull(any(), any(), any())).thenReturn(records);
+
+        final MvcResult mvcResult = mockMvc.perform(get("/records/export")
+                                                            .param("minDate", minDate.toString())
+                                                            .param("maxDate", maxDate.toString())
+                                                            .param("institution", user.getInstitution().getKey()))
+                                           .andReturn();
+        final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
+        });
+        assertThat(result, containsSameEntities(records));
+        verify(patientRecordServiceMock).findAllFull(user.getInstitution(), minDate, maxDate);
+    }
+
+    @Test
+    void exportRecordsExportsRecordsForProvidedInstitutionWithDefaultDatesWhenNoneAreProvided() throws Exception {
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        when(institutionServiceMock.findByKey(user.getInstitution().getKey())).thenReturn(user.getInstitution());
+        when(patientRecordServiceMock.findAllFull(any(), any(), any())).thenReturn(records);
+
+        final MvcResult mvcResult = mockMvc.perform(get("/records/export").
+                                                            param("institution", user.getInstitution().getKey()))
+                                           .andReturn();
+        final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
+        });
+        assertThat(result, containsSameEntities(records));
+        verify(patientRecordServiceMock).findAllFull(user.getInstitution(), LocalDate.EPOCH, LocalDate.now());
+    }
 }

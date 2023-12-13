@@ -19,6 +19,9 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 
@@ -163,5 +166,72 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
                                           "Local name of record is not unique for entity " + entity);
         }
         em.clear();
+    }
+
+    /**
+     * Retrieves records modified (created or modified) in the specified time interval.
+     * <p>
+     * Since the record modification is tracked by a timestamp and the arguments here are dates, this method uses
+     * beginning of the min date and end of the max date.
+     *
+     * @param minDate Minimum date of modification of matching records, inclusive
+     * @param maxDate Maximum date of modification of matching records, inclusive
+     * @return List of matching records
+     */
+    public List<PatientRecord> findAllFull(LocalDate minDate, LocalDate maxDate) {
+        Objects.requireNonNull(minDate);
+        Objects.requireNonNull(maxDate);
+
+        final Instant min = minDate.atStartOfDay(ZoneOffset.UTC).toInstant();
+        final Instant max = maxDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return em.createNativeQuery("SELECT ?r WHERE {" +
+                                            "?r a ?type ;" +
+                                            "?hasCreatedDate ?created ." +
+                                            "OPTIONAL { ?r ?hasLastModified ?lastModified . }" +
+                                            "BIND (IF (BOUND(?lastModified), ?lastModified, ?created) AS ?edited)" +
+                                            "FILTER (?edited >= ?minDate && ?edited < ?maxDate)" +
+                                            "} ORDER BY DESC(?edited)", PatientRecord.class)
+                 .setParameter("type", typeUri)
+                 .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
+                 .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified))
+                 .setParameter("minDate", min)
+                 .setParameter("maxDate", max).getResultList();
+    }
+
+    /**
+     * Retrieves records modified (created or modified) in the specified time interval.
+     * <p>
+     * Since the record modification is tracked by a timestamp and the arguments here are dates, this method uses
+     * beginning of the min date and end of the max date.
+     *
+     * @param institution Institution with which matching records have to be associated
+     * @param minDate     Minimum date of modification of matching records, inclusive
+     * @param maxDate     Maximum date of modification of matching records, inclusive
+     * @return List of matching records
+     */
+    public List<PatientRecord> findAllFull(Institution institution, LocalDate minDate, LocalDate maxDate) {
+        Objects.requireNonNull(institution);
+        Objects.requireNonNull(minDate);
+        Objects.requireNonNull(maxDate);
+
+        final Instant min = minDate.atStartOfDay(ZoneOffset.UTC).toInstant();
+        final Instant max = maxDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return em.createNativeQuery("SELECT ?r WHERE {" +
+                                            "?r a ?type ; " +
+                                            "?hasCreatedDate ?created ; " +
+                                            "?hasInstitution ?institution . " +
+                                            "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
+                                            "BIND (IF (BOUND(?lastModified), ?lastModified, ?created) AS ?edited) " +
+                                            "FILTER (?edited >= ?minDate && ?edited < ?maxDate)" +
+                                            "} ORDER BY DESC(?edited)", PatientRecord.class)
+                 .setParameter("type", typeUri)
+                 .setParameter("hasInstitution", URI.create(Vocabulary.s_p_was_treated_at))
+                 .setParameter("institution", institution)
+                 .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
+                 .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified))
+                 .setParameter("minDate", min)
+                 .setParameter("maxDate", max).getResultList();
     }
 }
