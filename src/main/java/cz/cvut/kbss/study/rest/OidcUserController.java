@@ -66,7 +66,7 @@ public class OidcUserController extends BaseController {
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
     @PutMapping(value = "/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUserInstitution(@PathVariable("username") String username, @RequestBody User user,
+    public void updateUser(@PathVariable("username") String username, @RequestBody User user,
                                       @RequestParam(value = "email", defaultValue = "true") boolean sendEmail) {
         if (!username.equals(user.getUsername())) {
             throw new BadRequestException("The passed user's username is different from the specified one.");
