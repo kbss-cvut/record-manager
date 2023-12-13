@@ -10,7 +10,9 @@ public enum RecordPhase {
     @Individual(iri = Vocabulary.s_c_completed_record_phase)
     completed(Vocabulary.s_c_completed_record_phase),
     @Individual(iri = Vocabulary.s_c_published_record_phase)
-    published(Vocabulary.s_c_published_record_phase);
+    published(Vocabulary.s_c_published_record_phase),
+    @Individual(iri = Vocabulary.s_c_rejected_record_phase)
+    rejected(Vocabulary.s_c_rejected_record_phase);
 
     private final String iri;
 
