@@ -9,7 +9,6 @@ import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
@@ -45,6 +46,17 @@ public class PatientRecordController extends BaseController {
             throw NotFoundException.create("Institution", institutionKey);
         }
         return recordService.findByInstitution(institution);
+    }
+
+    @PreAuthorize(
+            "hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
+    @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<PatientRecord> exportRecords(
+            @RequestParam(value = "institution", required = false) String institutionKey,
+            @RequestParam(name = "minDate", required = false) Optional<LocalDate> minDate,
+            @RequestParam(name = "maxDate", required = false) Optional<LocalDate> maxDate) {
+        // TODO
+        return null;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")

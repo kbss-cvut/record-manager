@@ -1,16 +1,17 @@
 package cz.cvut.kbss.study.rest.util;
 
-import cz.cvut.kbss.study.exception.WebServiceIntegrationException;
-import cz.cvut.kbss.study.util.Constants;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class RestUtils {
 
@@ -79,4 +80,22 @@ public class RestUtils {
         }
         return null;
     }
+
+    /**
+     * Parses the specified date string.
+     * <p>
+     * The parameter is expected to be in the ISO format.
+     *
+     * @param dateStr Date string
+     * @return {@code LocalDate} object corresponding to the specified date string
+     * @throws ResponseStatusException Bad request is thrown if the date string is not parseable
+     */
+    public static LocalDate parseDate(String dateStr) {
+        try {
+            return LocalDate.parse(dateStr);
+        } catch (DateTimeParseException | NullPointerException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Value '" + dateStr + "' is not a valid date in ISO format.");
+        }
+    }
+
 }

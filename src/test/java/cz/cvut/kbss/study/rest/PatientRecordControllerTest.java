@@ -232,5 +232,4 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(patientRecordServiceMock).findByKey(key);
     }
-
 }
