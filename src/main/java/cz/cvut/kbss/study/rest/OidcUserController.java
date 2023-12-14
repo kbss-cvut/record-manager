@@ -102,7 +102,7 @@ public class OidcUserController extends BaseController {
      * @return the URI of the entity or null if entity is null.
      */
     private URI getURI(HasUri entity){
-        return Optional.of(entity).map(HasUri::getUri).orElse(null);
+        return Optional.ofNullable(entity).map(HasUri::getUri).orElse(null);
     }
 
     private List<User> getByInstitution(String institutionKey) {
