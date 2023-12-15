@@ -6,19 +6,32 @@ import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
 import cz.cvut.kbss.jopa.model.metamodel.EntityType;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
+import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.qam.Answer;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.IntStream;
 
+import static cz.cvut.kbss.study.environment.util.ContainsSameEntities.containsSameEntities;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PatientRecordDaoTest extends BaseDaoTestRunner {
@@ -230,5 +243,83 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         assertNotNull(result);
         assertEquals(record.getUri(), result.getUri());
         assertNotNull(result.getQuestion());
+    }
+
+    private void persistRecordWithIdentification(PatientRecord record) {
+        record.setKey(IdentificationUtils.generateKey());
+        record.setUri(PatientRecordDao.generateRecordUriFromKey(record.getKey()));
+        em.persist(record, getDescriptor(record));
+    }
+
+    @Test
+    void findAllFullReturnsRecordsMatchingSpecifiedDatePeriod() {
+        final User author = generateAuthorWithInstitution();
+        final List<PatientRecord> allRecords = generateRecordsForAuthor(author);
+        transactional(() -> allRecords.forEach(this::persistRecordWithIdentification));
+        final LocalDate minDate = LocalDate.now().minusDays(3);
+        final LocalDate maxDate = LocalDate.now().minusDays(1);
+        final List<PatientRecord> expected = allRecords.stream().filter(r -> {
+            final Date modified = r.getLastModified() != null ? r.getLastModified() : r.getDateCreated();
+            final LocalDate modifiedDate = modified.toInstant().atZone(ZoneOffset.UTC).toLocalDate();
+            return !modifiedDate.isBefore(minDate) && !modifiedDate.isAfter(maxDate);
+        }).toList();
+
+        final List<PatientRecord> result =
+                sut.findAllFull(new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()));
+        assertFalse(result.isEmpty());
+        assertThat(result, containsSameEntities(expected));
+    }
+
+    private List<PatientRecord> generateRecordsForAuthor(User author) {
+        return IntStream.range(0, 5).mapToObj(i -> {
+            final PatientRecord r = Generator.generatePatientRecord(author);
+            if (Generator.randomBoolean()) {
+                r.setDateCreated(new Date(System.currentTimeMillis() - i * Environment.MILLIS_PER_DAY));
+            } else {
+                r.setDateCreated(new Date(System.currentTimeMillis() - 365 * Environment.MILLIS_PER_DAY));
+                r.setLastModified(new Date(System.currentTimeMillis() - i * Environment.MILLIS_PER_DAY));
+            }
+            return r;
+        }).toList();
+    }
+
+    @Test
+    void findAllFullReturnsRecordsMatchingSpecifiedDatePeriodAndInstitution() {
+        final User authorOne = generateAuthorWithInstitution();
+        final Institution institution = authorOne.getInstitution();
+        final User authorTwo = generateAuthorWithInstitution();
+        final List<PatientRecord> allRecords = new ArrayList<>(generateRecordsForAuthor(authorOne));
+        allRecords.addAll(generateRecordsForAuthor(authorTwo));
+        transactional(() -> allRecords.forEach(this::persistRecordWithIdentification));
+        final LocalDate minDate = LocalDate.now().minusDays(3);
+        final LocalDate maxDate = LocalDate.now().minusDays(1);
+        final List<PatientRecord> expected = allRecords.stream().filter(r -> {
+            final Date modified = r.getLastModified() != null ? r.getLastModified() : r.getDateCreated();
+            final LocalDate modifiedDate = modified.toInstant().atZone(ZoneOffset.UTC).toLocalDate();
+            return !modifiedDate.isBefore(minDate) && !modifiedDate.isAfter(maxDate) && r.getInstitution().getUri()
+                                                                                         .equals(institution.getUri());
+        }).toList();
+
+        final List<PatientRecord> result =
+                sut.findAllFull(new RecordFilterParams(institution.getKey(), minDate, maxDate, Collections.emptySet()));
+        assertFalse(result.isEmpty());
+        assertThat(result, containsSameEntities(expected));
+    }
+
+    @Test
+    void findAllFullReturnsRecordsMatchingSpecifiedPhase() {
+        final User author = generateAuthorWithInstitution();
+        final List<PatientRecord> allRecords = generateRecordsForAuthor(author);
+        transactional(() -> allRecords.forEach(r -> {
+            r.setPhase(RecordPhase.values()[Generator.randomInt(RecordPhase.values().length)]);
+            persistRecordWithIdentification(r);
+        }));
+        final RecordPhase phase = allRecords.get(Generator.randomIndex(allRecords)).getPhase();
+        final RecordFilterParams filterParams = new RecordFilterParams();
+        filterParams.setPhaseIds(Set.of(phase.getIri()));
+
+        final List<PatientRecord> result = sut.findAllFull(filterParams);
+        assertFalse(result.isEmpty());
+        result.forEach(res -> assertEquals(phase, res.getPhase()));
     }
 }

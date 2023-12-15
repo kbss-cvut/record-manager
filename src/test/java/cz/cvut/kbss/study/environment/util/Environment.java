@@ -21,6 +21,8 @@ public class Environment {
 
     private static ObjectMapper objectMapper;
 
+    public static long MILLIS_PER_DAY = 24 * 3600 * 1000L;
+
     private Environment() {
         throw new AssertionError();
     }

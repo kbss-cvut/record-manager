@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 
 import java.util.List;
 
@@ -39,4 +40,15 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @return Records of matching patients
      */
     List<PatientRecordDto> findAllRecords();
+
+    /**
+     * Finds all records that match the specified parameters.
+     * <p>
+     * In contrast to {@link #findAll()}, this method returns full records, not DTOs.
+     *
+     * @param filterParams Record filtering criteria
+     * @return List of matching records
+     * @see #findAllRecords()
+     */
+    List<PatientRecord> findAllFull(RecordFilterParams filterParams);
 }
