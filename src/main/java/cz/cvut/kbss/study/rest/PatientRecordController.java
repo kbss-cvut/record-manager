@@ -5,6 +5,7 @@ import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
+import cz.cvut.kbss.study.rest.util.RecordFilterMapper;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.InstitutionService;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,9 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
@@ -63,15 +63,9 @@ public class PatientRecordController extends BaseController {
             "hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecord> exportRecords(
-            @RequestParam(value = "institution", required = false) String institutionKey,
-            @RequestParam(name = "minDate", required = false) Optional<LocalDate> minDateParam,
-            @RequestParam(name = "maxDate", required = false) Optional<LocalDate> maxDateParam) {
-        final LocalDate minDate = minDateParam.orElse(LocalDate.EPOCH);
-        final LocalDate maxDate = maxDateParam.orElse(LocalDate.now());
-        if (institutionKey != null) {
-            return recordService.findAllFull(getInstitution(institutionKey), minDate, maxDate);
-        }
-        return recordService.findAllFull(minDate, maxDate);
+            @RequestParam(name = "institutionKey", required = false) String institutionKey,
+            @RequestParam MultiValueMap<String, String> params) {
+        return recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params));
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")

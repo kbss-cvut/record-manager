@@ -5,6 +5,8 @@ import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
 import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
 import cz.cvut.kbss.jopa.model.metamodel.EntityType;
+import cz.cvut.kbss.jopa.model.query.TypedQuery;
+import cz.cvut.kbss.ontodriver.model.LangString;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.exception.PersistenceException;
 import cz.cvut.kbss.study.exception.ValidationException;
@@ -13,17 +15,20 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.net.URI;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Repository
 public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
@@ -169,69 +174,58 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     }
 
     /**
-     * Retrieves records modified (created or modified) in the specified time interval.
+     * Retrieves records matching the specified filtering criteria.
      * <p>
-     * Since the record modification is tracked by a timestamp and the arguments here are dates, this method uses
+     * Note that since the record modification is tracked by a timestamp and the filter uses dates, this method uses
      * beginning of the min date and end of the max date.
      *
-     * @param minDate Minimum date of modification of matching records, inclusive
-     * @param maxDate Maximum date of modification of matching records, inclusive
+     * @param filterParams Record filtering criteria
      * @return List of matching records
      */
-    public List<PatientRecord> findAllFull(LocalDate minDate, LocalDate maxDate) {
-        Objects.requireNonNull(minDate);
-        Objects.requireNonNull(maxDate);
+    public List<PatientRecord> findAllFull(RecordFilterParams filterParams) {
+        Objects.requireNonNull(filterParams);
+        // Could not use Criteria API because it does not support OPTIONAL
+        String queryString = "SELECT ?r WHERE {" +
+                "?r a ?type ; " +
+                "?hasCreatedDate ?created ; " +
+                "?hasInstitution ?institution . " +
+                "?institution ?hasKey ?institutionKey ." +
+                "OPTIONAL { ?r ?hasPhase ?phase . } " +
+                "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
+                "BIND (IF (BOUND(?lastModified), ?lastModified, ?created) AS ?edited) ";
+        final Map<String, Object> queryParams = new HashMap<>();
+        queryString += mapParamsToQuery(filterParams, queryParams);
+        queryString += "} ORDER BY ?edited";
 
-        final Instant min = minDate.atStartOfDay(ZoneOffset.UTC).toInstant();
-        final Instant max = maxDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
-        return em.createNativeQuery("SELECT ?r WHERE {" +
-                                            "?r a ?type ;" +
-                                            "?hasCreatedDate ?created ." +
-                                            "OPTIONAL { ?r ?hasLastModified ?lastModified . }" +
-                                            "BIND (IF (BOUND(?lastModified), ?lastModified, ?created) AS ?edited)" +
-                                            "FILTER (?edited >= ?minDate && ?edited < ?maxDate)" +
-                                            "} ORDER BY DESC(?edited)", PatientRecord.class)
-                 .setParameter("type", typeUri)
-                 .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
-                 .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified))
-                 .setParameter("minDate", min)
-                 .setParameter("maxDate", max).getResultList();
+        final TypedQuery<PatientRecord> query = em.createNativeQuery(queryString, PatientRecord.class)
+                                                  .setParameter("type", typeUri)
+                                                  .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
+                                                  .setParameter("hasInstitution",
+                                                                URI.create(Vocabulary.s_p_was_treated_at))
+                                                  .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
+                                                  .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
+                                                  .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified));
+        queryParams.forEach(query::setParameter);
+        return query.getResultList();
     }
 
-    /**
-     * Retrieves records modified (created or modified) in the specified time interval.
-     * <p>
-     * Since the record modification is tracked by a timestamp and the arguments here are dates, this method uses
-     * beginning of the min date and end of the max date.
-     *
-     * @param institution Institution with which matching records have to be associated
-     * @param minDate     Minimum date of modification of matching records, inclusive
-     * @param maxDate     Maximum date of modification of matching records, inclusive
-     * @return List of matching records
-     */
-    public List<PatientRecord> findAllFull(Institution institution, LocalDate minDate, LocalDate maxDate) {
-        Objects.requireNonNull(institution);
-        Objects.requireNonNull(minDate);
-        Objects.requireNonNull(maxDate);
-
-        final Instant min = minDate.atStartOfDay(ZoneOffset.UTC).toInstant();
-        final Instant max = maxDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
-        return em.createNativeQuery("SELECT ?r WHERE {" +
-                                            "?r a ?type ; " +
-                                            "?hasCreatedDate ?created ; " +
-                                            "?hasInstitution ?institution . " +
-                                            "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
-                                            "BIND (IF (BOUND(?lastModified), ?lastModified, ?created) AS ?edited) " +
-                                            "FILTER (?edited >= ?minDate && ?edited < ?maxDate)" +
-                                            "} ORDER BY DESC(?edited)", PatientRecord.class)
-                 .setParameter("type", typeUri)
-                 .setParameter("hasInstitution", URI.create(Vocabulary.s_p_was_treated_at))
-                 .setParameter("institution", institution)
-                 .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
-                 .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified))
-                 .setParameter("minDate", min)
-                 .setParameter("maxDate", max).getResultList();
+    private static String mapParamsToQuery(RecordFilterParams filterParams, Map<String, Object> queryParams) {
+        final List<String> filters = new ArrayList<>();
+        filterParams.getInstitutionKey()
+                    .ifPresent(key -> queryParams.put("institutionKey", new LangString(key, Constants.PU_LANGUAGE)));
+        filterParams.getMinModifiedDate().ifPresent(date -> {
+            filters.add("FILTER (?edited >= ?minDate)");
+            queryParams.put("minDate", date.atStartOfDay(ZoneOffset.UTC).toInstant());
+        });
+        filterParams.getMaxModifiedDate().ifPresent(date -> {
+            filters.add("FILTER (?edited < ?maxDate)");
+            queryParams.put("maxDate", date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant());
+        });
+        if (!filterParams.getPhaseIds().isEmpty()) {
+            filters.add("FILTER (?phase in (?phases))");
+            queryParams.put("phases",
+                            filterParams.getPhaseIds().stream().map(URI::create).collect(Collectors.toList()));
+        }
+        return String.join(" ", filters);
     }
 }

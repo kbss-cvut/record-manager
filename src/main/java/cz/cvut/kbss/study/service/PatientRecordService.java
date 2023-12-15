@@ -4,8 +4,8 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface PatientRecordService extends BaseService<PatientRecord> {
@@ -42,29 +42,13 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
     List<PatientRecordDto> findAllRecords();
 
     /**
-     * Finds all records that were created or modified in the specified date interval.
+     * Finds all records that match the specified parameters.
      * <p>
      * In contrast to {@link #findAll()}, this method returns full records, not DTOs.
      *
-     * @param minDate Minimum date of modification of returned records, inclusive
-     * @param maxDate Maximum date of modification of returned records, inclusive
+     * @param filterParams Record filtering criteria
      * @return List of matching records
-     * @see #findAllFull(Institution, LocalDate, LocalDate)
      * @see #findAllRecords()
      */
-    List<PatientRecord> findAllFull(LocalDate minDate, LocalDate maxDate);
-
-    /**
-     * Finds all records that were created or modified at the specified institution in the specified date interval.
-     * <p>
-     * In contrast to {@link #findByInstitution(Institution)}, this method returns full records, not DTOs.
-     *
-     * @param institution Institution with which the records are associated
-     * @param minDate     Minimum date of modification of returned records, inclusive
-     * @param maxDate     Maximum date of modification of returned records, inclusive
-     * @return List of matching records
-     * @see #findAllFull(LocalDate, LocalDate)
-     * @see #findByInstitution(Institution)
-     */
-    List<PatientRecord> findAllFull(Institution institution, LocalDate minDate, LocalDate maxDate);
+    List<PatientRecord> findAllFull(RecordFilterParams filterParams);
 }

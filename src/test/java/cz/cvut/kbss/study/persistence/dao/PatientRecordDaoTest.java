@@ -9,10 +9,12 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.qam.Answer;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static cz.cvut.kbss.study.environment.util.ContainsSameEntities.containsSameEntities;
@@ -260,7 +264,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             return !modifiedDate.isBefore(minDate) && !modifiedDate.isAfter(maxDate);
         }).toList();
 
-        final List<PatientRecord> result = sut.findAllFull(minDate, maxDate);
+        final List<PatientRecord> result =
+                sut.findAllFull(new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()));
         assertFalse(result.isEmpty());
         assertThat(result, containsSameEntities(expected));
     }
@@ -295,8 +300,26 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
                                                                                          .equals(institution.getUri());
         }).toList();
 
-        final List<PatientRecord> result = sut.findAllFull(institution, minDate, maxDate);
+        final List<PatientRecord> result =
+                sut.findAllFull(new RecordFilterParams(institution.getKey(), minDate, maxDate, Collections.emptySet()));
         assertFalse(result.isEmpty());
         assertThat(result, containsSameEntities(expected));
+    }
+
+    @Test
+    void findAllFullReturnsRecordsMatchingSpecifiedPhase() {
+        final User author = generateAuthorWithInstitution();
+        final List<PatientRecord> allRecords = generateRecordsForAuthor(author);
+        transactional(() -> allRecords.forEach(r -> {
+            r.setPhase(RecordPhase.values()[Generator.randomInt(RecordPhase.values().length)]);
+            persistRecordWithIdentification(r);
+        }));
+        final RecordPhase phase = allRecords.get(Generator.randomIndex(allRecords)).getPhase();
+        final RecordFilterParams filterParams = new RecordFilterParams();
+        filterParams.setPhaseIds(Set.of(phase.getIri()));
+
+        final List<PatientRecord> result = sut.findAllFull(filterParams);
+        assertFalse(result.isEmpty());
+        result.forEach(res -> assertEquals(phase, res.getPhase()));
     }
 }

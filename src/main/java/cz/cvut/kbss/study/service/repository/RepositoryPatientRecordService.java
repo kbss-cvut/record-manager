@@ -6,6 +6,7 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.IdentificationUtils;
@@ -55,14 +56,8 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
 
     @Transactional(readOnly = true)
     @Override
-    public List<PatientRecord> findAllFull(LocalDate minDate, LocalDate maxDate) {
-        return recordDao.findAllFull(minDate, maxDate);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<PatientRecord> findAllFull(Institution institution, LocalDate minDate, LocalDate maxDate) {
-        return recordDao.findAllFull(institution, minDate, maxDate);
+    public List<PatientRecord> findAllFull(RecordFilterParams filterParams) {
+        return recordDao.findAllFull(filterParams);
     }
 
     @Override

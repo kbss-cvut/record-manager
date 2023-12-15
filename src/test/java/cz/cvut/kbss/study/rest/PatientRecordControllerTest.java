@@ -7,6 +7,7 @@ import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.util.IdentificationUtils;
@@ -244,7 +245,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final LocalDate maxDate = LocalDate.now().minusDays(5);
         final List<PatientRecord> records =
                 List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
-        when(patientRecordServiceMock.findAllFull(any(), any())).thenReturn(records);
+        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class))).thenReturn(records);
 
         final MvcResult mvcResult = mockMvc.perform(get("/records/export")
                                                             .param("minDate", minDate.toString())
@@ -253,20 +254,21 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
         });
         assertThat(result, containsSameEntities(records));
-        verify(patientRecordServiceMock).findAllFull(minDate, maxDate);
+        verify(patientRecordServiceMock).findAllFull(
+                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()));
     }
 
     @Test
     void exportRecordsUsesDefaultValuesForMinAndMaxDateWhenTheyAreNotProvidedByRequest() throws Exception {
         final List<PatientRecord> records =
                 List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
-        when(patientRecordServiceMock.findAllFull(any(), any())).thenReturn(records);
+        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class))).thenReturn(records);
 
         final MvcResult mvcResult = mockMvc.perform(get("/records/export")).andReturn();
         final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
         });
         assertThat(result, containsSameEntities(records));
-        verify(patientRecordServiceMock).findAllFull(LocalDate.EPOCH, LocalDate.now());
+        verify(patientRecordServiceMock).findAllFull(new RecordFilterParams());
     }
 
     @Test
@@ -275,8 +277,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final LocalDate maxDate = LocalDate.now().minusDays(5);
         final List<PatientRecord> records =
                 List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
-        when(institutionServiceMock.findByKey(user.getInstitution().getKey())).thenReturn(user.getInstitution());
-        when(patientRecordServiceMock.findAllFull(any(), any(), any())).thenReturn(records);
+        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class))).thenReturn(records);
 
         final MvcResult mvcResult = mockMvc.perform(get("/records/export")
                                                             .param("minDate", minDate.toString())
@@ -286,22 +287,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
         });
         assertThat(result, containsSameEntities(records));
-        verify(patientRecordServiceMock).findAllFull(user.getInstitution(), minDate, maxDate);
-    }
-
-    @Test
-    void exportRecordsExportsRecordsForProvidedInstitutionWithDefaultDatesWhenNoneAreProvided() throws Exception {
-        final List<PatientRecord> records =
-                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
-        when(institutionServiceMock.findByKey(user.getInstitution().getKey())).thenReturn(user.getInstitution());
-        when(patientRecordServiceMock.findAllFull(any(), any(), any())).thenReturn(records);
-
-        final MvcResult mvcResult = mockMvc.perform(get("/records/export").
-                                                            param("institution", user.getInstitution().getKey()))
-                                           .andReturn();
-        final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
-        });
-        assertThat(result, containsSameEntities(records));
-        verify(patientRecordServiceMock).findAllFull(user.getInstitution(), LocalDate.EPOCH, LocalDate.now());
+        verify(patientRecordServiceMock).findAllFull(
+                new RecordFilterParams(user.getInstitution().getKey(), minDate, maxDate, Collections.emptySet()));
     }
 }
