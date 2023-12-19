@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
@@ -74,5 +75,12 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         instance.setLastModifiedBy(securityUtils.getCurrentUser());
         instance.setLastModified(new Date());
         recordDao.requireUniqueNonEmptyLocalName(instance);
+    }
+
+    @Transactional
+    @Override
+    public RecordImportResult importRecords(List<PatientRecord> records) {
+        // TODO
+        return null;
     }
 }

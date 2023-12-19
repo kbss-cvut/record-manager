@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
@@ -92,6 +93,13 @@ public class PatientRecordController extends BaseController {
         final String key = record.getKey();
         final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/{key}", key);
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public RecordImportResult importRecords(@RequestBody List<PatientRecord> records) {
+        final RecordImportResult result = recordService.importRecords(records);
+        LOG.trace("Records imported with result: {}.", result);
+        return result;
     }
 
     @PutMapping(value = "/{key}", consumes = MediaType.APPLICATION_JSON_VALUE)

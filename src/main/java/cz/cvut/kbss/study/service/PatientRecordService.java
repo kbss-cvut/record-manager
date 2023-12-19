@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
@@ -51,4 +52,16 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @see #findAllRecords()
      */
     List<PatientRecord> findAllFull(RecordFilterParams filterParams);
+
+    /**
+     * Imports the specified records.
+     * <p>
+     * The current user is set as the author of the records. Only records whose identifiers do not already exist in the
+     * repository are imported. Existing records are skipped and the returned object contains a note that the record
+     * already exists.
+     *
+     * @param records Records to import
+     * @return Instance representing the import result
+     */
+    RecordImportResult importRecords(List<PatientRecord> records);
 }

@@ -2,6 +2,7 @@ package cz.cvut.kbss.study.rest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
@@ -14,6 +15,7 @@ import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,9 +30,13 @@ import java.util.List;
 
 import static cz.cvut.kbss.study.environment.util.ContainsSameEntities.containsSameEntities;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.anyOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -289,5 +295,24 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
                 new RecordFilterParams(user.getInstitution().getKey(), minDate, maxDate, Collections.emptySet()));
+    }
+
+    @Test
+    void importRecordsImportsSpecifiedRecordsAndReturnsImportResult() throws Exception {
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        final RecordImportResult importResult = new RecordImportResult(records.size());
+        importResult.setImportedCount(records.size());
+        when(patientRecordServiceMock.importRecords(anyList())).thenReturn(importResult);
+
+        final MvcResult mvcResult = mockMvc.perform(
+                post("/records/import").content(toJson(records)).contentType(MediaType.APPLICATION_JSON)).andReturn();
+        final RecordImportResult result = readValue(mvcResult, RecordImportResult.class);
+        assertEquals(importResult.getTotalCount(), result.getTotalCount());
+        assertEquals(importResult.getImportedCount(), result.getImportedCount());
+        assertThat(importResult.getErrors(), anyOf(nullValue(), empty()));
+        final ArgumentCaptor<List<PatientRecord>> captor = ArgumentCaptor.forClass(List.class);
+        verify(patientRecordServiceMock).importRecords(captor.capture());
+        assertEquals(records.size(), captor.getValue().size());
     }
 }
