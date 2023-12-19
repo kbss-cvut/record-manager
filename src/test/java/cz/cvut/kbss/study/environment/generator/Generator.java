@@ -170,6 +170,7 @@ public class Generator {
         rec.setLocalName("RandomRecord" + randomInt());
         rec.setUri(generateUri());
         rec.setInstitution(author.getInstitution());
+        rec.setPhase(RecordPhase.values()[Generator.randomInt(0, RecordPhase.values().length)]);
         return rec;
     }
 

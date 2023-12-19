@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 
@@ -59,9 +60,24 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * The current user is set as the author of the records. Only records whose identifiers do not already exist in the
      * repository are imported. Existing records are skipped and the returned object contains a note that the record
      * already exists.
+     * <p>
+     * This method, in contrast to {@link #importRecords(List, RecordPhase)}, preserves the phase of the imported
+     * records.
      *
      * @param records Records to import
      * @return Instance representing the import result
      */
     RecordImportResult importRecords(List<PatientRecord> records);
+
+    /**
+     * Imports the specified records and sets them all to the specified phase.
+     * <p>
+     * The current user is set as the author of the records. Only records whose identifiers do not already exist in the
+     * repository are imported. Existing records are skipped and the returned object contains a note that the record
+     * already exists.
+     *
+     * @param records Records to import
+     * @return Instance representing the import result
+     */
+    RecordImportResult importRecords(List<PatientRecord> records, RecordPhase targetPhase);
 }

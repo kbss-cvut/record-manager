@@ -7,6 +7,7 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.InstitutionService;
@@ -30,19 +31,21 @@ import java.util.List;
 
 import static cz.cvut.kbss.study.environment.util.ContainsSameEntities.containsSameEntities;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.anyOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class PatientRecordControllerTest extends BaseControllerTestRunner {
@@ -314,5 +317,19 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final ArgumentCaptor<List<PatientRecord>> captor = ArgumentCaptor.forClass(List.class);
         verify(patientRecordServiceMock).importRecords(captor.capture());
         assertEquals(records.size(), captor.getValue().size());
+    }
+
+    @Test
+    void importRecordsImportsSpecifiedRecordsWithSpecifiedPhaseAndReturnsImportResult() throws Exception {
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        final RecordImportResult importResult = new RecordImportResult(records.size());
+        importResult.setImportedCount(records.size());
+        final RecordPhase targetPhase = RecordPhase.values()[Generator.randomInt(0, RecordPhase.values().length)];
+        when(patientRecordServiceMock.importRecords(anyList(), any(RecordPhase.class))).thenReturn(importResult);
+
+        mockMvc.perform(post("/records/import").content(toJson(records)).contentType(MediaType.APPLICATION_JSON)
+                                               .param("phase", targetPhase.getIri())).andExpect(status().isOk());
+        verify(patientRecordServiceMock).importRecords(anyList(), eq(targetPhase));
     }
 }

@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
@@ -102,5 +103,14 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
             }
         });
         return result;
+    }
+
+    @Transactional
+    @Override
+    public RecordImportResult importRecords(List<PatientRecord> records, RecordPhase targetPhase) {
+        Objects.requireNonNull(records);
+        LOG.debug("Importing records to target phase '{}'.", targetPhase);
+        records.forEach(r -> r.setPhase(targetPhase));
+        return importRecords(records);
     }
 }
