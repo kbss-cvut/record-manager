@@ -2,7 +2,11 @@ package cz.cvut.kbss.study.util;
 
 import cz.cvut.kbss.study.exception.RecordManagerException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -42,5 +46,15 @@ public class Utils {
             containsQueryString = true;
         }
         return URI.create(sb.toString());
+    }
+
+    /**
+     * Returns specified URI enclosed in &lt; and &gt;.
+     *
+     * @param uri URI to stringify
+     * @return URI in angle brackets
+     */
+    public static String uriToString(URI uri) {
+        return "<" + uri + ">";
     }
 }

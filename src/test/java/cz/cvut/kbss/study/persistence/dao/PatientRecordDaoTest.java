@@ -19,6 +19,7 @@ import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -321,5 +322,22 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         final List<PatientRecord> result = sut.findAllFull(filterParams);
         assertFalse(result.isEmpty());
         result.forEach(res -> assertEquals(phase, res.getPhase()));
+    }
+
+    @Test
+    void persistDoesNotGenerateIdentificationWhenRecordAlreadyHasIt() {
+        final User author = generateAuthorWithInstitution();
+        final PatientRecord record = Generator.generatePatientRecord(author);
+        final String key = IdentificationUtils.generateKey();
+        record.setKey(key);
+        final URI uri = Generator.generateUri();
+        record.setUri(uri);
+
+        transactional(() -> sut.persist(record));
+
+        final PatientRecord result = em.find(PatientRecord.class, uri);
+        assertNotNull(result);
+        assertEquals(uri, result.getUri());
+        assertEquals(key, result.getKey());
     }
 }

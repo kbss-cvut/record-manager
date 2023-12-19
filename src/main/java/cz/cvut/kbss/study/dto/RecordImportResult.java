@@ -46,6 +46,10 @@ public class RecordImportResult {
         this.importedCount = importedCount;
     }
 
+    public void incrementImportedCount() {
+        this.importedCount++;
+    }
+
     public List<String> getErrors() {
         return errors;
     }
