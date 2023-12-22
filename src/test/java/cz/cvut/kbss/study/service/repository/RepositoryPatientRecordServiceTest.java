@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -62,13 +63,7 @@ class RepositoryPatientRecordServiceTest {
     @Test
     void importRecordsSetsCurrentUserAsAuthorWhenTheyAreRegularUserAndImportsSpecifiedRecords() {
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
-        final List<PatientRecord> toImport =
-                List.of(Generator.generatePatientRecord(originalAuthor), Generator.generatePatientRecord(originalAuthor));
-        toImport.forEach(r -> {
-            // Simulate that the records existed in another deployment from which they are imported
-            r.setKey(IdentificationUtils.generateKey());
-            r.setDateCreated(new Date(System.currentTimeMillis() - 10000L));
-        });
+        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         when(recordDao.exists(any())).thenReturn(false);
 
         final RecordImportResult result = sut.importRecords(toImport);
@@ -87,9 +82,7 @@ class RepositoryPatientRecordServiceTest {
         }
     }
 
-    @Test
-    void importRecordsRetainsRecordProvenanceDataWhenCurrentUserIsAdmin() {
-        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+    private List<PatientRecord> generateRecordsToImport(User originalAuthor) {
         final List<PatientRecord> toImport =
                 List.of(Generator.generatePatientRecord(originalAuthor), Generator.generatePatientRecord(originalAuthor));
         toImport.forEach(r -> {
@@ -97,6 +90,13 @@ class RepositoryPatientRecordServiceTest {
             r.setKey(IdentificationUtils.generateKey());
             r.setDateCreated(new Date(System.currentTimeMillis() - 10000L));
         });
+        return toImport;
+    }
+
+    @Test
+    void importRecordsRetainsRecordProvenanceDataWhenCurrentUserIsAdmin() {
+        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         user.addType(Vocabulary.s_c_administrator);
         Environment.setCurrentUser(user);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
@@ -112,19 +112,14 @@ class RepositoryPatientRecordServiceTest {
             assertEquals(toImport.get(i).getKey(), imported.get(i).getKey());
             assertEquals(originalAuthor, imported.get(i).getAuthor());
             assertEquals(toImport.get(i).getDateCreated(), imported.get(i).getDateCreated());
+            assertEquals(toImport.get(i).getPhase(), imported.get(i).getPhase());
         }
     }
 
     @Test
     void importRecordsThrowsRecordAuthorNotFoundExceptionWhenAdminImportsRecordsAndRecordAuthorIsNotFound() {
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
-        final List<PatientRecord> toImport =
-                List.of(Generator.generatePatientRecord(originalAuthor), Generator.generatePatientRecord(originalAuthor));
-        toImport.forEach(r -> {
-            // Simulate that the records existed in another deployment from which they are imported
-            r.setKey(IdentificationUtils.generateKey());
-            r.setDateCreated(new Date(System.currentTimeMillis() - 10000L));
-        });
+        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         user.addType(Vocabulary.s_c_administrator);
         Environment.setCurrentUser(user);
 
@@ -133,17 +128,11 @@ class RepositoryPatientRecordServiceTest {
 
     @Test
     void importRecordsSkipsImportingRecordsThatAlreadyExist() {
-        final List<PatientRecord> toImport =
-                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         final PatientRecord existing = toImport.get(Generator.randomIndex(toImport));
+        when(recordDao.exists(any(URI.class))).thenReturn(false);
         when(recordDao.exists(existing.getUri())).thenReturn(true);
-        toImport.forEach(r -> {
-            // Simulate that the records existed in another deployment from which they are imported
-            r.setKey(IdentificationUtils.generateKey());
-            r.setDateCreated(new Date(System.currentTimeMillis() - 10000L));
-            r.setAuthor(originalAuthor);
-        });
 
         final RecordImportResult result = sut.importRecords(toImport);
         assertEquals(toImport.size(), result.getTotalCount());
@@ -154,21 +143,26 @@ class RepositoryPatientRecordServiceTest {
 
     @Test
     void importRecordsWithPhaseSetsSpecifiedPhaseToAllRecords() {
-        final List<PatientRecord> toImport =
-                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         final RecordPhase targetPhase = RecordPhase.values()[Generator.randomInt(0, RecordPhase.values().length)];
-        toImport.forEach(r -> {
-            // Simulate that the records existed in another deployment from which they are imported
-            r.setKey(IdentificationUtils.generateKey());
-            r.setDateCreated(new Date(System.currentTimeMillis() - 10000L));
-            r.setAuthor(originalAuthor);
-        });
         when(recordDao.exists(any())).thenReturn(false);
 
         sut.importRecords(toImport, targetPhase);
         final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
         verify(recordDao, times(toImport.size())).persist(captor.capture());
         captor.getAllValues().forEach(r -> assertEquals(targetPhase, r.getPhase()));
+    }
+
+    @Test
+    void importRecordsSetsRecordPhaseToOpenOnAllImportedRecordsWhenCurrentUserIsRegularUser() {
+        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
+        when(recordDao.exists(any())).thenReturn(false);
+
+        sut.importRecords(toImport);
+        final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
+        verify(recordDao, times(toImport.size())).persist(captor.capture());
+        captor.getAllValues().forEach(r -> assertEquals(RecordPhase.open, r.getPhase()));
     }
 }

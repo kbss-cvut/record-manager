@@ -64,7 +64,8 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * records.
      * <p>
      * If the current user is an admin, the import procedure retains provenance data of the record. Otherwise, the
-     * current user is set as the record's author.
+     * current user is set as the record's author. Also, if the current user is not an admin, the phase of all
+     * the imported records is set to {@link RecordPhase#open}, for admin, the phase of the records is retained.
      *
      * @param records Records to import
      * @return Instance representing the import result

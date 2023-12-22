@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class RepositoryPatientRecordService extends KeySupportingRepositoryService<PatientRecord>
@@ -92,11 +93,15 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     public RecordImportResult importRecords(List<PatientRecord> records) {
         Objects.requireNonNull(records);
         LOG.debug("Importing records.");
+        return importRecordsImpl(records, Optional.empty());
+    }
+
+    private RecordImportResult importRecordsImpl(List<PatientRecord> records, Optional<RecordPhase> targetPhase) {
         final User author = securityUtils.getCurrentUser();
         final Date created = new Date();
         final RecordImportResult result = new RecordImportResult(records.size());
         records.forEach(r -> {
-            setImportedRecordProvenance(author, created, r);
+            setImportedRecordProvenance(author, created, targetPhase, r);
             if (recordDao.exists(r.getUri())) {
                 LOG.warn("Record {} already exists. Skipping it.", Utils.uriToString(r.getUri()));
                 result.addError("Record " + Utils.uriToString(r.getUri()) + " already exists.");
@@ -108,13 +113,18 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         return result;
     }
 
-    private void setImportedRecordProvenance(User currentUser, Date now, PatientRecord record) {
+    private void setImportedRecordProvenance(User currentUser, Date now, Optional<RecordPhase> targetPhase,
+                                             PatientRecord record) {
         if (!currentUser.isAdmin()) {
             record.setAuthor(currentUser);
             record.setInstitution(currentUser.getInstitution());
             record.setDateCreated(now);
-        } else if (!userService.exists(record.getAuthor().getUri())) {
-            throw new RecordAuthorNotFoundException("Author of record " + record + "not found during import.");
+            targetPhase.ifPresentOrElse(record::setPhase, () -> record.setPhase(RecordPhase.open));
+        } else {
+            targetPhase.ifPresent(record::setPhase);
+            if (!userService.exists(record.getAuthor().getUri())) {
+                throw new RecordAuthorNotFoundException("Author of record " + record + "not found during import.");
+            }
         }
     }
 
@@ -124,7 +134,6 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     public RecordImportResult importRecords(List<PatientRecord> records, RecordPhase targetPhase) {
         Objects.requireNonNull(records);
         LOG.debug("Importing records to target phase '{}'.", targetPhase);
-        records.forEach(r -> r.setPhase(targetPhase));
-        return importRecords(records);
+        return importRecordsImpl(records, Optional.ofNullable(targetPhase));
     }
 }
