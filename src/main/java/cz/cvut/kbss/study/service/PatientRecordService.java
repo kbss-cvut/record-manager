@@ -57,27 +57,37 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
     /**
      * Imports the specified records.
      * <p>
-     * The current user is set as the author of the records. Only records whose identifiers do not already exist in the
-     * repository are imported. Existing records are skipped and the returned object contains a note that the record
-     * already exists.
+     * Only records whose identifiers do not already exist in the repository are imported. Existing records are skipped
+     * and the returned object contains a note that the record already exists.
      * <p>
      * This method, in contrast to {@link #importRecords(List, RecordPhase)}, preserves the phase of the imported
      * records.
+     * <p>
+     * If the current user is an admin, the import procedure retains provenance data of the record. Otherwise, the
+     * current user is set as the record's author.
      *
      * @param records Records to import
      * @return Instance representing the import result
+     * @throws cz.cvut.kbss.study.exception.RecordAuthorNotFoundException Thrown when importing a record whose author
+     *                                                                    does not exist in this application instance's
+     *                                                                    repository
      */
     RecordImportResult importRecords(List<PatientRecord> records);
 
     /**
      * Imports the specified records and sets them all to the specified phase.
      * <p>
-     * The current user is set as the author of the records. Only records whose identifiers do not already exist in the
-     * repository are imported. Existing records are skipped and the returned object contains a note that the record
-     * already exists.
+     * Only records whose identifiers do not already exist in the repository are imported. Existing records are skipped
+     * and the returned object contains a note that the record already exists.
+     * <p>
+     * If the current user is an admin, the import procedure retains provenance data of the record. Otherwise, the
+     * current user is set as the record's author.
      *
      * @param records Records to import
      * @return Instance representing the import result
+     * @throws cz.cvut.kbss.study.exception.RecordAuthorNotFoundException Thrown when importing a record whose author
+     *                                                                    does not exist in this application instance's
+     *                                                                    repository
      */
     RecordImportResult importRecords(List<PatientRecord> records, RecordPhase targetPhase);
 }

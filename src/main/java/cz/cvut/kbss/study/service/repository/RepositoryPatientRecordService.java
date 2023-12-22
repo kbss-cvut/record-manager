@@ -2,6 +2,7 @@ package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
+import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
@@ -10,6 +11,7 @@ import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.Utils;
 import org.slf4j.Logger;
@@ -31,10 +33,13 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
 
     private final SecurityUtils securityUtils;
 
-    public RepositoryPatientRecordService(PatientRecordDao recordDao,
-                                          SecurityUtils securityUtils) {
+    private final UserService userService;
+
+    public RepositoryPatientRecordService(PatientRecordDao recordDao, SecurityUtils securityUtils,
+                                          UserService userService) {
         this.recordDao = recordDao;
         this.securityUtils = securityUtils;
+        this.userService = userService;
     }
 
     @Override
@@ -91,9 +96,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         final Date created = new Date();
         final RecordImportResult result = new RecordImportResult(records.size());
         records.forEach(r -> {
-            r.setAuthor(author);
-            r.setInstitution(author.getInstitution());
-            r.setDateCreated(created);
+            setImportedRecordProvenance(author, created, r);
             if (recordDao.exists(r.getUri())) {
                 LOG.warn("Record {} already exists. Skipping it.", Utils.uriToString(r.getUri()));
                 result.addError("Record " + Utils.uriToString(r.getUri()) + " already exists.");
@@ -104,6 +107,17 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         });
         return result;
     }
+
+    private void setImportedRecordProvenance(User currentUser, Date now, PatientRecord record) {
+        if (!currentUser.isAdmin()) {
+            record.setAuthor(currentUser);
+            record.setInstitution(currentUser.getInstitution());
+            record.setDateCreated(now);
+        } else if (!userService.exists(record.getAuthor().getUri())) {
+            throw new RecordAuthorNotFoundException("Author of record " + record + "not found during import.");
+        }
+    }
+
 
     @Transactional
     @Override

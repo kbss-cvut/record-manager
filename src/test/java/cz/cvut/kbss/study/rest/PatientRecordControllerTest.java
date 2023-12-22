@@ -5,6 +5,7 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
+import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
@@ -331,5 +332,15 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         mockMvc.perform(post("/records/import").content(toJson(records)).contentType(MediaType.APPLICATION_JSON)
                                                .param("phase", targetPhase.getIri())).andExpect(status().isOk());
         verify(patientRecordServiceMock).importRecords(anyList(), eq(targetPhase));
+    }
+
+    @Test
+    void importRecordsReturnsConflictWhenServiceThrowsRecordAuthorNotFound() throws Exception {
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        when(patientRecordServiceMock.importRecords(anyList())).thenThrow(RecordAuthorNotFoundException.class);
+
+        mockMvc.perform(post("/records/import").content(toJson(records)).contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isConflict());
     }
 }
