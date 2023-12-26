@@ -18,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@EnableAspectJAutoProxy(proxyTargetClass = true)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestServiceConfig.class, TestPersistenceConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
