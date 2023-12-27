@@ -1,6 +1,11 @@
 package cz.cvut.kbss.study.rest.handler;
 
-import cz.cvut.kbss.study.exception.*;
+import cz.cvut.kbss.study.exception.EntityExistsException;
+import cz.cvut.kbss.study.exception.NotFoundException;
+import cz.cvut.kbss.study.exception.PersistenceException;
+import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
+import cz.cvut.kbss.study.exception.ValidationException;
+import cz.cvut.kbss.study.exception.WebServiceIntegrationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,13 +88,14 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorInfo(request, e.getCause()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(RecordAuthorNotFoundException.class)
+    public ResponseEntity<ErrorInfo> recordAuthorNotFoundException(HttpServletRequest request,
+                                                                   RecordAuthorNotFoundException e) {
+        logException(request, e);
+        return new ResponseEntity<>(errorInfo(request, e), HttpStatus.CONFLICT);
+    }
+
     void logException(HttpServletRequest request, RuntimeException e) {
-        LOG.debug(
-            String.format(
-                "Request to '%s' failed due to error: %s",
-                request.getRequestURI(),
-                e.getMessage()
-            )
-        );
+        LOG.debug("Request to '{}' failed due to error: {}", request.getRequestURI(), e.getMessage());
     }
 }

@@ -23,4 +23,20 @@ public enum RecordPhase {
     public String getIri() {
         return iri;
     }
+
+    /**
+     * Returns {@link RecordPhase} with the specified IRI.
+     *
+     * @param iri record phase identifier
+     * @return matching {@code RecordPhase}
+     * @throws IllegalArgumentException When no matching phase is found
+     */
+    public static RecordPhase fromString(String iri) {
+        for (RecordPhase p : values()) {
+            if (p.getIri().equals(iri)) {
+                return p;
+            }
+        }
+        throw new IllegalArgumentException("Unknown record phase identifier '" + iri + "'.");
+    }
 }

@@ -63,8 +63,12 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     @Override
     public void persist(PatientRecord entity) {
         Objects.requireNonNull(entity);
-        entity.setKey(IdentificationUtils.generateKey());
-        entity.setUri(generateRecordUriFromKey(entity.getKey()));
+        if (entity.getKey() == null) {
+            entity.setKey(IdentificationUtils.generateKey());
+        }
+        if (entity.getUri() == null) {
+            entity.setUri(generateRecordUriFromKey(entity.getKey()));
+        }
         try {
             final Descriptor descriptor = getDescriptor(entity.getUri());
             em.persist(entity, descriptor);

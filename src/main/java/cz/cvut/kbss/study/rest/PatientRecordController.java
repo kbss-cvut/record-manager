@@ -1,9 +1,11 @@
 package cz.cvut.kbss.study.rest;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RecordFilterMapper;
 import cz.cvut.kbss.study.rest.util.RestUtils;
@@ -92,6 +94,20 @@ public class PatientRecordController extends BaseController {
         final String key = record.getKey();
         final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/{key}", key);
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public RecordImportResult importRecords(@RequestBody List<PatientRecord> records,
+                                            @RequestParam(name = "phase", required = false) String phaseIri) {
+        final RecordImportResult importResult;
+        if (phaseIri != null) {
+            final RecordPhase targetPhase = RecordPhase.fromString(phaseIri);
+            importResult = recordService.importRecords(records, targetPhase);
+        } else {
+            importResult = recordService.importRecords(records);
+        }
+        LOG.trace("Records imported with result: {}.", importResult);
+        return importResult;
     }
 
     @PutMapping(value = "/{key}", consumes = MediaType.APPLICATION_JSON_VALUE)

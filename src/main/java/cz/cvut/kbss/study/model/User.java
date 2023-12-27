@@ -1,7 +1,13 @@
 package cz.cvut.kbss.study.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cz.cvut.kbss.jopa.model.annotations.*;
+import cz.cvut.kbss.jopa.model.annotations.FetchType;
+import cz.cvut.kbss.jopa.model.annotations.Id;
+import cz.cvut.kbss.jopa.model.annotations.OWLClass;
+import cz.cvut.kbss.jopa.model.annotations.OWLDataProperty;
+import cz.cvut.kbss.jopa.model.annotations.OWLObjectProperty;
+import cz.cvut.kbss.jopa.model.annotations.ParticipationConstraints;
+import cz.cvut.kbss.jopa.model.annotations.Types;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
@@ -146,6 +152,18 @@ public class User implements HasDerivableUri, Serializable {
     public void addType(String type) {
         assert types != null;
         getTypes().add(type);
+    }
+
+    /**
+     * Returns true if this user is an admin.
+     * <p>
+     * That is, it has an admin type.
+     *
+     * @return {@code true} if this is admin, {@code false} otherwise
+     */
+    public boolean isAdmin() {
+        assert types != null;
+        return getTypes().contains(Vocabulary.s_c_administrator);
     }
 
     public String getToken() {
