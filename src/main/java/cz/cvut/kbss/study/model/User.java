@@ -11,8 +11,6 @@ import cz.cvut.kbss.jopa.model.annotations.Types;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serializable;
@@ -26,8 +24,6 @@ import java.util.Set;
 
 @OWLClass(iri = Vocabulary.s_c_user)
 public class User implements HasDerivableUri, Serializable {
-
-    private static final Logger LOG = LoggerFactory.getLogger(User.class);
 
     @Id
     private URI uri;
@@ -191,7 +187,7 @@ public class User implements HasDerivableUri, Serializable {
         if (password == null || password.isEmpty()) {
             throw new IllegalStateException("Cannot encode an empty password.");
         }
-        this.password = encoder.encode(password);
+        setPassword(encoder.encode(password));
     }
 
     /**
