@@ -44,7 +44,7 @@ public class WebAppConfig implements WebMvcConfigurer {
      */
     public static ObjectMapper createJsonObjectMapper() {
         final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // Ignore UoW references injected into entities
         objectMapper.addMixIn(UnitOfWorkImpl.class, ManageableIgnoreMixin.class);

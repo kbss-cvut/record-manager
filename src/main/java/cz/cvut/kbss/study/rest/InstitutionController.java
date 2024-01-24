@@ -8,7 +8,6 @@ import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -38,7 +37,7 @@ public class InstitutionController extends BaseController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Institution> getAllInstitutions() {
         final List<Institution> institutions = institutionService.findAll();
-        Collections.sort(institutions, (a, b) -> a.getName().compareTo(b.getName()));
+        institutions.sort(Comparator.comparing(Institution::getName));
         return institutions;
     }
 
@@ -85,7 +84,7 @@ public class InstitutionController extends BaseController {
             throw new BadRequestException("The passed institution's key is different from the specified one.");
         }
         final Institution original = findInternal(key);
-        assert original != null;
+
         institutionService.update(institution);
         if (LOG.isTraceEnabled()) {
             LOG.trace("Institution {} successfully updated.", institution);
