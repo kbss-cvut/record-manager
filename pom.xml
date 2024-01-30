@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.4</version>
+        <version>3.2.2</version>
     </parent>
 
     <artifactId>record-manager</artifactId>
@@ -48,7 +48,6 @@
         <maven.compiler.target>${jdk.version}</maven.compiler.target>
 
         <cz.cvut.kbss.jopa.version>2.0.0-SNAPSHOT</cz.cvut.kbss.jopa.version>
-        <org.aspectj.version>1.9.20</org.aspectj.version>
         <org.mockito.version>4.11.0</org.mockito.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     </properties>
@@ -98,7 +97,7 @@
         <dependency>
             <groupId>com.github.ledsoft</groupId>
             <artifactId>jopa-spring-transaction</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Logging -->
