@@ -53,8 +53,8 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory> {
                                                            ActionHistory.class)
                                         .setParameter("type", typeUri)
                                         .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
-                                        .setFirstResult((pageNumber - 1) * Constants.ACTIONS_PER_PAGE)
-                                        .setMaxResults(Constants.ACTIONS_PER_PAGE + 1);
+                                        .setFirstResult((pageNumber - 1) * Constants.DEFAULT_PAGE_SIZE)
+                                        .setMaxResults(Constants.DEFAULT_PAGE_SIZE + 1);
 
         if (author != null) {
             q.setParameter("hasOwner", URI.create(Vocabulary.s_p_has_owner))

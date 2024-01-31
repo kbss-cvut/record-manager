@@ -10,7 +10,6 @@ import cz.cvut.kbss.study.rest.util.RecordFilterMapper;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.PatientRecordService;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,7 +45,8 @@ public class PatientRecordController extends BaseController {
     public List<PatientRecordDto> getRecords(
             @RequestParam(value = "institution", required = false) String institutionKey,
             @RequestParam MultiValueMap<String, String> params) {
-        return recordService.findAll(RecordFilterMapper.constructRecordFilter(params), Pageable.unpaged()).getContent();
+        return recordService.findAll(RecordFilterMapper.constructRecordFilter(params), RestUtils.resolvePaging(params))
+                            .getContent();
     }
 
     @PreAuthorize(
@@ -55,7 +55,8 @@ public class PatientRecordController extends BaseController {
     public List<PatientRecord> exportRecords(
             @RequestParam(name = "institution", required = false) String institutionKey,
             @RequestParam MultiValueMap<String, String> params) {
-        return recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params), Pageable.unpaged()).getContent();
+        return recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
+                                         RestUtils.resolvePaging(params)).getContent();
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")

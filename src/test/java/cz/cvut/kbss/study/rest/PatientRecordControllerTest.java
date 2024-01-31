@@ -11,7 +11,10 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
+import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
+import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +25,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -337,5 +342,33 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
         mockMvc.perform(post("/records/import").content(toJson(records)).contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void getRecordsResolvesPagingConfigurationFromRequestParameters() throws Exception {
+        final LocalDate minDate = LocalDate.now().minusDays(35);
+        final LocalDate maxDate = LocalDate.now().minusDays(5);
+        final int page = Generator.randomInt(0, 5);
+        final int pageSize = Generator.randomInt(30, 50);
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class), any(
+                Pageable.class))).thenReturn(new PageImpl<>(records));
+
+        final MvcResult mvcResult = mockMvc.perform(get("/records/export")
+                                                            .param("minDate", minDate.toString())
+                                                            .param("maxDate", maxDate.toString())
+                                                            .param(Constants.PAGE_PARAM, Integer.toString(page))
+                                                            .param(Constants.PAGE_SIZE_PARAM,
+                                                                   Integer.toString(pageSize))
+                                                            .param(Constants.SORT_PARAM,
+                                                                   RestUtils.SORT_DESC + RecordSort.SORT_DATE_PROPERTY))
+                                           .andReturn();
+        final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
+        });
+        assertThat(result, containsSameEntities(records));
+        verify(patientRecordServiceMock).findAllFull(
+                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()),
+                PageRequest.of(page, pageSize, Sort.Direction.DESC, RecordSort.SORT_DATE_PROPERTY));
     }
 }
