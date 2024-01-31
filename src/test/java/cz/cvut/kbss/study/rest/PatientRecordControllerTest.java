@@ -12,6 +12,7 @@ import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
+import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.util.Constants;
@@ -23,6 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -60,6 +62,9 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     @Mock
     private PatientRecordService patientRecordServiceMock;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisherMock;
 
     @InjectMocks
     private PatientRecordController controller;
@@ -120,18 +125,14 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         User user1 = Generator.generateUser(institution);
         User user2 = Generator.generateUser(institution);
 
-        PatientRecordDto record1 = Generator.generatePatientRecordDto(user1);
-        PatientRecordDto record2 = Generator.generatePatientRecordDto(user1);
-        PatientRecordDto record3 = Generator.generatePatientRecordDto(user2);
-        List<PatientRecordDto> records = new ArrayList<>();
-        records.add(record1);
-        records.add(record2);
-        records.add(record3);
+        List<PatientRecordDto> records =
+                List.of(Generator.generatePatientRecordDto(user1), Generator.generatePatientRecordDto(user1),
+                        Generator.generatePatientRecordDto(user2));
 
         when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(
                 new PageImpl<>(records));
 
-        final MvcResult result = mockMvc.perform(get("/records/")).andReturn();
+        final MvcResult result = mockMvc.perform(get("/records")).andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<PatientRecordDto> body = objectMapper.readValue(result.getResponse().getContentAsString(),
@@ -370,5 +371,57 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         verify(patientRecordServiceMock).findAllFull(
                 new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()),
                 PageRequest.of(page, pageSize, Sort.Direction.DESC, RecordSort.SORT_DATE_PROPERTY));
+    }
+
+    @Test
+    void getRecordsPublishesPagingEvent() throws Exception {
+        List<PatientRecordDto> records =
+                List.of(Generator.generatePatientRecordDto(user), Generator.generatePatientRecordDto(user),
+                        Generator.generatePatientRecordDto(user));
+
+        final Page<PatientRecordDto> page = new PageImpl<>(records, PageRequest.of(0, 5), 3);
+        when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(page);
+        final MvcResult result = mockMvc.perform(get("/records").queryParam(Constants.PAGE_PARAM, "0")
+                                                                .queryParam(Constants.PAGE_SIZE_PARAM, "5"))
+                                        .andReturn();
+
+        assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
+        final List<PatientRecordDto> body = objectMapper.readValue(result.getResponse().getContentAsString(),
+                                                                   new TypeReference<>() {
+                                                                   });
+        assertEquals(3, body.size());
+        verify(patientRecordServiceMock).findAll(new RecordFilterParams(), PageRequest.of(0, 5));
+        final ArgumentCaptor<PaginatedResultRetrievedEvent> captor = ArgumentCaptor.forClass(
+                PaginatedResultRetrievedEvent.class);
+        verify(eventPublisherMock).publishEvent(captor.capture());
+        final PaginatedResultRetrievedEvent event = captor.getValue();
+        assertEquals(page, event.getPage());
+    }
+
+    @Test
+    void exportRecordsPublishesPagingEvent() throws Exception {
+        final LocalDate minDate = LocalDate.now().minusDays(35);
+        final LocalDate maxDate = LocalDate.now().minusDays(5);
+        final List<PatientRecord> records =
+                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
+        final Page<PatientRecord> page = new PageImpl<>(records, PageRequest.of(0, 50), 100);
+        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(page);
+
+        final MvcResult mvcResult = mockMvc.perform(get("/records/export")
+                                                            .param("minDate", minDate.toString())
+                                                            .param("maxDate", maxDate.toString())
+                                                            .param(Constants.PAGE_PARAM, "0")
+                                                            .param(Constants.PAGE_SIZE_PARAM, "50"))
+                                           .andReturn();
+        final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
+        });
+        assertThat(result, containsSameEntities(records));
+        verify(patientRecordServiceMock).findAllFull(
+                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()), PageRequest.of(0, 50));
+        final ArgumentCaptor<PaginatedResultRetrievedEvent> captor =
+                ArgumentCaptor.forClass(PaginatedResultRetrievedEvent.class);
+        verify(eventPublisherMock).publishEvent(captor.capture());
+        final PaginatedResultRetrievedEvent event = captor.getValue();
+        assertEquals(page, event.getPage());
     }
 }
