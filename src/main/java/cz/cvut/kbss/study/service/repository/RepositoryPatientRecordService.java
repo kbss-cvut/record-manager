@@ -16,6 +16,8 @@ import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,10 +68,22 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         return recordDao.findAllRecords();
     }
 
+    @Override
+    public Page<PatientRecordDto> findAll(RecordFilterParams filters, Pageable pageSpec) {
+        // TODO
+        return null;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PatientRecord> findAllFull(RecordFilterParams filters, Pageable pageSpec) {
+        return recordDao.findAllRecordsFull(filters, pageSpec);
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<PatientRecord> findAllFull(RecordFilterParams filterParams) {
-        return recordDao.findAllFull(filterParams);
+        return findAllFull(filterParams, Pageable.unpaged()).getContent();
     }
 
     @Override
