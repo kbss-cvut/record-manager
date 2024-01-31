@@ -2,10 +2,8 @@ package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
-import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
-import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,29 +19,6 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @return Matching patient record or {@code null}
      */
     PatientRecord findByKey(String key);
-
-    /**
-     * Gets records of patients treated at the specified institution.
-     *
-     * @param institution The institution to filter by
-     * @return Records of matching patients
-     */
-    List<PatientRecordDto> findByInstitution(Institution institution);
-
-    /**
-     * Gets records of patients created by specified author.
-     *
-     * @param author The author to filter by
-     * @return Records of matching patients
-     */
-    List<PatientRecord> findByAuthor(User author);
-
-    /**
-     * Gets records of all patients.
-     *
-     * @return Records of matching patients
-     */
-    List<PatientRecordDto> findAllRecords();
 
     /**
      * Gets records corresponding to the specified filtering, paging, and sorting criteria.
@@ -64,17 +39,6 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @see #findAll(RecordFilterParams, Pageable)
      */
     Page<PatientRecord> findAllFull(RecordFilterParams filters, Pageable pageSpec);
-
-    /**
-     * Finds all records that match the specified parameters.
-     * <p>
-     * In contrast to {@link #findAll()}, this method returns full records, not DTOs.
-     *
-     * @param filterParams Record filtering criteria
-     * @return List of matching records
-     * @see #findAllRecords()
-     */
-    List<PatientRecord> findAllFull(RecordFilterParams filterParams);
 
     /**
      * Imports the specified records.

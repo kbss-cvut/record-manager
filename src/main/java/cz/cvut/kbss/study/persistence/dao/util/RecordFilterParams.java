@@ -22,6 +22,10 @@ public class RecordFilterParams {
     public RecordFilterParams() {
     }
 
+    public RecordFilterParams(String institutionKey) {
+        this.institutionKey = institutionKey;
+    }
+
     // This one mainly is for test data setup
     public RecordFilterParams(String institutionKey, LocalDate minModifiedDate, LocalDate maxModifiedDate,
                               Set<String> phaseIds) {

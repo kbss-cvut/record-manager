@@ -3,7 +3,6 @@ package cz.cvut.kbss.study.service.repository;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
-import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
@@ -52,38 +51,14 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
 
     @Transactional(readOnly = true)
     @Override
-    public List<PatientRecordDto> findByInstitution(Institution institution) {
-        return recordDao.findByInstitution(institution);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<PatientRecord> findByAuthor(User user) {
-        return recordDao.findByAuthor(user);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<PatientRecordDto> findAllRecords() {
-        return recordDao.findAllRecords();
-    }
-
-    @Override
     public Page<PatientRecordDto> findAll(RecordFilterParams filters, Pageable pageSpec) {
-        // TODO
-        return null;
+        return recordDao.findAllRecords(filters, pageSpec);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<PatientRecord> findAllFull(RecordFilterParams filters, Pageable pageSpec) {
         return recordDao.findAllRecordsFull(filters, pageSpec);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<PatientRecord> findAllFull(RecordFilterParams filterParams) {
-        return findAllFull(filterParams, Pageable.unpaged()).getContent();
     }
 
     @Override

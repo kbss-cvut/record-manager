@@ -11,7 +11,6 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
-import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +20,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -53,9 +55,6 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     @Mock
     private PatientRecordService patientRecordServiceMock;
-
-    @Mock
-    private InstitutionService institutionServiceMock;
 
     @InjectMocks
     private PatientRecordController controller;
@@ -97,7 +96,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     @Test
     public void getRecordsReturnsEmptyListWhenNoReportsAreFound() throws Exception {
-        when(patientRecordServiceMock.findAllRecords()).thenReturn(Collections.emptyList());
+        when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(
+                Page.empty());
 
         final MvcResult result = mockMvc.perform(get("/records/")).andReturn();
 
@@ -123,7 +123,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         records.add(record2);
         records.add(record3);
 
-        when(patientRecordServiceMock.findAllRecords()).thenReturn(records);
+        when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(
+                new PageImpl<>(records));
 
         final MvcResult result = mockMvc.perform(get("/records/")).andReturn();
 
@@ -132,11 +133,11 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                                                                    new TypeReference<>() {
                                                                    });
         assertEquals(3, body.size());
-        verify(patientRecordServiceMock).findAllRecords();
+        verify(patientRecordServiceMock).findAll(new RecordFilterParams(), Pageable.unpaged());
     }
 
     @Test
-    public void finByInstitutionReturnsRecords() throws Exception {
+    public void findByInstitutionReturnsRecords() throws Exception {
         final String key = "12345";
 
         Institution institution = Generator.generateInstitution();
@@ -151,8 +152,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         records.add(record1);
         records.add(record2);
 
-        when(institutionServiceMock.findByKey(institution.getKey())).thenReturn(institution);
-        when(patientRecordServiceMock.findByInstitution(institution)).thenReturn(records);
+        when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(
+                new PageImpl<>(records));
         System.out.println(institution.getKey());
         final MvcResult result =
                 mockMvc.perform(get("/records").param("institution", institution.getKey())).andReturn();
@@ -162,17 +163,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                                                                    new TypeReference<>() {
                                                                    });
         assertEquals(2, body.size());
-        verify(institutionServiceMock).findByKey(institution.getKey());
-    }
-
-    @Test
-    public void findByInstitutionReturnsNotFound() throws Exception {
-        final String key = "12345";
-
-        when(institutionServiceMock.findByKey(key)).thenReturn(null);
-        final MvcResult result = mockMvc.perform(get("/records").param("institution", key)).andReturn();
-
-        assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
+        verify(patientRecordServiceMock).findAll(new RecordFilterParams(institution.getKey()), Pageable.unpaged());
     }
 
     @Test
@@ -255,7 +246,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final LocalDate maxDate = LocalDate.now().minusDays(5);
         final List<PatientRecord> records =
                 List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
-        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class))).thenReturn(records);
+        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class), any(
+                Pageable.class))).thenReturn(new PageImpl<>(records));
 
         final MvcResult mvcResult = mockMvc.perform(get("/records/export")
                                                             .param("minDate", minDate.toString())
@@ -265,20 +257,21 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()));
+                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()), Pageable.unpaged());
     }
 
     @Test
     void exportRecordsUsesDefaultValuesForMinAndMaxDateWhenTheyAreNotProvidedByRequest() throws Exception {
         final List<PatientRecord> records =
                 List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
-        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class))).thenReturn(records);
+        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class), any(
+                Pageable.class))).thenReturn(new PageImpl<>(records));
 
         final MvcResult mvcResult = mockMvc.perform(get("/records/export")).andReturn();
         final List<PatientRecord> result = readValue(mvcResult, new TypeReference<>() {
         });
         assertThat(result, containsSameEntities(records));
-        verify(patientRecordServiceMock).findAllFull(new RecordFilterParams());
+        verify(patientRecordServiceMock).findAllFull(new RecordFilterParams(), Pageable.unpaged());
     }
 
     @Test
@@ -287,7 +280,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final LocalDate maxDate = LocalDate.now().minusDays(5);
         final List<PatientRecord> records =
                 List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
-        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class))).thenReturn(records);
+        when(patientRecordServiceMock.findAllFull(any(RecordFilterParams.class), any(
+                Pageable.class))).thenReturn(new PageImpl<>(records));
 
         final MvcResult mvcResult = mockMvc.perform(get("/records/export")
                                                             .param("minDate", minDate.toString())
@@ -298,7 +292,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(user.getInstitution().getKey(), minDate, maxDate, Collections.emptySet()));
+                new RecordFilterParams(user.getInstitution().getKey(), minDate, maxDate, Collections.emptySet()),
+                Pageable.unpaged());
     }
 
     @Test
