@@ -2,11 +2,11 @@ package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
-import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
-import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -21,38 +21,24 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
     PatientRecord findByKey(String key);
 
     /**
-     * Gets records of patients treated at the specified institution.
+     * Gets records corresponding to the specified filtering, paging, and sorting criteria.
      *
-     * @param institution The institution to filter by
-     * @return Records of matching patients
+     * @param filters  Record filtering criteria
+     * @param pageSpec Specification of page and sorting to retrieve
+     * @return List of matching record DTOs
+     * @see #findAllFull(RecordFilterParams, Pageable)
      */
-    List<PatientRecordDto> findByInstitution(Institution institution);
+    Page<PatientRecordDto> findAll(RecordFilterParams filters, Pageable pageSpec);
 
     /**
-     * Gets records of patients created by specified author.
+     * Gets records corresponding to the specified filtering, paging, and sorting criteria.
      *
-     * @param author The author to filter by
-     * @return Records of matching patients
-     */
-    List<PatientRecord> findByAuthor(User author);
-
-    /**
-     * Gets records of all patients.
-     *
-     * @return Records of matching patients
-     */
-    List<PatientRecordDto> findAllRecords();
-
-    /**
-     * Finds all records that match the specified parameters.
-     * <p>
-     * In contrast to {@link #findAll()}, this method returns full records, not DTOs.
-     *
-     * @param filterParams Record filtering criteria
+     * @param filters  Record filtering criteria
+     * @param pageSpec Specification of page and sorting to retrieve
      * @return List of matching records
-     * @see #findAllRecords()
+     * @see #findAll(RecordFilterParams, Pageable)
      */
-    List<PatientRecord> findAllFull(RecordFilterParams filterParams);
+    Page<PatientRecord> findAllFull(RecordFilterParams filters, Pageable pageSpec);
 
     /**
      * Imports the specified records.
@@ -64,8 +50,8 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * records.
      * <p>
      * If the current user is an admin, the import procedure retains provenance data of the record. Otherwise, the
-     * current user is set as the record's author. Also, if the current user is not an admin, the phase of all
-     * the imported records is set to {@link RecordPhase#open}, for admin, the phase of the records is retained.
+     * current user is set as the record's author. Also, if the current user is not an admin, the phase of all the
+     * imported records is set to {@link RecordPhase#open}, for admin, the phase of the records is retained.
      *
      * @param records Records to import
      * @return Instance representing the import result

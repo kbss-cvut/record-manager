@@ -1,9 +1,14 @@
 package cz.cvut.kbss.study.rest.util;
 
+import cz.cvut.kbss.study.util.Constants;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -12,8 +17,20 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class RestUtils {
+
+    /**
+     * Prefix indicating ascending sort order.
+     */
+    public static final char SORT_ASC = '+';
+
+    /**
+     * Prefix indicating descending sort order.
+     */
+    public static final char SORT_DESC = '-';
 
     private RestUtils() {
         throw new AssertionError();
@@ -94,8 +111,39 @@ public class RestUtils {
         try {
             return LocalDate.parse(dateStr);
         } catch (DateTimeParseException | NullPointerException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Value '" + dateStr + "' is not a valid date in ISO format.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                              "Value '" + dateStr + "' is not a valid date in ISO format.");
         }
     }
 
+    /**
+     * Resolves paging and sorting configuration from the specified request parameters.
+     * <p>
+     * If no paging and filtering info is specified, an {@link Pageable#unpaged()} object is returned.
+     * <p>
+     * Note that for sorting, {@literal +} should be used before sorting property name to specify ascending order,
+     * {@literal -} for descending order, for example, {@literal -date} indicates sorting by date in descending order.
+     *
+     * @param params Request parameters
+     * @return {@code Pageable} containing values resolved from the params or defaults
+     */
+    public static Pageable resolvePaging(MultiValueMap<String, String> params) {
+        if (params.getFirst(Constants.PAGE_PARAM) == null) {
+            return Pageable.unpaged();
+        }
+        final int page = Integer.parseInt(params.getFirst(Constants.PAGE_PARAM));
+        final int size = Optional.ofNullable(params.getFirst(Constants.PAGE_SIZE_PARAM)).map(Integer::parseInt)
+                                 .orElse(Constants.DEFAULT_PAGE_SIZE);
+        if (params.containsKey(Constants.SORT_PARAM)) {
+            final Sort sort = Sort.by(params.get(Constants.SORT_PARAM).stream().map(sp -> {
+                if (sp.charAt(0) == SORT_ASC || sp.charAt(0) == SORT_DESC) {
+                    final String property = sp.substring(1);
+                    return sp.charAt(0) == SORT_DESC ? Sort.Order.desc(property) : Sort.Order.asc(property);
+                }
+                return Sort.Order.asc(sp);
+            }).collect(Collectors.toList()));
+            return PageRequest.of(page, size, sort);
+        }
+        return PageRequest.of(page, size);
+    }
 }

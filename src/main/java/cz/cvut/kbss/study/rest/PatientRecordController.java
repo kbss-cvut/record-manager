@@ -3,15 +3,17 @@ package cz.cvut.kbss.study.rest;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
+import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RecordFilterMapper;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
-import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -38,36 +41,36 @@ public class PatientRecordController extends BaseController {
 
     private final PatientRecordService recordService;
 
-    private final InstitutionService institutionService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public PatientRecordController(PatientRecordService recordService, InstitutionService institutionService) {
+    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher) {
         this.recordService = recordService;
-        this.institutionService = institutionService;
+        this.eventPublisher = eventPublisher;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecordDto> getRecords(
-            @RequestParam(value = "institution", required = false) String institutionKey) {
-        return institutionKey != null ? recordService.findByInstitution(getInstitution(institutionKey)) :
-               recordService.findAllRecords();
-    }
-
-    private Institution getInstitution(String institutionKey) {
-        final Institution institution = institutionService.findByKey(institutionKey);
-        if (institution == null) {
-            throw NotFoundException.create("Institution", institutionKey);
-        }
-        return institution;
+            @RequestParam(value = "institution", required = false) String institutionKey,
+            @RequestParam MultiValueMap<String, String> params,
+            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+        final Page<PatientRecordDto> result = recordService.findAll(RecordFilterMapper.constructRecordFilter(params),
+                                                                    RestUtils.resolvePaging(params));
+        eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
+        return result.getContent();
     }
 
     @PreAuthorize(
             "hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecord> exportRecords(
-            @RequestParam(name = "institutionKey", required = false) String institutionKey,
-            @RequestParam MultiValueMap<String, String> params) {
-        return recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params));
+            @RequestParam(name = "institution", required = false) String institutionKey,
+            @RequestParam MultiValueMap<String, String> params,
+            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+        final Page<PatientRecord> result = recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
+                                                                     RestUtils.resolvePaging(params));
+        eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
+        return result.getContent();
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
