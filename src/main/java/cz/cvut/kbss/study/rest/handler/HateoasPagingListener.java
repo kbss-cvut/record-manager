@@ -19,13 +19,17 @@ public class HateoasPagingListener implements ApplicationListener<PaginatedResul
     public void onApplicationEvent(PaginatedResultRetrievedEvent event) {
         final Page<?> page = event.getPage();
         final LinkHeader header = new LinkHeader();
+        if (!page.isEmpty() || page.getTotalPages() > 0) {
+            // Always add first and last links, even when there is just one page. This allows clients to know where the limits
+            // are
+            header.addLink(generateFirstPageLink(page, event.getUriBuilder()), HttpPaginationLink.FIRST);
+            header.addLink(generateLastPageLink(page, event.getUriBuilder()), HttpPaginationLink.LAST);
+        }
         if (page.hasNext()) {
             header.addLink(generateNextPageLink(page, event.getUriBuilder()), HttpPaginationLink.NEXT);
-            header.addLink(generateLastPageLink(page, event.getUriBuilder()), HttpPaginationLink.LAST);
         }
         if (page.hasPrevious()) {
             header.addLink(generatePreviousPageLink(page, event.getUriBuilder()), HttpPaginationLink.PREVIOUS);
-            header.addLink(generateFirstPageLink(page, event.getUriBuilder()), HttpPaginationLink.FIRST);
         }
         if (header.hasLinks()) {
             event.getResponse().addHeader(HttpHeaders.LINK, header.toString());

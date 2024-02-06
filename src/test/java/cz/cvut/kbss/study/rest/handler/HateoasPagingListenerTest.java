@@ -168,11 +168,18 @@ class HateoasPagingListenerTest {
     }
 
     @Test
-    public void generatesNoLinksForOnlyPage() {
-        final Page<PatientRecordDto> page = new PageImpl<>(records, PageRequest.of(0, records.size()), records.size());
+    public void generatesFirstAndLastLinksForOnlyPage() {
+        final int size = records.size();
+        final Page<PatientRecordDto> page = new PageImpl<>(records, PageRequest.of(0, size), records.size());
         listener.onApplicationEvent(event(page));
         final String linkHeader = responseMock.getHeader(HttpHeaders.LINK);
-        assertNull(linkHeader);
+        assertNotNull(linkHeader);
+        final String firstLink = HttpLinkHeaderUtil.extractURIByRel(linkHeader, HttpPaginationLink.FIRST.getName());
+        assertThat(firstLink, containsString(page(0)));
+        assertThat(firstLink, containsString(pageSize(size)));
+        final String lastLink = HttpLinkHeaderUtil.extractURIByRel(linkHeader, HttpPaginationLink.LAST.getName());
+        assertThat(lastLink, containsString(page(0)));
+        assertThat(lastLink, containsString(pageSize(size)));
     }
 
 }
