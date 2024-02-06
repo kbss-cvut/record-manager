@@ -7,10 +7,12 @@ import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.util.Constants;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Objects;
 
 @Repository
@@ -35,7 +37,7 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory> {
         }
     }
 
-    public List<ActionHistory> findAllWithParams(String typeFilter, User author, int pageNumber) {
+    public Page<ActionHistory> findAllWithParams(String typeFilter, User author, Pageable pageSpec) {
         String params;
         if (typeFilter == null && author == null) {
             params = " } ";
@@ -52,10 +54,11 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory> {
                                                                    params + "ORDER BY DESC(?timestamp)",
                                                            ActionHistory.class)
                                         .setParameter("type", typeUri)
-                                        .setParameter("isCreated", URI.create(Vocabulary.s_p_created))
-                                        .setFirstResult((pageNumber - 1) * Constants.DEFAULT_PAGE_SIZE)
-                                        .setMaxResults(Constants.DEFAULT_PAGE_SIZE + 1);
-
+                                        .setParameter("isCreated", URI.create(Vocabulary.s_p_created));
+        if (pageSpec.isPaged()) {
+            q.setFirstResult((int) pageSpec.getOffset());
+            q.setMaxResults(pageSpec.getPageSize());
+        }
         if (author != null) {
             q.setParameter("hasOwner", URI.create(Vocabulary.s_p_has_owner))
              .setParameter("author", author.getUri());
@@ -64,6 +67,6 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory> {
             q.setParameter("typeFilter", typeFilter, Constants.PU_LANGUAGE)
              .setParameter("isType", URI.create(Vocabulary.s_p_action_type));
         }
-        return q.getResultList();
+        return new PageImpl<>(q.getResultList(), pageSpec, 0L);
     }
 }
