@@ -101,10 +101,10 @@ public class PatientRecordController extends BaseController {
 
     @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
     public RecordImportResult importRecords(@RequestBody List<PatientRecord> records,
-                                            @RequestParam(name = "phase", required = false) String phaseIri) {
+                                            @RequestParam(name = "phase", required = false) String phase) {
         final RecordImportResult importResult;
-        if (phaseIri != null) {
-            final RecordPhase targetPhase = RecordPhase.fromString(phaseIri);
+        if (phase != null) {
+            final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
             importResult = recordService.importRecords(records, targetPhase);
         } else {
             importResult = recordService.importRecords(records);
