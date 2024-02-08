@@ -7,24 +7,34 @@ import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
 import cz.cvut.kbss.study.service.ActionHistoryService;
 import cz.cvut.kbss.study.service.UserService;
+import cz.cvut.kbss.study.util.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,23 +49,29 @@ public class ActionHistoryControllerTest extends BaseControllerTestRunner {
     @Mock
     private UserService userServiceMock;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisherMock;
+
     @InjectMocks
     private ActionHistoryController controller;
+
+    private User user;
 
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
+        this.user = Generator.generateUser(institution);
         Environment.setCurrentUser(user);
     }
 
     @Test
     public void createActionReturnsResponseStatusCreated() throws Exception {
-        ActionHistory action = Generator.generateActionHistory(Environment.getCurrentUser());
+        ActionHistory action = Generator.generateActionHistory(user);
 
         final MvcResult result = mockMvc.perform(post("/history").content(toJson(action))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                                                                 .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.CREATED, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
@@ -72,49 +88,48 @@ public class ActionHistoryControllerTest extends BaseControllerTestRunner {
     @Test
     public void getByKeyReturnsFoundAction() throws Exception {
         final String key = "12345";
-        ActionHistory action = Generator.generateActionHistory(Environment.getCurrentUser());
+        ActionHistory action = Generator.generateActionHistory(user);
         action.setKey(key);
         when(actionHistoryServiceMock.findByKey(key)).thenReturn(action);
 
         final MvcResult result = mockMvc.perform(get("/history/" + key)).andReturn();
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
-        final ActionHistory res = objectMapper.readValue(result.getResponse().getContentAsString(), ActionHistory.class);
-        assertEquals(res.getUri(),action.getUri());
+        final ActionHistory res =
+                objectMapper.readValue(result.getResponse().getContentAsString(), ActionHistory.class);
+        assertEquals(res.getUri(), action.getUri());
         verify(actionHistoryServiceMock).findByKey(key);
     }
 
     @Test
     public void getActionsReturnsEmptyListWhenNoActionsAreFound() throws Exception {
-        when(actionHistoryServiceMock.findAllWithParams(null, null, 1)).thenReturn(Collections.emptyList());
+        when(actionHistoryServiceMock.findAllWithParams(any(), any(), any())).thenReturn(Page.empty());
 
-        final MvcResult result = mockMvc.perform(get("/history/").param("page", "1")).andReturn();
+        final MvcResult result = mockMvc.perform(get("/history/")).andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<ActionHistory> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<ActionHistory>>() {
-                });
+                                                                new TypeReference<>() {
+                                                                });
         assertTrue(body.isEmpty());
     }
 
     @Test
     public void getActionsReturnsAllActions() throws Exception {
-        ActionHistory action1 = Generator.generateActionHistory(Environment.getCurrentUser());
-        ActionHistory action2 = Generator.generateActionHistory(Environment.getCurrentUser());
-        List<ActionHistory> actions = new ArrayList<>();
+        ActionHistory action1 = Generator.generateActionHistory(user);
+        ActionHistory action2 = Generator.generateActionHistory(user);
+        List<ActionHistory> actions = List.of(action1, action2);
 
-        actions.add(action1);
-        actions.add(action2);
-
-        when(actionHistoryServiceMock.findAllWithParams(null, null, 1)).thenReturn(actions);
+        when(actionHistoryServiceMock.findAllWithParams(any(), any(), any(
+                Pageable.class))).thenReturn(new PageImpl<>(actions));
 
         final MvcResult result = mockMvc.perform(get("/history/").param("page", "1")).andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<ActionHistory> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<ActionHistory>>() {
-                });
+                                                                new TypeReference<>() {
+                                                                });
         assertEquals(2, body.size());
-        verify(actionHistoryServiceMock).findAllWithParams(null , null, 1);
+        verify(actionHistoryServiceMock).findAllWithParams(null, null, PageRequest.of(1, Constants.DEFAULT_PAGE_SIZE));
     }
 
     @Test
@@ -123,90 +138,104 @@ public class ActionHistoryControllerTest extends BaseControllerTestRunner {
         when(userServiceMock.findByUsername(username)).thenThrow(NotFoundException.create("User", username));
 
         final MvcResult result = mockMvc.perform(get("/history/")
-                .param("author", username)
-                .param("page", "1"))
-                .andReturn();
+                                                         .param("author", username)
+                                                         .param("page", "1"))
+                                        .andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<ActionHistory> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<ActionHistory>>() {
-                });
+                                                                new TypeReference<>() {
+                                                                });
         assertTrue(body.isEmpty());
+        verify(actionHistoryServiceMock, never()).findAllWithParams(any(), any(), any());
     }
 
     @Test
     public void getActionsByAuthorReturnsActions() throws Exception {
-        ActionHistory action1 = Generator.generateActionHistory(Environment.getCurrentUser());
-        ActionHistory action2 = Generator.generateActionHistory(Environment.getCurrentUser());
-        List<ActionHistory> actions = new ArrayList<>();
+        ActionHistory action1 = Generator.generateActionHistory(user);
+        ActionHistory action2 = Generator.generateActionHistory(user);
+        List<ActionHistory> actions = List.of(action1, action2);
 
-        actions.add(action1);
-        actions.add(action2);
-
-        when(actionHistoryServiceMock.findAllWithParams(null, Environment.getCurrentUser(), 1)).thenReturn(actions);
-        when(userServiceMock.findByUsername(Environment.getCurrentUser().getUsername())).thenReturn(Environment.getCurrentUser());
+        when(actionHistoryServiceMock.findAllWithParams(any(), eq(user), any(
+                Pageable.class))).thenReturn(new PageImpl<>(actions));
+        when(userServiceMock.findByUsername(user.getUsername())).thenReturn(
+                user);
 
         final MvcResult result = mockMvc.perform(get("/history/")
-                .param("author", Environment.getCurrentUser().getUsername())
-                .param("page", "1"))
-                .andReturn();
+                                                         .param("author", user.getUsername())
+                                                         .param("page", "1"))
+                                        .andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<ActionHistory> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<ActionHistory>>() {
-                });
+                                                                new TypeReference<>() {
+                                                                });
         assertEquals(2, body.size());
-        verify(actionHistoryServiceMock).findAllWithParams(null, Environment.getCurrentUser(), 1);
+        verify(actionHistoryServiceMock).findAllWithParams(null, user,
+                                                           PageRequest.of(1, Constants.DEFAULT_PAGE_SIZE));
     }
 
     @Test
     public void getActionsByTypeReturnsActions() throws Exception {
-        ActionHistory action1 = Generator.generateActionHistory(Environment.getCurrentUser());
-        ActionHistory action2 = Generator.generateActionHistory(Environment.getCurrentUser());
-        List<ActionHistory> actions = new ArrayList<>();
+        ActionHistory action1 = Generator.generateActionHistory(user);
+        ActionHistory action2 = Generator.generateActionHistory(user);
+        List<ActionHistory> actions = List.of(action1, action2);
 
-        actions.add(action1);
-        actions.add(action2);
-
-        when(actionHistoryServiceMock.findAllWithParams("TYPE", null, 1)).thenReturn(actions);
+        when(actionHistoryServiceMock.findAllWithParams(eq("TYPE"), any(), any(Pageable.class))).thenReturn(
+                new PageImpl<>(actions));
 
         final MvcResult result = mockMvc.perform(get("/history/")
-                .param("type", "TYPE")
-                .param("page", "1"))
-                .andReturn();
+                                                         .param("type", "TYPE")
+                                                         .param("page", "1"))
+                                        .andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<ActionHistory> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<ActionHistory>>() {
-                });
+                                                                new TypeReference<>() {
+                                                                });
         assertEquals(2, body.size());
-        verify(actionHistoryServiceMock).findAllWithParams("TYPE", null, 1);
+        verify(actionHistoryServiceMock).findAllWithParams("TYPE", null,
+                                                           PageRequest.of(1, Constants.DEFAULT_PAGE_SIZE));
     }
 
     @Test
     public void getActionsByTypeAndAuthorReturnsActions() throws Exception {
-        User user = Environment.getCurrentUser();
         ActionHistory action1 = Generator.generateActionHistory(user);
         ActionHistory action2 = Generator.generateActionHistory(user);
-        List<ActionHistory> actions = new ArrayList<>();
-
-        actions.add(action1);
-        actions.add(action2);
+        List<ActionHistory> actions = List.of(action1, action2);
 
         when(userServiceMock.findByUsername(user.getUsername())).thenReturn(user);
-        when(actionHistoryServiceMock.findAllWithParams("TYPE", user, 1)).thenReturn(actions);
+        when(actionHistoryServiceMock.findAllWithParams(eq("TYPE"), eq(user), any(Pageable.class))).thenReturn(
+                new PageImpl<>(actions));
 
         final MvcResult result = mockMvc.perform(get("/history/")
-                .param("author", user.getUsername())
-                .param("type", "TYPE")
-                .param("page", "1"))
-                .andReturn();
+                                                         .param("author", user.getUsername())
+                                                         .param("type", "TYPE")
+                                                         .param("page", "1"))
+                                        .andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<ActionHistory> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<ActionHistory>>() {
-                });
+                                                                new TypeReference<>() {
+                                                                });
         assertEquals(2, body.size());
-        verify(actionHistoryServiceMock).findAllWithParams("TYPE", user, 1);
+        verify(actionHistoryServiceMock).findAllWithParams("TYPE", user,
+                                                           PageRequest.of(1, Constants.DEFAULT_PAGE_SIZE));
+    }
+
+    @Test
+    void getActionsPublishesPagingEvent() throws Exception {
+        List<ActionHistory> actions =
+                IntStream.range(0, 5).mapToObj(i -> Generator.generateActionHistory(user)).toList();
+        final Page<ActionHistory> page = new PageImpl<>(actions, PageRequest.of(2, 5), 0L);
+        when(actionHistoryServiceMock.findAllWithParams(any(), any(), any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/history/").param("page", "2").param("size", "5"));
+        verify(actionHistoryServiceMock).findAllWithParams(null, null, PageRequest.of(2, 5));
+        final ArgumentCaptor<PaginatedResultRetrievedEvent> captor = ArgumentCaptor.forClass(
+                PaginatedResultRetrievedEvent.class);
+        verify(eventPublisherMock).publishEvent(captor.capture());
+        final PaginatedResultRetrievedEvent event = captor.getValue();
+        assertEquals(page, event.getPage());
     }
 }

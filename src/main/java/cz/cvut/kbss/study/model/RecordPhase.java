@@ -31,12 +31,46 @@ public enum RecordPhase {
      * @return matching {@code RecordPhase}
      * @throws IllegalArgumentException When no matching phase is found
      */
-    public static RecordPhase fromString(String iri) {
+    public static RecordPhase fromIri(String iri) {
         for (RecordPhase p : values()) {
             if (p.getIri().equals(iri)) {
                 return p;
             }
         }
         throw new IllegalArgumentException("Unknown record phase identifier '" + iri + "'.");
+    }
+
+    /**
+     * Returns {@link RecordPhase} with the specified constant name.
+     *
+     * @param name record phase name
+     * @return matching {@code RecordPhase}
+     * @throws IllegalArgumentException When no matching phase is found
+     */
+    public static RecordPhase fromName(String name) {
+        for (RecordPhase p : values()) {
+            if (p.name().equalsIgnoreCase(name)) {
+                return p;
+            }
+        }
+        throw new IllegalArgumentException("Unknown record phase '" + name + "'.");
+    }
+
+    /**
+     * Returns a {@link RecordPhase} with the specified IRI or constant name.
+     * <p>
+     * This function first tries to find the enum constant by IRI. If it is not found, constant name matching is
+     * attempted.
+     *
+     * @param identification Constant IRI or name to find match by
+     * @return matching {@code RecordPhase}
+     * @throws IllegalArgumentException When no matching phase is found
+     */
+    public static RecordPhase fromIriOrName(String identification) {
+        try {
+            return fromIri(identification);
+        } catch (IllegalArgumentException e) {
+            return fromName(identification);
+        }
     }
 }
