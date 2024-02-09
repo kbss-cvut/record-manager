@@ -16,8 +16,13 @@ import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
+import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
@@ -178,39 +183,84 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     }
 
     /**
+     * Retrieves DTOs of records matching the specified filtering criteria.
+     * <p>
+     * Note that since the record modification is tracked by a timestamp and the filter uses dates, this method uses
+     * beginning of the min date and end of the max date.
+     * <p>
+     * The returned page contains also information about total number of matching records.
+     *
+     * @param filters  Record filtering criteria
+     * @param pageSpec Specification of page and sorting
+     * @return Page with matching records
+     * @see #findAllRecordsFull(RecordFilterParams, Pageable)
+     */
+    public Page<PatientRecordDto> findAllRecords(RecordFilterParams filters, Pageable pageSpec) {
+        Objects.requireNonNull(filters);
+        Objects.requireNonNull(pageSpec);
+        return findRecords(filters, pageSpec, PatientRecordDto.class);
+    }
+
+    /**
      * Retrieves records matching the specified filtering criteria.
      * <p>
      * Note that since the record modification is tracked by a timestamp and the filter uses dates, this method uses
      * beginning of the min date and end of the max date.
+     * <p>
+     * The returned page contains also information about total number of matching records.
      *
-     * @param filterParams Record filtering criteria
-     * @return List of matching records
+     * @param filters  Record filtering criteria
+     * @param pageSpec Specification of page and sorting
+     * @return Page with matching records
+     * @see #findAllRecords(RecordFilterParams, Pageable)
      */
-    public List<PatientRecord> findAllFull(RecordFilterParams filterParams) {
-        Objects.requireNonNull(filterParams);
+    public Page<PatientRecord> findAllRecordsFull(RecordFilterParams filters, Pageable pageSpec) {
+        Objects.requireNonNull(filters);
+        Objects.requireNonNull(pageSpec);
+        return findRecords(filters, pageSpec, PatientRecord.class);
+    }
+
+    private <T> Page<T> findRecords(RecordFilterParams filters, Pageable pageSpec, Class<T> resultClass) {
+        final Map<String, Object> queryParams = new HashMap<>();
+        final String whereClause = constructWhereClause(filters, queryParams);
+        final String queryString = "SELECT ?r WHERE " + whereClause + resolveOrderBy(pageSpec.getSortOr(RecordSort.defaultSort()));
+        final TypedQuery<T> query = em.createNativeQuery(queryString, resultClass);
+        setQueryParameters(query, queryParams);
+        if (pageSpec.isPaged()) {
+            query.setFirstResult((int) pageSpec.getOffset());
+            query.setMaxResults(pageSpec.getPageSize());
+        }
+        final List<T> records = query.getResultList();
+        final TypedQuery<Integer> countQuery = em.createNativeQuery("SELECT (COUNT(?r) as ?cnt) WHERE " + whereClause, Integer.class);
+        setQueryParameters(countQuery, queryParams);
+        final Integer totalCount = countQuery.getSingleResult();
+        return new PageImpl<>(records, pageSpec, totalCount);
+    }
+
+    private void setQueryParameters(TypedQuery<?> query, Map<String, Object> queryParams) {
+        query.setParameter("type", typeUri)
+             .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
+             .setParameter("hasInstitution",
+                           URI.create(Vocabulary.s_p_was_treated_at))
+             .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
+             .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
+             .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified));
+        queryParams.forEach(query::setParameter);
+    }
+
+    private static String constructWhereClause(RecordFilterParams filters, Map<String, Object> queryParams) {
         // Could not use Criteria API because it does not support OPTIONAL
-        String queryString = "SELECT ?r WHERE {" +
+        String whereClause = "{" +
                 "?r a ?type ; " +
                 "?hasCreatedDate ?created ; " +
                 "?hasInstitution ?institution . " +
                 "?institution ?hasKey ?institutionKey ." +
                 "OPTIONAL { ?r ?hasPhase ?phase . } " +
                 "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
-                "BIND (IF (BOUND(?lastModified), ?lastModified, ?created) AS ?edited) ";
-        final Map<String, Object> queryParams = new HashMap<>();
-        queryString += mapParamsToQuery(filterParams, queryParams);
-        queryString += "} ORDER BY ?edited";
-
-        final TypedQuery<PatientRecord> query = em.createNativeQuery(queryString, PatientRecord.class)
-                                                  .setParameter("type", typeUri)
-                                                  .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
-                                                  .setParameter("hasInstitution",
-                                                                URI.create(Vocabulary.s_p_was_treated_at))
-                                                  .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
-                                                  .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
-                                                  .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified));
-        queryParams.forEach(query::setParameter);
-        return query.getResultList();
+                "BIND (COALESCE(?lastModified, ?created) AS ?date) ";
+        whereClause += mapParamsToQuery(filters, queryParams);
+        whereClause += "}";
+        return whereClause;
     }
 
     private static String mapParamsToQuery(RecordFilterParams filterParams, Map<String, Object> queryParams) {
@@ -218,11 +268,11 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         filterParams.getInstitutionKey()
                     .ifPresent(key -> queryParams.put("institutionKey", new LangString(key, Constants.PU_LANGUAGE)));
         filterParams.getMinModifiedDate().ifPresent(date -> {
-            filters.add("FILTER (?edited >= ?minDate)");
+            filters.add("FILTER (?date >= ?minDate)");
             queryParams.put("minDate", date.atStartOfDay(ZoneOffset.UTC).toInstant());
         });
         filterParams.getMaxModifiedDate().ifPresent(date -> {
-            filters.add("FILTER (?edited < ?maxDate)");
+            filters.add("FILTER (?date < ?maxDate)");
             queryParams.put("maxDate", date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant());
         });
         if (!filterParams.getPhaseIds().isEmpty()) {
@@ -231,5 +281,21 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
                             filterParams.getPhaseIds().stream().map(URI::create).collect(Collectors.toList()));
         }
         return String.join(" ", filters);
+    }
+
+    private static String resolveOrderBy(Sort sort) {
+        if (sort.isUnsorted()) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder(" ORDER BY");
+        for (Sort.Order o : sort) {
+            if (!RecordSort.SORTING_PROPERTIES.contains(o.getProperty())) {
+                throw new IllegalArgumentException("Unsupported record sorting property '" + o.getProperty() + "'.");
+            }
+            sb.append(' ');
+            sb.append(o.isAscending() ? "ASC(" : "DESC(");
+            sb.append('?').append(o.getProperty()).append(')');
+        }
+        return sb.toString();
     }
 }

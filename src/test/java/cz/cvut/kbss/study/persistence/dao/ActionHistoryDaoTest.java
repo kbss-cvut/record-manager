@@ -5,10 +5,14 @@ import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
+import cz.cvut.kbss.study.util.Constants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -24,9 +28,9 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     @Autowired
     ActionHistoryDao actionHistoryDao;
 
-    private final String LOAD_SUCCESS = "LOAD_SUCCESS";
-    private final String LOAD_ERROR = "LOAD_ERROR";
-    private final String LOAD_PENDING = "LOAD_PENDING";
+    private static final String LOAD_SUCCESS = "LOAD_SUCCESS";
+    private static final String LOAD_ERROR = "LOAD_ERROR";
+    private static final String LOAD_PENDING = "LOAD_PENDING";
 
     @Test
     public void findByKeyReturnsActionWithPayload() {
@@ -61,9 +65,9 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
             actionHistoryDao.persist(List.of(action1, action2, action3));
         });
 
-        List<ActionHistory> actionsList = actionHistoryDao.findAllWithParams(null, null, 1);
+        Page<ActionHistory> actionsList = actionHistoryDao.findAllWithParams(null, null, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
 
-        assertEquals(3, actionsList.size());
+        assertEquals(3, actionsList.getNumberOfElements());
     }
 
     @Test
@@ -82,13 +86,13 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
             actionHistoryDao.persist(List.of(action1, action2, action3));
         });
 
-        List<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(null, user1, 1);
-        List<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(null, user2, 1);
-        List<ActionHistory> actionsList3 = actionHistoryDao.findAllWithParams(null, user3, 1);
+        Page<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(null, user1, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
+        Page<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(null, user2, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
+        Page<ActionHistory> actionsList3 = actionHistoryDao.findAllWithParams(null, user3, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
 
-        assertEquals(2, actionsList1.size());
-        assertEquals(1, actionsList2.size());
-        assertEquals(0, actionsList3.size());
+        assertEquals(2, actionsList1.getNumberOfElements());
+        assertEquals(1, actionsList2.getNumberOfElements());
+        assertEquals(0, actionsList3.getNumberOfElements());
     }
 
     @Test
@@ -108,13 +112,13 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
             actionHistoryDao.persist(List.of(action1, action2, action3));
         });
 
-        List<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, null, 1);
-        List<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(LOAD_ERROR, null, 1);
-        List<ActionHistory> actionsList3 = actionHistoryDao.findAllWithParams(LOAD_PENDING, null, 1);
+        Page<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, null, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
+        Page<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(LOAD_ERROR, null, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
+        Page<ActionHistory> actionsList3 = actionHistoryDao.findAllWithParams(LOAD_PENDING, null, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
 
-        assertEquals(2, actionsList1.size());
-        assertEquals(1, actionsList2.size());
-        assertEquals(0, actionsList3.size());
+        assertEquals(2, actionsList1.getNumberOfElements());
+        assertEquals(1, actionsList2.getNumberOfElements());
+        assertEquals(0, actionsList3.getNumberOfElements());
     }
 
     @Test
@@ -133,9 +137,9 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
             actionHistoryDao.persist(List.of(action1, action2, action3));
         });
 
-        List<ActionHistory> actionsList = actionHistoryDao.findAllWithParams("LOAD", null, 1);
+        Page<ActionHistory> actionsList = actionHistoryDao.findAllWithParams("LOAD", null, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
 
-        assertEquals(2, actionsList.size());
+        assertEquals(2, actionsList.getNumberOfElements());
     }
 
     @Test
@@ -156,14 +160,30 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
             actionHistoryDao.persist(List.of(action1, action2, action3));
         });
 
-        List<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, user1, 1);
-        List<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, user2, 1);
-        List<ActionHistory> actionsList3 = actionHistoryDao.findAllWithParams(LOAD_ERROR, user2, 1);
-        List<ActionHistory> actionsList4 = actionHistoryDao.findAllWithParams("LOAD", user2, 1);
+        Page<ActionHistory> actionsList1 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, user1, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
+        Page<ActionHistory> actionsList2 = actionHistoryDao.findAllWithParams(LOAD_SUCCESS, user2, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
+        Page<ActionHistory> actionsList3 = actionHistoryDao.findAllWithParams(LOAD_ERROR, user2, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
+        Page<ActionHistory> actionsList4 = actionHistoryDao.findAllWithParams("LOAD", user2, PageRequest.of(0, Constants.DEFAULT_PAGE_SIZE));
 
-        assertEquals(2, actionsList1.size());
-        assertEquals(0, actionsList2.size());
-        assertEquals(1, actionsList3.size());
-        assertEquals(1, actionsList4.size());
+        assertEquals(2, actionsList1.getNumberOfElements());
+        assertEquals(0, actionsList2.getNumberOfElements());
+        assertEquals(1, actionsList3.getNumberOfElements());
+        assertEquals(1, actionsList4.getNumberOfElements());
+    }
+
+    @Test
+    void findAllReturnsActionsOnMatchingPage() {
+        Institution institution = Generator.generateInstitution();
+        User user = Generator.generateUser(institution);
+        final List<ActionHistory> allActions = IntStream.range(0, 10).mapToObj(i -> Generator.generateActionHistory(user)).toList();
+        transactional(() -> {
+            institutionDao.persist(institution);
+            userDao.persist(user);
+            actionHistoryDao.persist(allActions);
+        });
+
+        final PageRequest pageSpec = PageRequest.of(2, allActions.size() / 2);
+        final Page<ActionHistory> result = actionHistoryDao.findAllWithParams(null, null, pageSpec);
+        assertEquals(allActions.subList((int) pageSpec.getOffset(), allActions.size()), result.getContent());
     }
 }

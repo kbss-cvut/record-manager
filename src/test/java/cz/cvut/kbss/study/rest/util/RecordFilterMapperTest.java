@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.rest.util;
 
+import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,16 +41,16 @@ class RecordFilterMapperTest {
                 )), new RecordFilterParams("1111111", LocalDate.EPOCH, LocalDate.now(), Collections.emptySet())),
                 Arguments.of(new LinkedMultiValueMap<>(Map.of(
                         "institution", List.of("1111111"),
-                        "phase", List.of("http://example.org/phaseOne", "http://example.org/phaseTwo")
+                        "phase", List.of(RecordPhase.open.getIri(), RecordPhase.completed.name())
                 )), new RecordFilterParams("1111111", LocalDate.EPOCH, LocalDate.now(),
-                                           Set.of("http://example.org/phaseOne", "http://example.org/phaseTwo"))),
+                                           Set.of(RecordPhase.open.getIri(), RecordPhase.completed.getIri()))),
                 Arguments.of(new LinkedMultiValueMap<>(Map.of(
                         "minDate", List.of(LocalDate.now().minusYears(1).toString()),
                         "maxDate", List.of(LocalDate.now().minusDays(1).toString()),
                         "institution", List.of("1111111"),
-                        "phase", List.of("http://example.org/phaseOne")
+                        "phase", List.of(RecordPhase.published.name())
                 )), new RecordFilterParams("1111111", LocalDate.now().minusYears(1), LocalDate.now().minusDays(1),
-                                           Set.of("http://example.org/phaseOne")))
+                                           Set.of(RecordPhase.published.getIri())))
         );
     }
 }

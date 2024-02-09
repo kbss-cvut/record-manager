@@ -4,6 +4,7 @@ import cz.cvut.kbss.jopa.model.annotations.*;
 import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.model.util.HasOwlKey;
 
+import java.net.URI;
 import java.util.Date;
 
 @OWLClass(iri = Vocabulary.s_c_patient_record)
@@ -21,8 +22,8 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
     private String localName;
 
     @ParticipationConstraints(nonEmpty = true)
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_author, fetch = FetchType.EAGER)
-    private User author;
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_author)
+    private URI author;
 
     @OWLDataProperty(iri = Vocabulary.s_p_created)
     private Date dateCreated;
@@ -30,8 +31,8 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
     @OWLDataProperty(iri = Vocabulary.s_p_modified)
     private Date lastModified;
 
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_last_editor, fetch = FetchType.EAGER)
-    private User lastModifiedBy;
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_last_editor)
+    private URI lastModifiedBy;
 
     @OWLObjectProperty(iri = Vocabulary.s_p_was_treated_at, fetch = FetchType.EAGER)
     private Institution institution;
@@ -58,11 +59,11 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
         this.localName = localName;
     }
 
-    public User getAuthor() {
+    public URI getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(URI author) {
         this.author = author;
     }
 
@@ -82,11 +83,11 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
         this.lastModified = lastModified;
     }
 
-    public User getLastModifiedBy() {
+    public URI getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(User lastModifiedBy) {
+    public void setLastModifiedBy(URI lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 

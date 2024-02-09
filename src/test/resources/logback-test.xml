@@ -24,12 +24,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <!-- Restrict logging of the Sesame HTTP client (used to connect to remote repositories -->
-    <logger name="org.openrdf.http" level="WARN" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
-    <logger name="org.apache.http" level="WARN" additivity="false">
+    <logger name="com.github.ledsoft" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

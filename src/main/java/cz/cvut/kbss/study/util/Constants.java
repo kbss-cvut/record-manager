@@ -28,7 +28,7 @@ public final class Constants {
     /**
      * Number of history actions fetched from database. Needs to be changes also in front-end.
      */
-    public static final int ACTIONS_PER_PAGE = 25;
+    public static final int DEFAULT_PAGE_SIZE = 25;
 
     /**
      * Path to directory containing queries used by the system.
@@ -37,4 +37,19 @@ public final class Constants {
      * ClassLoader#getResourceAsStream(String)}.
      */
     public static final String QUERY_DIRECTORY = "query";
+
+    /**
+     * Name of the request parameter specifying page number.
+     */
+    public static final String PAGE_PARAM = "page";
+
+    /**
+     * Name of the request parameter specifying page size.
+     */
+    public static final String PAGE_SIZE_PARAM = "size";
+
+    /**
+     * Name of the request parameter specifying sorting.
+     */
+    public static final String SORT_PARAM = "sort";
 }

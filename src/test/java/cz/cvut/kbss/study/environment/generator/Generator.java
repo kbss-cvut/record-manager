@@ -26,7 +26,7 @@ public class Generator {
      * @return Random URI
      */
     public static URI generateUri() {
-        return URI.create(Vocabulary.ONTOLOGY_IRI_record_manager + "/randomInstance" + randomInt());
+        return URI.create(Vocabulary.ONTOLOGY_IRI_RECORD_MANAGER + "/randomInstance" + randomInt());
     }
 
     /**
@@ -183,7 +183,7 @@ public class Generator {
     public static PatientRecordDto generatePatientRecordDto(User author) {
         final PatientRecordDto rec = new PatientRecordDto();
         rec.setLocalName("RandomRecordDto" + randomInt());
-        rec.setAuthor(author);
+        rec.setAuthor(author.getUri());
         rec.setUri(generateUri());
         rec.setInstitution(author.getInstitution());
         return rec;

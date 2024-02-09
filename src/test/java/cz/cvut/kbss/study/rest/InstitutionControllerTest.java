@@ -6,6 +6,7 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -24,6 +27,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -58,8 +62,8 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<Institution> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<Institution>>() {
-                });
+                                                              new TypeReference<>() {
+                                                              });
         assertTrue(body.isEmpty());
     }
 
@@ -82,8 +86,8 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<Institution> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<Institution>>() {
-                });
+                                                              new TypeReference<>() {
+                                                              });
 
         assertEquals("A", body.get(0).getName());
         assertEquals("B", body.get(1).getName());
@@ -102,7 +106,7 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final Institution res = objectMapper.readValue(result.getResponse().getContentAsString(), Institution.class);
-        assertEquals(res.getUri(),institution.getUri());
+        assertEquals(res.getUri(), institution.getUri());
         verify(institutionServiceMock).findByKey(key);
     }
 
@@ -130,16 +134,17 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
         records.add(record2);
 
         when(institutionServiceMock.findByKey(key)).thenReturn(institution);
-        when(patientRecordServiceMock.findByInstitution(institution)).thenReturn(records);
+        when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(
+                new PageImpl<>(records));
         final MvcResult result = mockMvc.perform(get("/institutions/" + key + "/patients/")).andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<PatientRecordDto> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<PatientRecordDto>>() {
-                });
+                                                                   new TypeReference<>() {
+                                                                   });
         assertEquals(2, body.size());
         verify(institutionServiceMock).findByKey(key);
-        verify(patientRecordServiceMock).findByInstitution(institution);
+        verify(patientRecordServiceMock).findAll(new RecordFilterParams(key), Pageable.unpaged());
     }
 
     @Test
@@ -147,7 +152,8 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
         Institution institution = Generator.generateInstitution();
 
         final MvcResult result = mockMvc.perform(post("/institutions/").content(toJson(institution))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                                                                       .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.CREATED, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
@@ -162,7 +168,9 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
         when(institutionServiceMock.findByKey(key)).thenReturn(institution);
 
         final MvcResult result = mockMvc.perform(put("/institutions/" + key).content(toJson(institution))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                                                                            .contentType(
+                                                                                    MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(institutionServiceMock).findByKey(key);
@@ -175,8 +183,10 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
         Institution institution = Generator.generateInstitution();
         institution.setKey(key);
 
-        final MvcResult result = mockMvc.perform(put("/institutions/123456" ).content(toJson(institution))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+        final MvcResult result = mockMvc.perform(put("/institutions/123456").content(toJson(institution))
+                                                                            .contentType(
+                                                                                    MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.BAD_REQUEST, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
@@ -191,7 +201,9 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
         when(institutionServiceMock.findByKey(key)).thenReturn(null);
 
         final MvcResult result = mockMvc.perform(put("/institutions/" + key).content(toJson(institution))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+                                                                            .contentType(
+                                                                                    MediaType.APPLICATION_JSON_VALUE))
+                                        .andReturn();
 
         assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(institutionServiceMock).findByKey(key);
@@ -206,7 +218,7 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
 
         when(institutionServiceMock.findByKey(key)).thenReturn(institution);
 
-        final MvcResult result = mockMvc.perform(delete("/institutions/12345" )).andReturn();
+        final MvcResult result = mockMvc.perform(delete("/institutions/12345")).andReturn();
 
         assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(institutionServiceMock).findByKey(key);

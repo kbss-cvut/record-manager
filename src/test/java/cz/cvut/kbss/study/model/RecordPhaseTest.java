@@ -8,19 +8,51 @@ import static org.junit.jupiter.api.Assertions.*;
 class RecordPhaseTest {
 
     @Test
-    void fromStringReturnsMatchingRecordPhase() {
+    void fromIriReturnsMatchingRecordPhase() {
         for (RecordPhase p : RecordPhase.values()) {
-            assertEquals(p, RecordPhase.fromString(p.getIri()));
+            assertEquals(p, RecordPhase.fromIri(p.getIri()));
         }
     }
 
     @Test
-    void fromStringThrowsIllegalArgumentForUnknownPhaseIri() {
-        assertThrows(IllegalArgumentException.class, () -> RecordPhase.fromString(Generator.generateUri().toString()));
+    void fromIriThrowsIllegalArgumentForUnknownPhaseIri() {
+        assertThrows(IllegalArgumentException.class, () -> RecordPhase.fromIri(Generator.generateUri().toString()));
     }
 
     @Test
-    void fromStringThrowsIllegalArgumentForNullArgument() {
-        assertThrows(IllegalArgumentException.class, () -> RecordPhase.fromString(null));
+    void fromIriThrowsIllegalArgumentForNullArgument() {
+        assertThrows(IllegalArgumentException.class, () -> RecordPhase.fromIri(null));
+    }
+
+    @Test
+    void fromNameReturnsMatchingRecordPhase() {
+        for (RecordPhase p : RecordPhase.values()) {
+            assertEquals(p, RecordPhase.fromName(p.name()));
+        }
+    }
+
+    @Test
+    void fromNameMatchesIgnoringCase() {
+        for (RecordPhase p : RecordPhase.values()) {
+            assertEquals(p, RecordPhase.fromName(p.name().toUpperCase()));
+        }
+    }
+
+    @Test
+    void fromNameThrowsIllegalArgumentForUnknownPhaseIri() {
+        assertThrows(IllegalArgumentException.class, () -> RecordPhase.fromName("unknown"));
+    }
+
+    @Test
+    void fromNameThrowsIllegalArgumentForNullArgument() {
+        assertThrows(IllegalArgumentException.class, () -> RecordPhase.fromName(null));
+    }
+
+    @Test
+    void fromNameOrIriMatchesPhaseByIriAndName() {
+        for (RecordPhase p : RecordPhase.values()) {
+            assertEquals(p, RecordPhase.fromIriOrName(p.getIri()));
+            assertEquals(p, RecordPhase.fromIriOrName(p.name()));
+        }
     }
 }
