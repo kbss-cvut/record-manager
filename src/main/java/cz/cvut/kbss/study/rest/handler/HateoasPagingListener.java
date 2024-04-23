@@ -34,6 +34,7 @@ public class HateoasPagingListener implements ApplicationListener<PaginatedResul
         if (header.hasLinks()) {
             event.getResponse().addHeader(HttpHeaders.LINK, header.toString());
         }
+        event.getResponse().addHeader(Constants.X_TOTAL_COUNT_HEADER, Long.toString(page.getTotalElements()));
     }
 
     private String generateNextPageLink(Page<?> page, UriComponentsBuilder uriBuilder) {
