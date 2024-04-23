@@ -52,4 +52,10 @@ public final class Constants {
      * Name of the request parameter specifying sorting.
      */
     public static final String SORT_PARAM = "sort";
+
+    /**
+     * Represents the X-Total-Count HTTP header used to convey the total number of items in paged or otherwise
+     * restricted response.
+     */
+    public static final String X_TOTAL_COUNT_HEADER = "X-Total-Count";
 }

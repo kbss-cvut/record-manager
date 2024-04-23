@@ -22,6 +22,7 @@ import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -182,4 +183,13 @@ class HateoasPagingListenerTest {
         assertThat(lastLink, containsString(pageSize(size)));
     }
 
+    @Test
+    public void generatesTotalCountHeader() {
+        final int size = records.size();
+        final Page<PatientRecordDto> page = new PageImpl<>(records, PageRequest.of(0, size / 2), records.size());
+        listener.onApplicationEvent(event(page));
+        final String totalCountHeader = responseMock.getHeader(Constants.X_TOTAL_COUNT_HEADER);
+        assertNotNull(totalCountHeader);
+        assertEquals(size, Integer.parseInt(totalCountHeader));
+    }
 }
