@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@OWLClass(iri = Vocabulary.s_c_user)
+@OWLClass(iri = Vocabulary.s_c_Person)
 public class User implements HasDerivableUri, Serializable {
 
     @Id
