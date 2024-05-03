@@ -161,8 +161,8 @@ rm:patient-record rdf:type owl:Class ;
                   rdfs:label "PatientRecord"@en .
 
 
-###  http://onto.fel.cvut.cz/ontologies/record-manager/user
-rm:user rdf:type owl:Class ;
+###  http://xmlns.com/foaf/0.1/Person
+foaf:Person rdf:type owl:Class ;
         rdfs:label "User"@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/impersonator
