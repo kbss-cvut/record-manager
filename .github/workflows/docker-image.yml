@@ -9,9 +9,8 @@ on:
 env:
   # Last fragment of identifier of the docker image
   IMAGE_NAME: ${{ github.repository }}
-  # Group identifier of the docker image, typically ${{ github.repository_owner }} or ${{ github.repository }}
-  IMAGE_GROUP_NAME: ${{ github.repository_owner }}
   MAIN_BRANCH_NAME: main
+  REGISTRY: ghcr.io
 
 jobs:
   build-and-publish:
@@ -20,24 +19,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build docker image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
       - name: Log in to the Container registry
-        run: echo "${{ github.token }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+        run: echo "${{ github.token }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
 
       - name: Push image
         run: |
-          IMAGE_ID=docker.pkg.github.com/$IMAGE_GROUP_NAME/$IMAGE_NAME
+          IMAGE_ID=${{ env.REGISTRY }}/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Get branch name if merge to a branch
           GIT_BRANCH_NAME=$(echo "${{ github.ref }}" | grep 'refs/heads/.*' | cut -d"/" -f 3)
           # Get pull request id (e.g. "pr-123" from "/pulls/123")
           PULL_REQUEST_ID=$(echo "${{ github.event.pull_request.number }}" | grep -v "^$" | sed 's/^/pr-/')
-          # Get tag id while strip "v" prefix (e.g. "1.2" from "v1.2")
+          # Get tag id while stripping "v" prefix (e.g. "1.2" from "v1.2")
           TAG_ID=$(echo "${{ github.ref }}" | grep 'refs/tags/.*' | cut -d"/" -f 3 | sed -e 's/^v//')
           # Version is either "git branch name"/"pull request id"/"tag id"                    
           VERSION=${GIT_BRANCH_NAME:-${PULL_REQUEST_ID:-${TAG_ID}}}
