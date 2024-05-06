@@ -7,7 +7,7 @@ on:
     branches: [ main ]
   workflow_dispatch:
 env:
-  # Last fragment of identifier of the docker image
+  # The last two fragments of the identifier of the docker image
   IMAGE_NAME: ${{ github.repository }}
   MAIN_BRANCH_NAME: main
   REGISTRY: ghcr.io
