@@ -263,7 +263,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()), Pageable.unpaged());
+                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()), Pageable.unpaged());
     }
 
     @Test
@@ -298,7 +298,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(user.getInstitution().getKey(), minDate, maxDate, Collections.emptySet()),
+                new RecordFilterParams(user.getInstitution().getKey(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                 Pageable.unpaged());
     }
 
@@ -369,7 +369,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()),
+                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                 PageRequest.of(page, pageSize, Sort.Direction.DESC, RecordSort.SORT_DATE_PROPERTY));
     }
 
@@ -417,7 +417,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()), PageRequest.of(0, 50));
+                new RecordFilterParams(null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()), PageRequest.of(0, 50));
         final ArgumentCaptor<PaginatedResultRetrievedEvent> captor =
                 ArgumentCaptor.forClass(PaginatedResultRetrievedEvent.class);
         verify(eventPublisherMock).publishEvent(captor.capture());

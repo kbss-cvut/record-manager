@@ -240,6 +240,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     private void setQueryParameters(TypedQuery<?> query, Map<String, Object> queryParams) {
         query.setParameter("type", typeUri)
              .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
+            .setParameter("hasFormTemplate", URI.create(Vocabulary.s_p_has_form_template))
              .setParameter("hasInstitution",
                            URI.create(Vocabulary.s_p_was_treated_at))
              .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
@@ -256,6 +257,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
                 "?hasInstitution ?institution . " +
                 "?institution ?hasKey ?institutionKey ." +
                 "OPTIONAL { ?r ?hasPhase ?phase . } " +
+                "OPTIONAL { ?r ?hasFormTemplate ?formTemplate . } " +
                 "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
                 "BIND (COALESCE(?lastModified, ?created) AS ?date) ";
         whereClause += mapParamsToQuery(filters, queryParams);
@@ -279,6 +281,11 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
             filters.add("FILTER (?phase in (?phases))");
             queryParams.put("phases",
                             filterParams.getPhaseIds().stream().map(URI::create).collect(Collectors.toList()));
+        }
+        if (!filterParams.getFormTemplateIds().isEmpty()) {
+            filters.add("FILTER (?formTemplate in (?formTemplates))");
+            queryParams.put("formTemplates",
+                filterParams.getFormTemplateIds().stream().map(id -> new LangString(id, Constants.PU_LANGUAGE)).collect(Collectors.toList()));
         }
         return String.join(" ", filters);
     }
