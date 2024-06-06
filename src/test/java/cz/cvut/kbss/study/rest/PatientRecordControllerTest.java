@@ -316,6 +316,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         assertEquals(importResult.getTotalCount(), result.getTotalCount());
         assertEquals(importResult.getImportedCount(), result.getImportedCount());
         assertThat(importResult.getErrors(), anyOf(nullValue(), empty()));
+        @SuppressWarnings("unchecked")
         final ArgumentCaptor<List<PatientRecord>> captor = ArgumentCaptor.forClass(List.class);
         verify(patientRecordServiceMock).importRecords(captor.capture());
         assertEquals(records.size(), captor.getValue().size());
