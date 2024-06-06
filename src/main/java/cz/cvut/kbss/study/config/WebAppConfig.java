@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import cz.cvut.kbss.jopa.sessions.UnitOfWorkImpl;
 import cz.cvut.kbss.study.rest.servlet.DiagnosticsContextFilter;
 import cz.cvut.kbss.study.util.Constants;
-import cz.cvut.kbss.study.util.json.ManageableIgnoreMixin;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,8 +44,6 @@ public class WebAppConfig implements WebMvcConfigurer {
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // Ignore UoW references injected into entities
-        objectMapper.addMixIn(UnitOfWorkImpl.class, ManageableIgnoreMixin.class);
         // JSR 310 (Java 8 DateTime API)
         objectMapper.registerModule(new JavaTimeModule());
         // Serialize datetime as ISO strings
