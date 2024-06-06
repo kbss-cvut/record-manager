@@ -17,6 +17,8 @@ public class RecordFilterParams {
 
     private LocalDate maxModifiedDate = LocalDate.now();
 
+    private Set<String> formTemplateIds = Collections.emptySet();
+
     private Set<String> phaseIds = Collections.emptySet();
 
     public RecordFilterParams() {
@@ -28,11 +30,12 @@ public class RecordFilterParams {
 
     // This one mainly is for test data setup
     public RecordFilterParams(String institutionKey, LocalDate minModifiedDate, LocalDate maxModifiedDate,
-                              Set<String> phaseIds) {
+                              Set<String> phaseIds, Set<String> formTemplateIds) {
         this.institutionKey = institutionKey;
         this.minModifiedDate = minModifiedDate;
         this.maxModifiedDate = maxModifiedDate;
         this.phaseIds = phaseIds;
+        this.formTemplateIds = formTemplateIds;
     }
 
     public Optional<String> getInstitutionKey() {
@@ -59,6 +62,14 @@ public class RecordFilterParams {
         this.maxModifiedDate = maxModifiedDate;
     }
 
+    public Set<String> getFormTemplateIds() {
+        return formTemplateIds;
+    }
+
+    public void setFormTemplateIds(Set<String> formTemplateIds) {
+        this.formTemplateIds = formTemplateIds;
+    }
+
     public Set<String> getPhaseIds() {
         return phaseIds;
     }
@@ -78,12 +89,13 @@ public class RecordFilterParams {
         return Objects.equals(institutionKey, that.institutionKey)
                 && Objects.equals(minModifiedDate, that.minModifiedDate)
                 && Objects.equals(maxModifiedDate, that.maxModifiedDate)
+                && Objects.equals(formTemplateIds, that.formTemplateIds)
                 && Objects.equals(phaseIds, that.phaseIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(institutionKey, minModifiedDate, maxModifiedDate, phaseIds);
+        return Objects.hash(institutionKey, minModifiedDate, maxModifiedDate, formTemplateIds, phaseIds);
     }
 
     @Override
@@ -92,6 +104,7 @@ public class RecordFilterParams {
                 "institutionKey='" + institutionKey + '\'' +
                 ", minModifiedDate=" + minModifiedDate +
                 ", maxModifiedDate=" + maxModifiedDate +
+                ", formTemplateIds=" + formTemplateIds +
                 ", phaseIds=" + phaseIds +
                 '}';
     }

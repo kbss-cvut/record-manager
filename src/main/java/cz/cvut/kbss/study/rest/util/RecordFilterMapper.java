@@ -3,6 +3,7 @@ package cz.cvut.kbss.study.rest.util;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
+import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.LinkedMultiValueMap;
@@ -29,6 +30,8 @@ public class RecordFilterMapper {
     private static final String MAX_DATE_PARAM = "maxDate";
 
     private static final String INSTITUTION_KEY_PARAM = "institution";
+
+    private static final String FORM_TEMPLATE_ID_PARAM = "formTemplate";
 
     private static final String PHASE_ID_PARAM = "phase";
 
@@ -69,6 +72,10 @@ public class RecordFilterMapper {
         getSingleValue(INSTITUTION_KEY_PARAM, params).ifPresent(result::setInstitutionKey);
         result.setPhaseIds(params.getOrDefault(PHASE_ID_PARAM, Collections.emptyList()).stream()
                                  .map(s -> RecordPhase.fromIriOrName(s).getIri()).collect(Collectors.toSet()));
+
+        result.setFormTemplateIds(
+            new HashSet<>(params.getOrDefault(FORM_TEMPLATE_ID_PARAM, Collections.emptyList()))
+        );
         return result;
     }
 

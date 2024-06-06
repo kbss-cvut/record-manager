@@ -277,7 +277,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         }).toList();
 
         final Page<PatientRecord> result =
-                sut.findAllRecordsFull(new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()),
+                sut.findAllRecordsFull(new RecordFilterParams(null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        Pageable.unpaged());
         assertFalse(result.isEmpty());
         assertThat(result.getContent(), containsSameEntities(expected));
@@ -316,7 +316,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         }).toList();
 
         final Page<PatientRecord> result =
-                sut.findAllRecordsFull(new RecordFilterParams(institution.getKey(), minDate, maxDate, Collections.emptySet()),
+                sut.findAllRecordsFull(new RecordFilterParams(institution.getKey(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        Pageable.unpaged());
         assertFalse(result.isEmpty());
         assertThat(result.getContent(), containsSameEntities(expected));
@@ -327,7 +327,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         final User author = generateAuthorWithInstitution();
         final List<PatientRecord> allRecords = generateRecordsForAuthor(author, 5);
         transactional(() -> allRecords.forEach(r -> {
-            r.setPhase(RecordPhase.values()[Generator.randomInt(RecordPhase.values().length)]);
+            r.setPhase(RecordPhase.values()[Generator.randomInt(0, RecordPhase.values().length)]);
             persistRecordWithIdentification(r);
         }));
         final RecordPhase phase = allRecords.get(Generator.randomIndex(allRecords)).getPhase();
@@ -338,6 +338,28 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         assertFalse(result.isEmpty());
         result.forEach(res -> assertEquals(phase, res.getPhase()));
     }
+
+    @Test
+    void findAllFullReturnsRecordsMatchingSpecifiedFormTemplate() {
+        String[] formTemplates = new String[]{
+            "http://example.org/form-template-1",
+            "http://example.org/form-template-2"
+        };
+        final User author = generateAuthorWithInstitution();
+        final List<PatientRecord> allRecords = generateRecordsForAuthor(author, 5);
+        transactional(() -> allRecords.forEach(r -> {
+            r.setFormTemplate(formTemplates[Generator.randomInt(0, formTemplates.length)]);
+            persistRecordWithIdentification(r);
+        }));
+        final String formTemplate = allRecords.get(Generator.randomIndex(allRecords)).getFormTemplate();
+        final RecordFilterParams filterParams = new RecordFilterParams();
+        filterParams.setFormTemplateIds(Set.of(formTemplate));
+
+        final Page<PatientRecord> result = sut.findAllRecordsFull(filterParams, Pageable.unpaged());
+        assertFalse(result.isEmpty());
+        result.forEach(res -> assertEquals(formTemplate, res.getFormTemplate()));
+    }
+
 
     @Test
     void findAllFullReturnsRecordsMatchingSpecifiedPage() {
@@ -408,7 +430,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         final int pageSize = 3;
 
         final Page<PatientRecordDto> result =
-                sut.findAllRecords(new RecordFilterParams(null, minDate, maxDate, Collections.emptySet()),
+                sut.findAllRecords(new RecordFilterParams(null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        PageRequest.of(0, pageSize, Sort.Direction.ASC, RecordSort.SORT_DATE_PROPERTY));
         assertEquals(Math.min(pageSize, allMatching.size()), result.getNumberOfElements());
         assertEquals(allMatching.size(), result.getTotalElements());

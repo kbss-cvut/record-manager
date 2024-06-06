@@ -30,27 +30,27 @@ class RecordFilterMapperTest {
                 Arguments.of(new LinkedMultiValueMap<>(Map.of(
                         "minDate", List.of(LocalDate.now().minusYears(1).toString())
                 )), new RecordFilterParams(null, LocalDate.now().minusYears(1), LocalDate.now(),
-                                           Collections.emptySet())),
+                                           Collections.emptySet(), Collections.emptySet())),
                 Arguments.of(new LinkedMultiValueMap<>(Map.of(
                         "minDate", List.of(LocalDate.now().minusYears(1).toString()),
                         "maxDate", List.of(LocalDate.now().minusDays(1).toString())
                 )), new RecordFilterParams(null, LocalDate.now().minusYears(1), LocalDate.now().minusDays(1),
-                                           Collections.emptySet())),
+                                           Collections.emptySet(), Collections.emptySet())),
                 Arguments.of(new LinkedMultiValueMap<>(Map.of(
                         "institution", List.of("1111111")
-                )), new RecordFilterParams("1111111", LocalDate.EPOCH, LocalDate.now(), Collections.emptySet())),
+                )), new RecordFilterParams("1111111", LocalDate.EPOCH, LocalDate.now(), Collections.emptySet(), Collections.emptySet())),
                 Arguments.of(new LinkedMultiValueMap<>(Map.of(
                         "institution", List.of("1111111"),
                         "phase", List.of(RecordPhase.open.getIri(), RecordPhase.completed.name())
                 )), new RecordFilterParams("1111111", LocalDate.EPOCH, LocalDate.now(),
-                                           Set.of(RecordPhase.open.getIri(), RecordPhase.completed.getIri()))),
+                                           Set.of(RecordPhase.open.getIri(), RecordPhase.completed.getIri()), Collections.emptySet())),
                 Arguments.of(new LinkedMultiValueMap<>(Map.of(
                         "minDate", List.of(LocalDate.now().minusYears(1).toString()),
                         "maxDate", List.of(LocalDate.now().minusDays(1).toString()),
                         "institution", List.of("1111111"),
                         "phase", List.of(RecordPhase.published.name())
                 )), new RecordFilterParams("1111111", LocalDate.now().minusYears(1), LocalDate.now().minusDays(1),
-                                           Set.of(RecordPhase.published.getIri())))
+                                           Set.of(RecordPhase.published.getIri()), Collections.emptySet()))
         );
     }
 }
