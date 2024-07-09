@@ -5,6 +5,7 @@ import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
 import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
 import cz.cvut.kbss.jopa.model.metamodel.EntityType;
+import cz.cvut.kbss.jopa.model.query.Query;
 import cz.cvut.kbss.jopa.model.query.TypedQuery;
 import cz.cvut.kbss.ontodriver.model.LangString;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
@@ -14,11 +15,13 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
+import cz.cvut.kbss.study.util.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +40,9 @@ import java.util.stream.Collectors;
 
 @Repository
 public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
+
+    public static final String FIND_ALL_RAW_PATIENT_RECORDS = "find-raw-records.sparql";
+    public static final String RAW_RECORDS_FILTER_CLAUSE_PATTERN = "###FILTER_CLAUSES###";
 
     public PatientRecordDao(EntityManager em) {
         super(PatientRecord.class, em);
@@ -235,6 +241,16 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         setQueryParameters(countQuery, queryParams);
         final Integer totalCount = countQuery.getSingleResult();
         return new PageImpl<>(records, pageSpec, totalCount);
+    }
+
+    public List<RawRecord> findAllRecordsRaw(RecordFilterParams filters){
+        final Map<String, Object> queryParams = new HashMap<>();
+        final String filterClauseExtension = mapParamsToQuery(filters, queryParams);
+        final String queryString = Utils.loadQuery(FIND_ALL_RAW_PATIENT_RECORDS)
+                .replaceAll(RAW_RECORDS_FILTER_CLAUSE_PATTERN, filterClauseExtension);
+        Query query = em.createNativeQuery(queryString, RawRecord.class.getSimpleName());
+        queryParams.forEach(query::setParameter);
+        return query.getResultList();
     }
 
     private void setQueryParameters(TypedQuery<?> query, Map<String, Object> queryParams) {
