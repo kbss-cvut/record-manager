@@ -8,6 +8,7 @@ import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.InputStream;
 import java.util.List;
 
 public interface PatientRecordService extends BaseService<PatientRecord> {
@@ -77,4 +78,6 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      *                                                                    repository
      */
     RecordImportResult importRecords(List<PatientRecord> records, RecordPhase targetPhase);
+
+    InputStream exportRecords(RecordFilterParams filters);
 }

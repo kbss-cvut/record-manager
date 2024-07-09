@@ -54,8 +54,18 @@ public final class Constants {
     public static final String SORT_PARAM = "sort";
 
     /**
+     * Name of the request parameter specifying record the export type.
+     */
+    public static final String EXPORT_TYPE_PARAM  = "exportType";
+
+    /**
      * Represents the X-Total-Count HTTP header used to convey the total number of items in paged or otherwise
      * restricted response.
      */
     public static final String X_TOTAL_COUNT_HEADER = "X-Total-Count";
+
+    /**
+     * Excel MIME type
+     */
+    public static final String MEDIA_TYPE_EXCEL = "application/vnd.ms-excel";
 }
