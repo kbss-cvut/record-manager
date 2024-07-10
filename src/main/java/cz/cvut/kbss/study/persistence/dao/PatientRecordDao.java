@@ -5,6 +5,7 @@ import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
 import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
 import cz.cvut.kbss.jopa.model.metamodel.EntityType;
+import cz.cvut.kbss.jopa.model.query.Query;
 import cz.cvut.kbss.jopa.model.query.TypedQuery;
 import cz.cvut.kbss.ontodriver.model.LangString;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
@@ -14,11 +15,13 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
+import cz.cvut.kbss.study.util.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +40,9 @@ import java.util.stream.Collectors;
 
 @Repository
 public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
+
+    public static final String FIND_ALL_RAW_PATIENT_RECORDS = "find-raw-records.sparql";
+    public static final String RECORDS_CLAUSE_TEMPLATE_VAR = "###RECORD_CLAUSE###";
 
     public PatientRecordDao(EntityManager em) {
         super(PatientRecord.class, em);
@@ -237,7 +243,40 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         return new PageImpl<>(records, pageSpec, totalCount);
     }
 
-    private void setQueryParameters(TypedQuery<?> query, Map<String, Object> queryParams) {
+    public Page<RawRecord> findAllRecordsRaw(RecordFilterParams filters, Pageable pageSpec){
+        final Map<String, Object> queryParams = new HashMap<>();
+        final String whereClause = constructWhereClause(filters, queryParams);
+
+        final String queryStringNoPaging = Utils.loadQuery(FIND_ALL_RAW_PATIENT_RECORDS)
+                .replaceFirst(RECORDS_CLAUSE_TEMPLATE_VAR, whereClause);
+        final String queryString = queryStringNoPaging + (pageSpec.isPaged()
+                ? resolveOrderBy(pageSpec.getSortOr(RecordSort.defaultSort()))
+                : ""
+        );
+
+        Query query = em.createNativeQuery(queryString,  RawRecord.class.getSimpleName());
+        queryParams.forEach(query::setParameter);
+
+        if (pageSpec.isPaged()) {
+            query.setFirstResult((int) pageSpec.getOffset());
+            query.setMaxResults(pageSpec.getPageSize());
+        }
+        setQueryParameters(query, queryParams);
+        List<RawRecord> result = query.getResultList();
+        Integer totalCount = result.size();
+        if(pageSpec.isPaged()){
+            TypedQuery<Integer> countQuery = em.createNativeQuery(
+                    "SELECT (COUNT(?r) as ?cnt) WHERE {%s}".formatted(whereClause),
+                    Integer.class);
+
+            setQueryParameters(countQuery, queryParams);
+            totalCount = countQuery.getSingleResult();
+        }
+
+        return new PageImpl<>(result, pageSpec, totalCount);
+    }
+
+    private void setQueryParameters(Query query, Map<String, Object> queryParams) {
         query.setParameter("type", typeUri)
              .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
             .setParameter("hasFormTemplate", URI.create(Vocabulary.s_p_has_form_template))

@@ -45,16 +45,18 @@ public class RecordFilterMapper {
     public static RecordFilterParams constructRecordFilter(String param, String value) {
         return constructRecordFilter(new LinkedMultiValueMap<>(Map.of(param, List.of(value))));
     }
-
+    public static RecordFilterParams constructRecordFilter(MultiValueMap<String, String> params) {
+        final RecordFilterParams result = new RecordFilterParams();
+        return constructRecordFilter(result, new LinkedMultiValueMap<>(params));
+    }
     /**
      * Maps the specified parameters to a new {@link RecordFilterParams} instance.
      *
      * @param params Request parameters to map
      * @return New {@code RecordFilterParams} instance
      */
-    public static RecordFilterParams constructRecordFilter(MultiValueMap<String, String> params) {
+    public static RecordFilterParams constructRecordFilter(final RecordFilterParams result, MultiValueMap<String, String> params) {
         Objects.requireNonNull(params);
-        final RecordFilterParams result = new RecordFilterParams();
         getSingleValue(MIN_DATE_PARAM, params).ifPresent(s -> {
             try {
                 result.setMinModifiedDate(LocalDate.parse(s));

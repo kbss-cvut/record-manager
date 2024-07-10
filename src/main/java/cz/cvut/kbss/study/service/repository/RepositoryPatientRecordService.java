@@ -6,6 +6,7 @@ import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
@@ -36,12 +37,14 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     private final SecurityUtils securityUtils;
 
     private final UserService userService;
+    private final PatientRecordDao patientRecordDao;
 
     public RepositoryPatientRecordService(PatientRecordDao recordDao, SecurityUtils securityUtils,
-                                          UserService userService) {
+                                          UserService userService, PatientRecordDao patientRecordDao) {
         this.recordDao = recordDao;
         this.securityUtils = securityUtils;
         this.userService = userService;
+        this.patientRecordDao = patientRecordDao;
     }
 
     @Override
@@ -124,5 +127,10 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         Objects.requireNonNull(records);
         LOG.debug("Importing records to target phase '{}'.", targetPhase);
         return importRecordsImpl(records, Optional.ofNullable(targetPhase));
+    }
+
+    @Override
+    public Page<RawRecord> exportRecords(RecordFilterParams filters, Pageable pageSpec){
+        return patientRecordDao.findAllRecordsRaw(filters, pageSpec);
     }
 }

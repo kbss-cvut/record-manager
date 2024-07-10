@@ -5,34 +5,32 @@ import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
+import cz.cvut.kbss.study.model.export.RawRecord;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RecordFilterMapper;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import cz.cvut.kbss.study.service.ExcelRecordConverter;
 import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.util.Constants;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.InputStream;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @RestController
 @PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
@@ -42,10 +40,12 @@ public class PatientRecordController extends BaseController {
     private final PatientRecordService recordService;
 
     private final ApplicationEventPublisher eventPublisher;
+    private final ExcelRecordConverter excelRecordConverter;
 
-    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher) {
+    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher, ExcelRecordConverter excelRecordConverter) {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
+        this.excelRecordConverter = excelRecordConverter;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
@@ -62,15 +62,56 @@ public class PatientRecordController extends BaseController {
 
     @PreAuthorize(
             "hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
-    @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PatientRecord> exportRecords(
+    @GetMapping(value = "/export", produces = {MediaType.APPLICATION_JSON_VALUE, Constants.MEDIA_TYPE_EXCEL})
+    public ResponseEntity<?> exportRecords(
             @RequestParam(name = "institution", required = false) String institutionKey,
-            @RequestParam MultiValueMap<String, String> params,
-            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            @RequestParam(required = false) MultiValueMap<String, String> params,
+            UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response) {
+        MediaType exportType = Stream.of(
+                        Optional.ofNullable(params).map(p -> p.getFirst(Constants.EXPORT_TYPE_PARAM)),
+                        Optional.ofNullable(request.getHeader(HttpHeaders.ACCEPT))
+                ).filter(Optional::isPresent)
+                .findFirst()
+                .orElse(Optional.empty())
+                .flatMap(s -> MediaType.parseMediaTypes(s).stream()
+                        .max(Comparator.comparing(MediaType::getQualityValue))
+                ).orElse(MediaType.APPLICATION_JSON)
+                .removeQualityValue();
+
+        return switch (exportType.toString()){
+            case Constants.MEDIA_TYPE_EXCEL ->  exportRecordsExcel(params, uriBuilder, response);
+            case MediaType.APPLICATION_JSON_VALUE -> exportRecordsAsJson(params, uriBuilder, response);
+            default -> throw new IllegalArgumentException("Unsupported export type: " + exportType);
+        };
+    }
+
+    protected ResponseEntity<List<PatientRecord>> exportRecordsAsJson(
+            MultiValueMap<String, String> params,
+            UriComponentsBuilder uriBuilder, HttpServletResponse response){
         final Page<PatientRecord> result = recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
-                                                                     RestUtils.resolvePaging(params));
+                RestUtils.resolvePaging(params));
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
-        return result.getContent();
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(result.getContent());
+    }
+
+    public ResponseEntity<InputStreamResource> exportRecordsExcel(MultiValueMap<String, String> params,
+                                                                  UriComponentsBuilder uriBuilder, HttpServletResponse response){
+        RecordFilterParams filterParams = new RecordFilterParams();
+        filterParams.setMinModifiedDate(null);
+        filterParams.setMaxModifiedDate(null);
+        RecordFilterMapper.constructRecordFilter(filterParams, params);
+
+        Page<RawRecord> result = recordService.exportRecords(filterParams, RestUtils.resolvePaging(params));
+
+        InputStream stream = excelRecordConverter.convert(result.getContent());
+        eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
+        ContentDisposition contentDisposition = ContentDisposition.attachment().filename("export.xlsx").build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(Constants.MEDIA_TYPE_EXCEL))
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .body(new InputStreamResource(stream));
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
