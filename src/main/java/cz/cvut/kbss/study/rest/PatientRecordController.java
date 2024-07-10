@@ -13,6 +13,7 @@ import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.util.Constants;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
@@ -24,8 +25,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.InputStream;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @RestController
 @PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
@@ -59,13 +62,19 @@ public class PatientRecordController extends BaseController {
     public ResponseEntity<?> exportRecords(
             @RequestParam(name = "institution", required = false) String institutionKey,
             @RequestParam(required = false) MultiValueMap<String, String> params,
-            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response) {
+        MediaType exportType = Stream.of(
+                        Optional.ofNullable(params).map(p -> p.getFirst(Constants.EXPORT_TYPE_PARAM)),
+                        Optional.ofNullable(request.getHeader(HttpHeaders.ACCEPT))
+                ).filter(Optional::isPresent)
+                .findFirst()
+                .orElse(Optional.empty())
+                .flatMap(s -> MediaType.parseMediaTypes(s).stream()
+                        .max(Comparator.comparing(MediaType::getQualityValue))
+                ).orElse(MediaType.APPLICATION_JSON)
+                .removeQualityValue();
 
-        String exportType = Optional.ofNullable(params)
-                .map(p -> p.getFirst(Constants.EXPORT_TYPE_PARAM))
-                .orElse(MediaType.APPLICATION_JSON_VALUE);
-
-        return switch (exportType){
+        return switch (exportType.toString()){
             case Constants.MEDIA_TYPE_EXCEL ->  exportRecordsExcel(params, response);
             case MediaType.APPLICATION_JSON_VALUE -> exportRecordsAsJson(institutionKey, params, uriBuilder, response);
             default -> throw new IllegalArgumentException("Unsupported export type: " + exportType);
