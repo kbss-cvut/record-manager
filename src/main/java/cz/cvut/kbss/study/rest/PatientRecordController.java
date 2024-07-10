@@ -76,14 +76,13 @@ public class PatientRecordController extends BaseController {
 
         return switch (exportType.toString()){
             case Constants.MEDIA_TYPE_EXCEL ->  exportRecordsExcel(params, response);
-            case MediaType.APPLICATION_JSON_VALUE -> exportRecordsAsJson(institutionKey, params, uriBuilder, response);
+            case MediaType.APPLICATION_JSON_VALUE -> exportRecordsAsJson(params, uriBuilder, response);
             default -> throw new IllegalArgumentException("Unsupported export type: " + exportType);
         };
     }
 
     protected ResponseEntity<List<PatientRecord>> exportRecordsAsJson(
-            @RequestParam(name = "institution", required = false) String institutionKey,
-            @RequestParam MultiValueMap<String, String> params,
+            MultiValueMap<String, String> params,
             UriComponentsBuilder uriBuilder, HttpServletResponse response){
         final Page<PatientRecord> result = recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
                 RestUtils.resolvePaging(params));
@@ -93,7 +92,7 @@ public class PatientRecordController extends BaseController {
                 .body(result.getContent());
     }
 
-    public ResponseEntity<InputStreamResource> exportRecordsExcel(@RequestParam(required = false) MultiValueMap<String, String> params, HttpServletResponse response){
+    public ResponseEntity<InputStreamResource> exportRecordsExcel(MultiValueMap<String, String> params, HttpServletResponse response){
         RecordFilterParams filterParams = new RecordFilterParams();
         filterParams.setMinModifiedDate(null);
         filterParams.setMaxModifiedDate(null);
@@ -105,7 +104,6 @@ public class PatientRecordController extends BaseController {
                 .contentType(MediaType.parseMediaType(Constants.MEDIA_TYPE_EXCEL))
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
                 .body(new InputStreamResource(stream));
-
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
