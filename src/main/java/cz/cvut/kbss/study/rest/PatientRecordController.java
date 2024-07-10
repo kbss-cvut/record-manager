@@ -35,12 +35,10 @@ public class PatientRecordController extends BaseController {
     private final PatientRecordService recordService;
 
     private final ApplicationEventPublisher eventPublisher;
-    private final HttpServletResponse httpServletResponse;
 
-    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher, HttpServletResponse httpServletResponse) {
+    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher) {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
-        this.httpServletResponse = httpServletResponse;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
