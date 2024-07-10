@@ -18,6 +18,8 @@ public class RawRecord {
 
     @OWLDataProperty(iri = "http://created")
     private Date created;
+    @OWLDataProperty(iri = "http://modified")
+    private Date modified;
     @OWLDataProperty(iri = "http://label")
     private String label;
     @OWLObjectProperty(iri = "http://phase")
@@ -85,6 +87,14 @@ public class RawRecord {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public Date getModified() {
+        return modified;
+    }
+
+    public void setModified(Date modified) {
+        this.modified = modified;
     }
 
     public String getLabel() {

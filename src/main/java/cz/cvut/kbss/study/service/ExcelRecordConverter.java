@@ -91,6 +91,7 @@ public class ExcelRecordConverter {
             er.setFuselage(r.getFuselage());
             er.setUri(r.getUri());
             er.setCreated(r.getCreated());
+            er.setModified(r.getModified());
             er.setLabel(r.getLabel());
             er.setFailDate(r.getFailDate());
             er.setFlightHours(r.getFlightHours());
@@ -119,7 +120,7 @@ public class ExcelRecordConverter {
             r.createCell(2).setCellValue(rec.getCreated());
 //            r.createCell(3).setCellValue(rec.ed);
 //            r.createCell(4).setCellValue(rec.);
-//            r.createCell(5).setCellValue(rec.);
+            r.createCell(5).setCellValue(rec.getModified());
             r.createCell(6).setCellValue(rec.getLabel());
             r.createCell(7).setCellValue(rec.getInstitution());
             r.createCell(8).setCellValue(rec.getAircraftType());
