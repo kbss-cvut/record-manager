@@ -17,6 +17,7 @@ import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.util.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.collections4.EnumerationUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -27,9 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.InputStream;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 @RestController
@@ -67,15 +66,21 @@ public class PatientRecordController extends BaseController {
             @RequestParam(name = "institution", required = false) String institutionKey,
             @RequestParam(required = false) MultiValueMap<String, String> params,
             UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response) {
+
         MediaType exportType = Stream.of(
-                        Optional.ofNullable(params).map(p -> p.getFirst(Constants.EXPORT_TYPE_PARAM)),
-                        Optional.ofNullable(request.getHeader(HttpHeaders.ACCEPT))
-                ).filter(Optional::isPresent)
+                        Optional.ofNullable(params).map(p -> p.get(Constants.EXPORT_TYPE_PARAM)),
+                        Optional.of(Collections.list(request.getHeaders(HttpHeaders.ACCEPT)))
+                )
+                .map(o -> o.filter(l -> !l.isEmpty()))
+                .filter(Optional::isPresent)
+                .map(o -> o.map(l -> l.stream().flatMap(s ->
+                                MediaType.parseMediaTypes(s).stream()
+                                        .filter(RestUtils::isSupportedExportType)
+                        ).max(Comparator.comparing(MediaType::getQualityValue)).orElse(null)))
+                .filter(Optional::isPresent)
+                .map(o -> o.orElse(null))
                 .findFirst()
-                .orElse(Optional.empty())
-                .flatMap(s -> MediaType.parseMediaTypes(s).stream()
-                        .max(Comparator.comparing(MediaType::getQualityValue))
-                ).orElse(MediaType.APPLICATION_JSON)
+                .orElse(MediaType.APPLICATION_JSON)
                 .removeQualityValue();
 
         return switch (exportType.toString()){

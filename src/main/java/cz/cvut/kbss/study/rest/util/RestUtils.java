@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,10 +18,17 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RestUtils {
+
+    /**
+     * Supported export media types
+     */
+    public static List<String> SUPPORTED_EXPORT_MDEIA_TYPES = Arrays.asList(Constants.MEDIA_TYPE_EXCEL, MediaType.APPLICATION_JSON_VALUE);
 
     /**
      * Prefix indicating ascending sort order.
@@ -145,5 +153,9 @@ public class RestUtils {
             return PageRequest.of(page, size, sort);
         }
         return PageRequest.of(page, size);
+    }
+
+    public static boolean isSupportedExportType(MediaType mt){
+        return SUPPORTED_EXPORT_MDEIA_TYPES.stream().filter(s -> mt.toString().contains(s)).findAny().isPresent();
     }
 }
