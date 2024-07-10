@@ -6,10 +6,10 @@ import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
-import cz.cvut.kbss.study.service.ExcelRecordExporter;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
@@ -21,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -38,14 +37,14 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     private final SecurityUtils securityUtils;
 
     private final UserService userService;
-    private final ExcelRecordExporter excelRecordExporter;
+    private final PatientRecordDao patientRecordDao;
 
     public RepositoryPatientRecordService(PatientRecordDao recordDao, SecurityUtils securityUtils,
-                                          UserService userService, ExcelRecordExporter excelRecordExporter) {
+                                          UserService userService, PatientRecordDao patientRecordDao) {
         this.recordDao = recordDao;
         this.securityUtils = securityUtils;
         this.userService = userService;
-        this.excelRecordExporter = excelRecordExporter;
+        this.patientRecordDao = patientRecordDao;
     }
 
     @Override
@@ -131,7 +130,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     }
 
     @Override
-    public InputStream exportRecords(RecordFilterParams filters) {
-        return excelRecordExporter.exportRecords(filters);
+    public Page<RawRecord> exportRecords(RecordFilterParams filters, Pageable pageSpec){
+        return patientRecordDao.findAllRecordsRaw(filters, pageSpec);
     }
 }

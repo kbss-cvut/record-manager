@@ -16,30 +16,15 @@ PREFIX rm: <http://onto.fel.cvut.cz/ontologies/record-manager/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX spif: <http://spinrdf.org/spif#>
 
-SELECT (?rec as ?uri)
-?created ?label ?phase ?institution (IRI(str(?formTemplate)) as ?aircraftType) (str(?fus) as ?fuselage) ?ac_comp (str(?failDateStr) as ?failDate)
+SELECT ?r (?r as ?uri)
+?created ?label ?lastModified ?phase ?institution ?institutionKey ?formTemplate (IRI(str(?formTemplate)) as ?aircraftType) (str(?fus) as ?fuselage) ?ac_comp (str(?failDateStr) as ?failDate)
 ?flightHours ?numberOfAirframeOverhauls ?classificationOfOccurrence ?failureAscertainmentCircumstances (?repeatedFailureCode as ?repeatedFailure) ?failureCause ?consequence ?mission ?repair (str(?repairDurationStr) as ?repairDuration) ?averageNumberOfMenDuringRepairment ?failureDescription ?descriptionOfCorrectiveAction ?yearOfProductionOfDefectiveEquipment ?numberOfOverhaulsOfDefectiveEquipment ?serialNoOf ?notes ?fhaEvent
 {
+    ###RECORD_CLAUSE###
 
-    ?rec a rm:patient-record;
-    dcterms:created ?created;
-    rdfs:label ?label .
-    ?rec rm:was-treated-at ?institution.
-    	?institution rm:key ?institutionKey .
-
-    ?rec rm:has-form-template ?formTemplate.
-
-    OPTIONAL  {
-        ?rec dcterms:modified ?lastModified .
-    }
-
-    OPTIONAL{
-        ?rec rm:has-phase ?phase. #rm:completed-record-phase.
-    }
-
-    ?rec rm:has-question ?f.
+    ?r rm:has-question ?f.
     ?f doc:has_related_question ?s1.
-    ?f doc:has_related_question ?s2
+    ?f doc:has_related_question ?s2.
     FILTER(?s2 != ?s1)
     ?s2 doc:has_related_question ?fhaEventQ.
     ?fhaEventQ form:has-question-origin avamod:fha-event.
@@ -104,117 +89,115 @@ SELECT (?rec as ?uri)
 
     ?s1 doc:has_related_question ?notesQ.
     ?notesQ form:has-question-origin avamod:notes.
-
-	# avamod:fuselage-no
-	?FUSq doc:has_answer ?FUSa.
-	?FUSa doc:has_data_value ?fus.
-
-	#avamod:system-equipment-block-part-l-39ng.a1
-	# ?comp - label of general component/system
-	# ?comp_iri - iri of component type specific to the aircraft
-	?Cq doc:has_answer ?Ca.
-	?Ca doc:has_object_value ?ac_comp.
-
-	#avamod:date-of-failure-ascertainment
-	# ?failDate - creation date filter
-	?failDateq doc:has_answer ?failDatea.
-	?failDatea doc:has_data_value ?failDateStr.
-	#        BIND(spif:parseDate(?failDateStr, "DD-MM-yyyy") as ?failDate)
-	#    FILTER((!BOUND(?createdBefore) || ?createdBefore < ?failDate ) && (!BOUND(?createdAfter) || ?createdAfter >= ?failDate ))
-
-	#avamod:flight-hours-of-airframe-since-the-service-beginning
-
-	?FHq doc:has_answer ?FHa.
-	?FHa doc:has_data_value ?flightHours.
-
-	#avamod:classification-of-occurrence
-	?classificationOfOccurrenceQ doc:has_answer ?classificationOfOccurrenceA.
-	?classificationOfOccurrenceA doc:has_object_value ?classificationOfOccurrence.
-
-	#avamod:failure-ascertainment-circumstances
-
-	?failureAscertainmentCircumstancesQ doc:has_answer ?failureAscertainmentCircumstancesA.
-	?failureAscertainmentCircumstancesA doc:has_object_value ?failureAscertainmentCircumstances.
-
-	# during flight
-	#    BIND(IF(BOUND(?failureAscertainmentCircumstances) && ?failureAscertainmentCircumstances = avadom:during-flight, 1, 0) as ?duringFlight)
-
-	#avamod:repeated-failure
-	?repeatedFailureQ doc:has_answer ?repeatedFailureA.
-	?repeatedFailureA doc:has_object_value ?repeatedFailureCode.
-
-    OPTIONAL{
-        #avamod:failure-cause
-        ?failureCauseQ doc:has_answer ?failureCauseA.
-        ?failureCauseA doc:has_object_value ?failureCause.
-    }
-	#avamod:consequence
-
-	?consequenceQ doc:has_answer ?consequenceA.
-	?consequenceA doc:has_object_value ?consequence.
-
-	#avamod:mission
-	?missionQ doc:has_answer ?missionA.
-	?missionA doc:has_object_value ?mission.
-
-	#avamod:repair
-	?repairQ doc:has_answer ?repairA.
-	?repairA doc:has_object_value ?repair.
-
-	#avamod:repair-duration
-	?repairDurationQ doc:has_answer ?repairDurationA.
-	?repairDurationA doc:has_data_value ?repairDurationStr.
-
-	#avamod:average-number-of-men-during-repairment
-	?averageNumberOfMenDuringRepairmentQ doc:has_answer ?averageNumberOfMenDuringRepairmentA.
-	?averageNumberOfMenDuringRepairmentA doc:has_data_value ?averageNumberOfMenDuringRepairmentStr.
-	BIND(xsd:decimal(str(?averageNumberOfMenDuringRepairmentStr)) as ?averageNumberOfMenDuringRepairment)
-
-	#avamod:failure-description
-	?failureDescriptionQ doc:has_answer ?failureDescriptionA.
-	?failureDescriptionA doc:has_data_value ?failureDescription.
-
-	#avamod:description-of-corrective-action
-	?descriptionOfCorrectiveActionQ doc:has_answer ?descriptionOfCorrectiveActionA.
-	?descriptionOfCorrectiveActionA doc:has_data_value ?descriptionOfCorrectiveAction.
-
     OPTIONAL {
-        #avamod:number-of-airframe-overhauls
-        ?numberOfAirframeOverhaulsQ doc:has_answer ?numberOfAirframeOverhaulsA.
-        ?numberOfAirframeOverhaulsA doc:has_data_value ?numberOfAirframeOverhaulsStr.
-        BIND(xsd:integer(str(?numberOfAirframeOverhaulsStr)) as ?numberOfAirframeOverhauls)
-    }
+        # avamod:fuselage-no
+        ?FUSq doc:has_answer ?FUSa.
+        ?FUSa doc:has_data_value ?fus.
 
-	OPTIONAL {
-        #avamod:year-of-production-of-defective-equipment
-        ?yearOfProductionOfDefectiveEquipmentQ doc:has_answer ?yearOfProductionOfDefectiveEquipmentA.
-        ?yearOfProductionOfDefectiveEquipmentA doc:has_data_value ?yearOfProductionOfDefectiveEquipment.# TODO - transform to more suitable datatype
-        FILTER(str(spif:trim(?yearOfProductionOfDefectiveEquipment)) != "" )
-    }
+        #avamod:system-equipment-block-part-l-39ng.a1
+        # ?comp - label of general component/system
+        # ?comp_iri - iri of component type specific to the aircraft
+        ?Cq doc:has_answer ?Ca.
+        ?Ca doc:has_object_value ?ac_comp.
 
-	OPTIONAL {
-        #avamod:number-of-overhauls-of-defective-equipment
-        ?numberOfOverhaulsOfDefectiveEquipmentQ doc:has_answer ?numberOfOverhaulsOfDefectiveEquipmentA.
-        ?numberOfOverhaulsOfDefectiveEquipmentA doc:has_data_value ?numberOfOverhaulsOfDefectiveEquipment.# TODO - transform to more suitable datatype
-        FILTER(str(spif:trim(?numberOfOverhaulsOfDefectiveEquipment)) != "" )
-#    }
-# 	 OPTIONAL{
-#        #avamod:serial-no-of
-#        ?serialNoOfQ doc:has_answer ?serialNoOfA.
-#        ?serialNoOfA doc:has_data_value ?serialNoOf.
-    }
-	OPTIONAL{
-        #avamod:notes
-        ?notesQ doc:has_answer ?notesA.
-        ?notesA doc:has_data_value ?notes.
-        FILTER(str(spif:trim(?notes)) != "" )
-    }
-	OPTIONAL{
-        #avamod:fha-event
-        ?fhaEventQ doc:has_answer ?fhaEventA.
-        ?fhaEventA doc:has_object_value ?fhaEvent.
-    }
-    BIND (COALESCE(?lastModified, ?created) AS ?date)
+        #avamod:date-of-failure-ascertainment
+        # ?failDate - creation date filter
+        ?failDateq doc:has_answer ?failDatea.
+        ?failDatea doc:has_data_value ?failDateStr.
+        #        BIND(spif:parseDate(?failDateStr, "DD-MM-yyyy") as ?failDate)
+        #    FILTER((!BOUND(?createdBefore) || ?createdBefore < ?failDate ) && (!BOUND(?createdAfter) || ?createdAfter >= ?failDate ))
 
-    ###FILTER_CLAUSES###
+        #avamod:flight-hours-of-airframe-since-the-service-beginning
+
+        ?FHq doc:has_answer ?FHa.
+        ?FHa doc:has_data_value ?flightHours.
+
+        #avamod:classification-of-occurrence
+        ?classificationOfOccurrenceQ doc:has_answer ?classificationOfOccurrenceA.
+        ?classificationOfOccurrenceA doc:has_object_value ?classificationOfOccurrence.
+
+        #avamod:failure-ascertainment-circumstances
+
+        ?failureAscertainmentCircumstancesQ doc:has_answer ?failureAscertainmentCircumstancesA.
+        ?failureAscertainmentCircumstancesA doc:has_object_value ?failureAscertainmentCircumstances.
+
+        # during flight
+        #    BIND(IF(BOUND(?failureAscertainmentCircumstances) && ?failureAscertainmentCircumstances = avadom:during-flight, 1, 0) as ?duringFlight)
+
+        #avamod:repeated-failure
+        ?repeatedFailureQ doc:has_answer ?repeatedFailureA.
+        ?repeatedFailureA doc:has_object_value ?repeatedFailureCode.
+
+        OPTIONAL{
+            #avamod:failure-cause
+            ?failureCauseQ doc:has_answer ?failureCauseA.
+            ?failureCauseA doc:has_object_value ?failureCause.
+        }
+        #avamod:consequence
+
+        ?consequenceQ doc:has_answer ?consequenceA.
+        ?consequenceA doc:has_object_value ?consequence.
+
+        #avamod:mission
+        ?missionQ doc:has_answer ?missionA.
+        ?missionA doc:has_object_value ?mission.
+
+        #avamod:repair
+        ?repairQ doc:has_answer ?repairA.
+        ?repairA doc:has_object_value ?repair.
+
+        #avamod:repair-duration
+        ?repairDurationQ doc:has_answer ?repairDurationA.
+        ?repairDurationA doc:has_data_value ?repairDurationStr.
+
+        #avamod:average-number-of-men-during-repairment
+        ?averageNumberOfMenDuringRepairmentQ doc:has_answer ?averageNumberOfMenDuringRepairmentA.
+        ?averageNumberOfMenDuringRepairmentA doc:has_data_value ?averageNumberOfMenDuringRepairmentStr.
+        BIND(xsd:decimal(str(?averageNumberOfMenDuringRepairmentStr)) as ?averageNumberOfMenDuringRepairment)
+
+        #avamod:failure-description
+        ?failureDescriptionQ doc:has_answer ?failureDescriptionA.
+        ?failureDescriptionA doc:has_data_value ?failureDescription.
+
+        #avamod:description-of-corrective-action
+        ?descriptionOfCorrectiveActionQ doc:has_answer ?descriptionOfCorrectiveActionA.
+        ?descriptionOfCorrectiveActionA doc:has_data_value ?descriptionOfCorrectiveAction.
+
+        OPTIONAL {
+            #avamod:number-of-airframe-overhauls
+            ?numberOfAirframeOverhaulsQ doc:has_answer ?numberOfAirframeOverhaulsA.
+            ?numberOfAirframeOverhaulsA doc:has_data_value ?numberOfAirframeOverhaulsStr.
+            BIND(xsd:integer(str(?numberOfAirframeOverhaulsStr)) as ?numberOfAirframeOverhauls)
+        }
+
+        OPTIONAL {
+            #avamod:year-of-production-of-defective-equipment
+            ?yearOfProductionOfDefectiveEquipmentQ doc:has_answer ?yearOfProductionOfDefectiveEquipmentA.
+            ?yearOfProductionOfDefectiveEquipmentA doc:has_data_value ?yearOfProductionOfDefectiveEquipment.# TODO - transform to more suitable datatype
+            FILTER(str(spif:trim(?yearOfProductionOfDefectiveEquipment)) != "" )
+        }
+
+        OPTIONAL {
+            #avamod:number-of-overhauls-of-defective-equipment
+            ?numberOfOverhaulsOfDefectiveEquipmentQ doc:has_answer ?numberOfOverhaulsOfDefectiveEquipmentA.
+            ?numberOfOverhaulsOfDefectiveEquipmentA doc:has_data_value ?numberOfOverhaulsOfDefectiveEquipment.# TODO - transform to more suitable datatype
+            FILTER(str(spif:trim(?numberOfOverhaulsOfDefectiveEquipment)) != "" )
+    #    }
+    # 	 OPTIONAL{
+    #        #avamod:serial-no-of
+    #        ?serialNoOfQ doc:has_answer ?serialNoOfA.
+    #        ?serialNoOfA doc:has_data_value ?serialNoOf.
+        }
+        OPTIONAL{
+            #avamod:notes
+            ?notesQ doc:has_answer ?notesA.
+            ?notesA doc:has_data_value ?notes.
+            FILTER(str(spif:trim(?notes)) != "" )
+        }
+        OPTIONAL{
+            #avamod:fha-event
+            ?fhaEventQ doc:has_answer ?fhaEventA.
+            ?fhaEventA doc:has_object_value ?fhaEvent.
+        }
+    }
 }

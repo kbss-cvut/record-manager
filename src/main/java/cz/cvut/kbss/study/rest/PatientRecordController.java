@@ -5,12 +5,14 @@ import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
+import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RecordFilterMapper;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import cz.cvut.kbss.study.service.ExcelRecordConverter;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.util.Constants;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,10 +40,12 @@ public class PatientRecordController extends BaseController {
     private final PatientRecordService recordService;
 
     private final ApplicationEventPublisher eventPublisher;
+    private final ExcelRecordConverter excelRecordConverter;
 
-    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher) {
+    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher, ExcelRecordConverter excelRecordConverter) {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
+        this.excelRecordConverter = excelRecordConverter;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
@@ -75,7 +79,7 @@ public class PatientRecordController extends BaseController {
                 .removeQualityValue();
 
         return switch (exportType.toString()){
-            case Constants.MEDIA_TYPE_EXCEL ->  exportRecordsExcel(params, response);
+            case Constants.MEDIA_TYPE_EXCEL ->  exportRecordsExcel(params, uriBuilder, response);
             case MediaType.APPLICATION_JSON_VALUE -> exportRecordsAsJson(params, uriBuilder, response);
             default -> throw new IllegalArgumentException("Unsupported export type: " + exportType);
         };
@@ -92,13 +96,17 @@ public class PatientRecordController extends BaseController {
                 .body(result.getContent());
     }
 
-    public ResponseEntity<InputStreamResource> exportRecordsExcel(MultiValueMap<String, String> params, HttpServletResponse response){
+    public ResponseEntity<InputStreamResource> exportRecordsExcel(MultiValueMap<String, String> params,
+                                                                  UriComponentsBuilder uriBuilder, HttpServletResponse response){
         RecordFilterParams filterParams = new RecordFilterParams();
         filterParams.setMinModifiedDate(null);
         filterParams.setMaxModifiedDate(null);
         RecordFilterMapper.constructRecordFilter(filterParams, params);
 
-        InputStream stream = recordService.exportRecords(filterParams);
+        Page<RawRecord> result = recordService.exportRecords(filterParams, RestUtils.resolvePaging(params));
+
+        InputStream stream = excelRecordConverter.convert(result.getContent());
+        eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
         ContentDisposition contentDisposition = ContentDisposition.attachment().filename("export.xlsx").build();
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(Constants.MEDIA_TYPE_EXCEL))

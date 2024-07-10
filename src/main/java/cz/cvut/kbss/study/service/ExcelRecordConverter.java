@@ -4,8 +4,6 @@ import cz.cvut.kbss.study.model.export.ExportRecord;
 import cz.cvut.kbss.study.model.export.Path;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.CodeListValuesDao;
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
-import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.util.Utils;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -22,20 +20,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class ExcelRecordExporter {
+public class ExcelRecordConverter {
 
-    private final PatientRecordDao patientRecordDao;
     private final CodeListValuesDao codeListValuesDao;
 
-    public ExcelRecordExporter(PatientRecordDao patientRecordDao, CodeListValuesDao codeListValuesDao) {
-        this.patientRecordDao = patientRecordDao;
+    public ExcelRecordConverter(CodeListValuesDao codeListValuesDao) {
         this.codeListValuesDao = codeListValuesDao;
     }
 
-    public InputStream exportRecords(RecordFilterParams filters){
+    public InputStream convert(List<RawRecord> rawRecords){
         try {
             XSSFWorkbook workbook = new XSSFWorkbook(Utils.class.getClassLoader().getResourceAsStream("templates/record-export-template.xlsx"));
-            List<ExportRecord> exportRecords = findExportRecords(filters);
+            List<ExportRecord> exportRecords = findExportRecordsData(rawRecords);
             addDataToExcel(workbook, exportRecords);
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             workbook.write(output);
@@ -45,8 +41,7 @@ public class ExcelRecordExporter {
         }
     }
 
-    private List<ExportRecord> findExportRecords(RecordFilterParams filters){
-        List<RawRecord> rawRecords = patientRecordDao.findAllRecordsRaw(filters);
+    private List<ExportRecord> findExportRecordsData(List<RawRecord> rawRecords){
         Map<URI, String> translatorMap = new HashMap<>();
         List<Path> paths = codeListValuesDao.getBroaderPath(rawRecords.stream().map(r -> r.getAc_comp()).collect(Collectors.toSet()));
         Set<URI> uris = rawRecords.stream().flatMap(r -> Stream.of(

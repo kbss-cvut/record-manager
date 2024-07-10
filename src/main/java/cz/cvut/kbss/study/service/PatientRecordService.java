@@ -4,11 +4,11 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
+import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.io.InputStream;
 import java.util.List;
 
 public interface PatientRecordService extends BaseService<PatientRecord> {
@@ -79,5 +79,11 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      */
     RecordImportResult importRecords(List<PatientRecord> records, RecordPhase targetPhase);
 
-    InputStream exportRecords(RecordFilterParams filters);
+    /**
+     *
+     * @param filters Record filtering criteria
+     * @param pageSpec Specification of page and sorting to retrieve
+     * @return List of matching records
+     */
+    Page<RawRecord> exportRecords(RecordFilterParams filters, Pageable pageSpec);
 }

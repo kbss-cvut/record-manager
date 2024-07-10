@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
 
     public static final String FIND_ALL_RAW_PATIENT_RECORDS = "find-raw-records.sparql";
-    public static final String RAW_RECORDS_FILTER_CLAUSE_PATTERN = "###FILTER_CLAUSES###";
+    public static final String RECORDS_CLAUSE_TEMPLATE_VAR = "###RECORD_CLAUSE###";
 
     public PatientRecordDao(EntityManager em) {
         super(PatientRecord.class, em);
@@ -243,17 +243,40 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         return new PageImpl<>(records, pageSpec, totalCount);
     }
 
-    public List<RawRecord> findAllRecordsRaw(RecordFilterParams filters){
+    public Page<RawRecord> findAllRecordsRaw(RecordFilterParams filters, Pageable pageSpec){
         final Map<String, Object> queryParams = new HashMap<>();
-        final String filterClauseExtension = mapParamsToQuery(filters, queryParams);
-        final String queryString = Utils.loadQuery(FIND_ALL_RAW_PATIENT_RECORDS)
-                .replaceAll(RAW_RECORDS_FILTER_CLAUSE_PATTERN, filterClauseExtension);
-        Query query = em.createNativeQuery(queryString, RawRecord.class.getSimpleName());
+        final String whereClause = constructWhereClause(filters, queryParams);
+
+        final String queryStringNoPaging = Utils.loadQuery(FIND_ALL_RAW_PATIENT_RECORDS)
+                .replaceFirst(RECORDS_CLAUSE_TEMPLATE_VAR, whereClause);
+        final String queryString = queryStringNoPaging + (pageSpec.isPaged()
+                ? resolveOrderBy(pageSpec.getSortOr(RecordSort.defaultSort()))
+                : ""
+        );
+
+        Query query = em.createNativeQuery(queryString,  RawRecord.class.getSimpleName());
         queryParams.forEach(query::setParameter);
-        return query.getResultList();
+
+        if (pageSpec.isPaged()) {
+            query.setFirstResult((int) pageSpec.getOffset());
+            query.setMaxResults(pageSpec.getPageSize());
+        }
+        setQueryParameters(query, queryParams);
+        List<RawRecord> result = query.getResultList();
+        Integer totalCount = result.size();
+        if(pageSpec.isPaged()){
+            TypedQuery<Integer> countQuery = em.createNativeQuery(
+                    "SELECT (COUNT(?r) as ?cnt) WHERE {%s}".formatted(whereClause),
+                    Integer.class);
+
+            setQueryParameters(countQuery, queryParams);
+            totalCount = countQuery.getSingleResult();
+        }
+
+        return new PageImpl<>(result, pageSpec, totalCount);
     }
 
-    private void setQueryParameters(TypedQuery<?> query, Map<String, Object> queryParams) {
+    private void setQueryParameters(Query query, Map<String, Object> queryParams) {
         query.setParameter("type", typeUri)
              .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
             .setParameter("hasFormTemplate", URI.create(Vocabulary.s_p_has_form_template))
