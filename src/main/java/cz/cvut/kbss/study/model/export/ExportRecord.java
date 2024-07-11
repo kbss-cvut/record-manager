@@ -11,7 +11,7 @@ public class ExportRecord {
 
     private Date created;
 
-    private Date modified;
+    private Date lastModified;
 
     private String label;
 
@@ -85,12 +85,12 @@ public class ExportRecord {
         this.created = created;
     }
 
-    public Date getModified() {
-        return modified;
+    public Date getLastModified() {
+        return lastModified;
     }
 
-    public void setModified(Date modified) {
-        this.modified = modified;
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
     }
 
     public String getLabel() {
