@@ -12,12 +12,13 @@ import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RecordFilterMapper;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.ExcelRecordConverter;
 import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.collections4.EnumerationUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -25,9 +26,11 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -40,11 +43,15 @@ public class PatientRecordController extends BaseController {
 
     private final ApplicationEventPublisher eventPublisher;
     private final ExcelRecordConverter excelRecordConverter;
+    private final RestTemplate restTemplate;
+    private final ConfigReader configReader;
 
-    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher, ExcelRecordConverter excelRecordConverter) {
+    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher, ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate, ConfigReader configReader) {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
         this.excelRecordConverter = excelRecordConverter;
+        this.restTemplate = restTemplate;
+        this.configReader = configReader;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
@@ -171,6 +178,23 @@ public class PatientRecordController extends BaseController {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Patient record {} successfully updated.", record);
         }
+
+        onUpdateRecord(record.getUri());
+    }
+
+    private void onUpdateRecord(URI uri){
+        Objects.nonNull(uri);
+        String onRecordUpdateServiceUrl = configReader.getConfig(ConfigParam.ON_UPDATE_RECORD_SERVICE_URL);
+        if(onRecordUpdateServiceUrl == null || onRecordUpdateServiceUrl.isBlank()) {
+            LOG.debug("No onRecordUpdateServiceUrl service url provided, noop.");
+            return;
+        }
+
+        LOG.debug("calling onRecordUpdateServiceUrl: {} with parameter {}", onRecordUpdateServiceUrl, uri);
+        String requestUrl = UriComponentsBuilder.fromHttpUrl(onRecordUpdateServiceUrl)
+                .queryParam("record", uri)
+                .toUriString();
+        restTemplate.getForObject(requestUrl,String.class);
     }
 
     @DeleteMapping(value = "/{key}")

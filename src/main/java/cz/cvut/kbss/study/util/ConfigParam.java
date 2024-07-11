@@ -9,6 +9,8 @@ public enum ConfigParam {
     FORM_GEN_REPOSITORY_URL("formGenRepositoryUrl"),
     FORM_GEN_SERVICE_URL("formGenServiceUrl"),
 
+    ON_UPDATE_RECORD_SERVICE_URL("onRecordUpdateServiceUrl"),
+
     APP_CONTEXT("appContext"),
 
     SMTP_HOST("smtp.host"),
