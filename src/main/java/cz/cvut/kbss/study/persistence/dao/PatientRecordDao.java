@@ -245,7 +245,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
 
     public Page<RawRecord> findAllRecordsRaw(RecordFilterParams filters, Pageable pageSpec){
         final Map<String, Object> queryParams = new HashMap<>();
-        final String whereClause = constructWhereClause(filters, queryParams);
+        final String whereClause = constructWhereClauseWithGraphs(filters, queryParams);
 
         final String queryStringNoPaging = Utils.loadQuery(FIND_ALL_RAW_PATIENT_RECORDS)
                 .replaceFirst(RECORDS_CLAUSE_TEMPLATE_VAR, whereClause);
@@ -301,6 +301,27 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
                 "BIND (COALESCE(?lastModified, ?created) AS ?date) ";
         whereClause += mapParamsToQuery(filters, queryParams);
         whereClause += "}";
+        return whereClause;
+    }
+
+    private static String constructWhereClauseWithGraphs(RecordFilterParams filters, Map<String, Object> queryParams) {
+        // Could not use Criteria API because it does not support OPTIONAL
+        String whereClause = "{GRAPH ?r{" +
+                "?r a ?type ; " +
+                "?hasCreatedDate ?created ; " +
+                "?hasInstitution ?institution . " +
+                "OPTIONAL { ?r ?hasPhase ?phase . } " +
+                "OPTIONAL { ?r ?hasFormTemplate ?formTemplate . } " +
+                "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
+                "BIND (COALESCE(?lastModified, ?created) AS ?date) ";
+        whereClause += mapParamsToQuery(filters, queryParams);
+        whereClause += "}" +
+                "GRAPH ?institutionGraph{" +
+                "?institution ?hasKey ?institutionKey ." +
+                "}}";
+
+        queryParams.put("institutionGraph", URI.create(Vocabulary.s_c_institution + "s"));
+
         return whereClause;
     }
 
