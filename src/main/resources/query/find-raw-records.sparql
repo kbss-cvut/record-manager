@@ -27,7 +27,8 @@ SELECT ?r (?r as ?uri)
         ?f doc:has_related_question ?s2.
         FILTER(?s2 != ?s1)
         ?s2 doc:has_related_question ?fhaEventQ.
-        ?fhaEventQ form:has-question-origin avamod:fha-event.
+        ?fhaEventQ form:has-question-origin ?fhaEventQuestionOrigin.
+        FILTER(contains(str(?fhaEventQuestionOrigin), "http://vfn.cz/ontologies/ava-study/model/fha-event-"))
 
         ?s1 doc:has_related_question ?FUSq.
         ?FUSq form:has-question-origin avamod:fuselage-no.
