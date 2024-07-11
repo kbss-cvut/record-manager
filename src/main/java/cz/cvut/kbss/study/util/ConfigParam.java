@@ -10,6 +10,7 @@ public enum ConfigParam {
     FORM_GEN_SERVICE_URL("formGenServiceUrl"),
 
     ON_UPDATE_RECORD_SERVICE_URL("onRecordUpdateServiceUrl"),
+    ON_PUBLISH_RECORDS_SERVICE_URL("onPublishRecordsServiceUrl"),
     EXCEL_IMPORT_SERVICE_URL("excelImportServiceUrl"),
 
     APP_CONTEXT("appContext"),
