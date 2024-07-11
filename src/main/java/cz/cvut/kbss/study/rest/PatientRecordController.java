@@ -184,7 +184,10 @@ public class PatientRecordController extends BaseController {
 
     private void onUpdateRecord(URI uri){
         Objects.nonNull(uri);
-        String onRecordUpdateServiceUrl = configReader.getConfig(ConfigParam.ON_UPDATE_RECORD_SERVICE_URL);
+        String onRecordUpdateServiceUrl = Optional.ofNullable(configReader)
+                .map(r -> r.getConfig(ConfigParam.ON_UPDATE_RECORD_SERVICE_URL))
+                .orElse(null);
+
         if(onRecordUpdateServiceUrl == null || onRecordUpdateServiceUrl.isBlank()) {
             LOG.debug("No onRecordUpdateServiceUrl service url provided, noop.");
             return;
