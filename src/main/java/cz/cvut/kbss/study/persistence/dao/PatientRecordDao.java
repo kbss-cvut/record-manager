@@ -284,23 +284,26 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
                            URI.create(Vocabulary.s_p_was_treated_at))
              .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
              .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
-             .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified));
+             .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified))
+             .setParameter("institutionGraph", URI.create(Vocabulary.s_c_institution + "s"));
         queryParams.forEach(query::setParameter);
     }
 
     private static String constructWhereClause(RecordFilterParams filters, Map<String, Object> queryParams) {
         // Could not use Criteria API because it does not support OPTIONAL
-        String whereClause = "{" +
+        String whereClause = "{GRAPH ?r{" +
                 "?r a ?type ; " +
                 "?hasCreatedDate ?created ; " +
                 "?hasInstitution ?institution . " +
-                "?institution ?hasKey ?institutionKey ." +
                 "OPTIONAL { ?r ?hasPhase ?phase . } " +
                 "OPTIONAL { ?r ?hasFormTemplate ?formTemplate . } " +
                 "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
                 "BIND (COALESCE(?lastModified, ?created) AS ?date) ";
         whereClause += mapParamsToQuery(filters, queryParams);
-        whereClause += "}";
+        whereClause += "}" +
+                "GRAPH ?institutionGraph{" +
+                "?institution ?hasKey ?institutionKey ." +
+                "}}";
         return whereClause;
     }
 
