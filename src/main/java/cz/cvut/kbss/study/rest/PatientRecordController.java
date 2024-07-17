@@ -152,17 +152,26 @@ public class PatientRecordController extends BaseController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE, MediaType.MEDIA_TYPE_EXCEL)
     public RecordImportResult importRecords(@RequestBody List<PatientRecord> records,
-                                            @RequestParam(name = "phase", required = false) String phase) {
+                                            @RequestParam(name = "phase", required = false) String phase,
+                                            @RequestHeader(value = "Content-Type") String contentType
+                                            ) {
+
         final RecordImportResult importResult;
-        if (phase != null) {
-            final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
-            importResult = recordService.importRecords(records, targetPhase);
-        } else {
-            importResult = recordService.importRecords(records);
+        if(contentType.equals(MediaType.APPLICATION_JSON)){
+            if (phase != null) {
+                final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
+                importResult = recordService.importRecords(records, targetPhase);
+            } else {
+                importResult = recordService.importRecords(records);
+            }
+            LOG.trace("Records imported with result: {}.", importResult);
+        }else if(contentType.equals(MediaType.MEDIA_TYPE_EXCEL)){
+            String excelImportServiceUrl = configReader.getConfig(ConfigParam.EXCEL_IMPORT_SERVICE_URL);
+            importResult = restTemplate.postForEntity(URI.create(publishServiceUrl), records, RecordImportResult.class).getBody();
+            LOG.trace("Records imported with result: {}.", importResult);
         }
-        LOG.trace("Records imported with result: {}.", importResult);
         return importResult;
     }
 
