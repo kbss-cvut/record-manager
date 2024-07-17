@@ -127,7 +127,7 @@ public class ExcelRecordConverter {
             r.createCell(10).setCellValue(rec.getFuselage());
             r.createCell(11).setCellValue(rec.getFailDate());
             r.createCell(12).setCellValue(rec.getFlightHours());
-            r.createCell(13).setCellValue(rec.getNumberOfAirframeOverhauls());
+            Optional.ofNullable(rec.getNumberOfAirframeOverhauls()).ifPresent( i -> r.createCell(13).setCellValue(i));
             r.createCell(14).setCellValue(rec.getClassificationOfOccurrence());
             r.createCell(15).setCellValue(rec.getFailureAscertainmentCircumstances());
             r.createCell(16).setCellValue(rec.getRepeatedFailure());
@@ -136,7 +136,7 @@ public class ExcelRecordConverter {
             r.createCell(19).setCellValue(rec.getMission());
             r.createCell(20).setCellValue(rec.getRepair());
             r.createCell(21).setCellValue(rec.getRepairDuration());
-            r.createCell(22).setCellValue(rec.getAverageNumberOfMenDuringRepairment());
+            Optional.ofNullable(rec.getAverageNumberOfMenDuringRepairment()).ifPresent( i -> r.createCell(22).setCellValue(i));
             r.createCell(23).setCellValue(rec.getFailureDescription());
             r.createCell(24).setCellValue(rec.getDescriptionOfCorrectiveAction());
             r.createCell(25).setCellValue(rec.getAc_compName());
