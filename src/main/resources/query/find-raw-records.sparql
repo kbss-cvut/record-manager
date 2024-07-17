@@ -24,11 +24,14 @@ SELECT ?r (?r as ?uri)
     GRAPH ?r {
         ?r rm:has-question ?f.
         ?f doc:has_related_question ?s1.
-        ?f doc:has_related_question ?s2.
-        FILTER(?s2 != ?s1)
-        ?s2 doc:has_related_question ?fhaEventQ.
-        ?fhaEventQ form:has-question-origin ?fhaEventQuestionOrigin.
-        FILTER(contains(str(?fhaEventQuestionOrigin), "http://vfn.cz/ontologies/ava-study/model/fha-event-"))
+
+        OPTIONAL{
+            ?f doc:has_related_question ?s2.
+            FILTER(?s2 != ?s1)
+            ?s2 doc:has_related_question ?fhaEventQ.
+            ?fhaEventQ form:has-question-origin ?fhaEventQuestionOrigin.
+            FILTER(contains(str(?fhaEventQuestionOrigin), "http://vfn.cz/ontologies/ava-study/model/fha-event"))
+        }
 
         ?s1 doc:has_related_question ?FUSq.
         ?FUSq form:has-question-origin avamod:fuselage-no.
@@ -181,8 +184,9 @@ SELECT ?r (?r as ?uri)
             OPTIONAL {
                 #avamod:number-of-overhauls-of-defective-equipment
                 ?numberOfOverhaulsOfDefectiveEquipmentQ doc:has_answer ?numberOfOverhaulsOfDefectiveEquipmentA.
-                ?numberOfOverhaulsOfDefectiveEquipmentA doc:has_data_value ?numberOfOverhaulsOfDefectiveEquipment.# TODO - transform to more suitable datatype
-                FILTER(str(spif:trim(?numberOfOverhaulsOfDefectiveEquipment)) != "" )
+                ?numberOfOverhaulsOfDefectiveEquipmentA doc:has_data_value ?numberOfOverhaulsOfDefectiveEquipmentStr.# TODO - transform to more suitable datatype
+                FILTER(str(spif:trim(?numberOfOverhaulsOfDefectiveEquipmentStr)) != "" )
+                BIND(xsd:integer(str(spif:trim(?numberOfOverhaulsOfDefectiveEquipmentStr))) as ?numberOfOverhaulsOfDefectiveEquipment)
         #    }
         # 	 OPTIONAL{
         #        #avamod:serial-no-of
@@ -196,6 +200,7 @@ SELECT ?r (?r as ?uri)
                 FILTER(str(spif:trim(?notes)) != "" )
             }
             OPTIONAL{
+                FILTER(BOUND(?s2) && BOUND(?fhaEventQ))
                 #avamod:fha-event
                 ?fhaEventQ doc:has_answer ?fhaEventA.
                 ?fhaEventA doc:has_object_value ?fhaEvent.
