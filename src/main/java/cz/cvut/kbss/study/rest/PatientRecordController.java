@@ -1,5 +1,7 @@
 package cz.cvut.kbss.study.rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
@@ -20,15 +22,19 @@ import cz.cvut.kbss.study.util.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
@@ -152,27 +158,57 @@ public class PatientRecordController extends BaseController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE, MediaType.MEDIA_TYPE_EXCEL)
-    public RecordImportResult importRecords(@RequestBody List<PatientRecord> records,
-                                            @RequestParam(name = "phase", required = false) String phase,
-                                            @RequestHeader(value = "Content-Type") String contentType
-                                            ) {
+    @PostMapping(value = "/import/{format}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public RecordImportResult importRecords(@RequestPart("file") MultipartFile file,
+                                            @PathVariable("format") String format,
+                                            @RequestParam(name = "phase", required = false) String phase) {
 
+        if(file.isEmpty())
+            throw new IllegalArgumentException("Cannot import records, missing input file");
+        List<PatientRecord> records;
+        records = parseRecords(file, format);
         final RecordImportResult importResult;
-        if(contentType.equals(MediaType.APPLICATION_JSON)){
-            if (phase != null) {
-                final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
-                importResult = recordService.importRecords(records, targetPhase);
-            } else {
-                importResult = recordService.importRecords(records);
-            }
-            LOG.trace("Records imported with result: {}.", importResult);
-        }else if(contentType.equals(MediaType.MEDIA_TYPE_EXCEL)){
-            String excelImportServiceUrl = configReader.getConfig(ConfigParam.EXCEL_IMPORT_SERVICE_URL);
-            importResult = restTemplate.postForEntity(URI.create(publishServiceUrl), records, RecordImportResult.class).getBody();
-            LOG.trace("Records imported with result: {}.", importResult);
+        if (phase != null) {
+            final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
+            importResult = recordService.importRecords(records, targetPhase);
+        } else {
+            importResult = recordService.importRecords(records);
         }
+        LOG.trace("Records imported with result: {}.", importResult);
         return importResult;
+    }
+
+    private List<PatientRecord> parseRecords(MultipartFile file, String format) {
+        format = format.toLowerCase();
+        if (format.equals("json")) {
+            try {
+                return new ObjectMapper().readValue(file.getBytes(), new TypeReference<List<PatientRecord>>(){});
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to parse JSON content", e);
+            }
+        } else if (format.equals("xls") || format.equals("xlsx")) {
+            String excelImportServiceUrl = configReader.getConfig(ConfigParam.EXCEL_IMPORT_SERVICE_URL);
+            if (excelImportServiceUrl == null) {
+                throw new IllegalArgumentException("Cannot import XLS, excelImportServiceUrl is not configured");
+            }
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", file.getResource());
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<List<PatientRecord>> responseEntity = restTemplate.exchange(
+                    URI.create(excelImportServiceUrl),
+                    HttpMethod.POST,
+                    requestEntity,
+                    new ParameterizedTypeReference<List<PatientRecord>>() {}
+            );
+            return responseEntity.getBody();
+        } else {
+            throw new RuntimeException("Unsupported file format: " + format);
+        }
     }
 
     @PutMapping(value = "/{key}", consumes = MediaType.APPLICATION_JSON_VALUE)
