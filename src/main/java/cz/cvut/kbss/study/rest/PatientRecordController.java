@@ -158,15 +158,55 @@ public class PatientRecordController extends BaseController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/import/{format}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public RecordImportResult importRecords(@RequestPart("file") MultipartFile file,
-                                            @PathVariable("format") String format,
+    @PostMapping(value = "/import/json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public RecordImportResult importRecordsJson(@RequestPart("file") MultipartFile file,
                                             @RequestParam(name = "phase", required = false) String phase) {
+
+        List<PatientRecord> records;
 
         if(file.isEmpty())
             throw new IllegalArgumentException("Cannot import records, missing input file");
+        try {
+            records = new ObjectMapper().readValue(file.getBytes(), new TypeReference<List<PatientRecord>>(){});
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to parse JSON content", e);
+        }
+        return importRecords(records, phase);
+    }
+
+    @PostMapping(value = "/import/excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public RecordImportResult importRecordsExcel(@RequestPart("file") MultipartFile file,
+                                            @RequestParam(name = "phase", required = false) String phase) {
+
         List<PatientRecord> records;
-        records = parseRecords(file, format);
+
+        if(file.isEmpty())
+            throw new IllegalArgumentException("Cannot import records, missing input file");
+
+        String excelImportServiceUrl = configReader.getConfig(ConfigParam.EXCEL_IMPORT_SERVICE_URL);
+
+        if (excelImportServiceUrl == null)
+            throw new IllegalArgumentException("Cannot import XLS, excelImportServiceUrl is not configured");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", file.getResource());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<List<PatientRecord>> responseEntity = restTemplate.exchange(
+                URI.create(excelImportServiceUrl),
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<List<PatientRecord>>() {}
+        );
+        records = responseEntity.getBody();
+        return importRecords(records, phase);
+    }
+
+    public RecordImportResult importRecords(List<PatientRecord> records, String phase) {
         final RecordImportResult importResult;
         if (phase != null) {
             final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
@@ -178,38 +218,6 @@ public class PatientRecordController extends BaseController {
         return importResult;
     }
 
-    private List<PatientRecord> parseRecords(MultipartFile file, String format) {
-        format = format.toLowerCase();
-        if (format.equals("json")) {
-            try {
-                return new ObjectMapper().readValue(file.getBytes(), new TypeReference<List<PatientRecord>>(){});
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to parse JSON content", e);
-            }
-        } else if (format.equals("xls") || format.equals("xlsx")) {
-            String excelImportServiceUrl = configReader.getConfig(ConfigParam.EXCEL_IMPORT_SERVICE_URL);
-            if (excelImportServiceUrl == null) {
-                throw new IllegalArgumentException("Cannot import XLS, excelImportServiceUrl is not configured");
-            }
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
-
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", file.getResource());
-
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-            ResponseEntity<List<PatientRecord>> responseEntity = restTemplate.exchange(
-                    URI.create(excelImportServiceUrl),
-                    HttpMethod.POST,
-                    requestEntity,
-                    new ParameterizedTypeReference<List<PatientRecord>>() {}
-            );
-            return responseEntity.getBody();
-        } else {
-            throw new RuntimeException("Unsupported file format: " + format);
-        }
-    }
 
     @PutMapping(value = "/{key}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
