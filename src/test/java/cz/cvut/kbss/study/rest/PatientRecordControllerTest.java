@@ -305,25 +305,6 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                 Pageable.unpaged());
     }
 
-//    @Test
-//    void importRecordsJsonImportsSpecifiedRecordsAndReturnsImportResult() throws Exception {
-//        final List<PatientRecord> records =
-//                List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
-//        final RecordImportResult importResult = new RecordImportResult(records.size());
-//        importResult.setImportedCount(records.size());
-//        when(patientRecordServiceMock.importRecords(anyList())).thenReturn(importResult);
-//
-//        final MvcResult mvcResult = mockMvc.perform(
-//                post("/records/import/json").content(toJson(records)).contentType(MediaType.MULTIPART_FORM_DATA_VALUE)).andReturn();
-//        final RecordImportResult result = readValue(mvcResult, RecordImportResult.class);
-//        assertEquals(importResult.getTotalCount(), result.getTotalCount());
-//        assertEquals(importResult.getImportedCount(), result.getImportedCount());
-//        assertThat(importResult.getErrors(), anyOf(nullValue(), empty()));
-//        @SuppressWarnings("unchecked")
-//        final ArgumentCaptor<List<PatientRecord>> captor = ArgumentCaptor.forClass(List.class);
-//        verify(patientRecordServiceMock).importRecords(captor.capture());
-//        assertEquals(records.size(), captor.getValue().size());
-//    }
 
     @Test
     void importRecordsJsonImportsSpecifiedRecordsAndReturnsImportResult() throws Exception {
@@ -337,9 +318,6 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         MockMultipartFile file = new MockMultipartFile("file", "records.json",
                 MediaType.MULTIPART_FORM_DATA_VALUE, toJson(records).getBytes());
 
-        String jsonContent = new String(file.getBytes());
-        System.out.println("Received JSON content: " + jsonContent);
-
         final MvcResult mvcResult = mockMvc.perform(
                 multipart("/records/import/json")
                         .file(file)
@@ -347,15 +325,13 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         ).andReturn();
 
         final RecordImportResult result = readValue(mvcResult, RecordImportResult.class);
-
-        // Assertions
         assertEquals(importResult.getTotalCount(), result.getTotalCount());
         assertEquals(importResult.getImportedCount(), result.getImportedCount());
         assertThat(importResult.getErrors(), anyOf(nullValue(), empty()));
 
-
         @SuppressWarnings("unchecked")
         final ArgumentCaptor<List<PatientRecord>> captor = ArgumentCaptor.forClass(List.class);
+        verify(patientRecordServiceMock).importRecords(captor.capture());
         assertEquals(records.size(), captor.getValue().size());
     }
 
@@ -388,8 +364,14 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                 List.of(Generator.generatePatientRecord(user), Generator.generatePatientRecord(user));
         when(patientRecordServiceMock.importRecords(anyList())).thenThrow(RecordAuthorNotFoundException.class);
 
-        mockMvc.perform(post("/records/import/json").content(toJson(records)).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
-               .andExpect(status().isConflict());
+        MockMultipartFile file = new MockMultipartFile("file", "records.json",
+                MediaType.MULTIPART_FORM_DATA_VALUE, toJson(records).getBytes());
+
+        mockMvc.perform(
+                multipart("/records/import/json")
+                        .file(file)
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+        ).andExpect(status().isConflict());
     }
 
     @Test
