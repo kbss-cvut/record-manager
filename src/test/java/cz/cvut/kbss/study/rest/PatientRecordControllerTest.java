@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -64,6 +65,9 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     @Mock
     private ApplicationEventPublisher eventPublisherMock;
+
+    @Spy
+    private ObjectMapper objectMapper = Environment.getObjectMapper();
 
     @InjectMocks
     private PatientRecordController controller;
@@ -365,8 +369,16 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final RecordPhase targetPhase = RecordPhase.values()[Generator.randomInt(0, RecordPhase.values().length)];
         when(patientRecordServiceMock.importRecords(anyList(), any(RecordPhase.class))).thenReturn(importResult);
 
-        mockMvc.perform(post("/records/import/json").content(toJson(records)).contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                                               .param("phase", targetPhase.getIri())).andExpect(status().isOk());
+        MockMultipartFile file = new MockMultipartFile("file", "records.json",
+            MediaType.MULTIPART_FORM_DATA_VALUE, toJson(records).getBytes());
+
+        mockMvc.perform(
+            multipart("/records/import/json")
+                .file(file)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .param("phase", targetPhase.getIri())
+        ).andExpect(status().isOk());
+
         verify(patientRecordServiceMock).importRecords(anyList(), eq(targetPhase));
     }
 

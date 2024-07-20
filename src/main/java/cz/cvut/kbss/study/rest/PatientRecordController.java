@@ -51,13 +51,17 @@ public class PatientRecordController extends BaseController {
     private final ExcelRecordConverter excelRecordConverter;
     private final RestTemplate restTemplate;
     private final ConfigReader configReader;
+    private ObjectMapper objectMapper;
 
-    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher, ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate, ConfigReader configReader) {
+    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher,
+                                   ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate,
+                                   ConfigReader configReader, ObjectMapper objectMapper)  {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
         this.excelRecordConverter = excelRecordConverter;
         this.restTemplate = restTemplate;
         this.configReader = configReader;
+        this.objectMapper = objectMapper;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
@@ -167,7 +171,7 @@ public class PatientRecordController extends BaseController {
         if(file.isEmpty())
             throw new IllegalArgumentException("Cannot import records, missing input file");
         try {
-            records = new ObjectMapper().readValue(file.getBytes(), new TypeReference<List<PatientRecord>>(){});
+            records =  objectMapper.readValue(file.getBytes(), new TypeReference<List<PatientRecord>>(){});
         } catch (IOException e) {
             throw new RuntimeException("Failed to parse JSON content", e);
         }
