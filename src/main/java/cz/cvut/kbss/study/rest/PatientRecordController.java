@@ -179,8 +179,9 @@ public class PatientRecordController extends BaseController {
     }
 
     @PostMapping(value = "/import/excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public RecordImportResult importRecordsExcel(@RequestPart("file") MultipartFile file,
-                                            @RequestParam(name = "phase", required = false) String phase) {
+    public RecordImportResult importRecordsExcel(
+        @RequestPart("file") MultipartFile file,
+        @RequestParam(name = "phase", required = false) String phase) {
 
         List<PatientRecord> records;
 
@@ -196,18 +197,64 @@ public class PatientRecordController extends BaseController {
         headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", file.getResource());
+        body.add("files", file.getResource());
+
+        String request = UriComponentsBuilder.fromHttpUrl(excelImportServiceUrl)
+            .queryParam("datasetResource", "@%s".formatted(file.getOriginalFilename()))
+            .toUriString();
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         ResponseEntity<List<PatientRecord>> responseEntity = restTemplate.exchange(
-                URI.create(excelImportServiceUrl),
+                URI.create(request),
                 HttpMethod.POST,
                 requestEntity,
                 new ParameterizedTypeReference<List<PatientRecord>>() {}
         );
         records = responseEntity.getBody();
         return importRecords(records, phase);
+    }
+
+    @PostMapping(value = "/import/tsv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public RecordImportResult importRecordsTsv(
+        @RequestPart("file") MultipartFile file,
+        @RequestParam(name = "phase", required = false) String phase) {
+
+        List<PatientRecord> records;
+
+        if(file.isEmpty())
+            throw new IllegalArgumentException("Cannot import records, missing input file");
+
+        String excelImportServiceUrl = configReader.getConfig(ConfigParam.EXCEL_IMPORT_SERVICE_URL);
+
+        if (excelImportServiceUrl == null)
+            throw new IllegalArgumentException("Cannot import TSV, excelImportServiceUrl is not configured");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("files", file.getResource());
+
+        String request = UriComponentsBuilder.fromHttpUrl(excelImportServiceUrl)
+            .queryParam("datasetResource", "@%s".formatted(file.getOriginalFilename()))
+            .toUriString();
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<byte[]> responseEntity = restTemplate.postForEntity(
+            URI.create(request),
+            requestEntity,
+            byte[].class
+        );
+
+        LOG.info("Import finished with status {}", responseEntity.getStatusCode());
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            byte[] responseBody = responseEntity.getBody();
+            LOG.debug("Response body length is {}", responseBody.length);
+        }
+
+        return new RecordImportResult();
     }
 
     public RecordImportResult importRecords(List<PatientRecord> records, String phase) {

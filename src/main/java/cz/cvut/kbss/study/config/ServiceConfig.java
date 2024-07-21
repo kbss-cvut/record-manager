@@ -7,6 +7,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -40,8 +41,12 @@ public class ServiceConfig {
         final MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter();
         jacksonConverter.setObjectMapper(objectMapper);
         final StringHttpMessageConverter stringConverter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
-        restTemplate.setMessageConverters(
-                Arrays.asList(stringConverter, jacksonConverter, new ResourceHttpMessageConverter()));
+        restTemplate.setMessageConverters(Arrays.asList(
+            stringConverter,
+            jacksonConverter,
+            new ResourceHttpMessageConverter(),
+            new FormHttpMessageConverter()
+        ));
         return restTemplate;
     }
 }
