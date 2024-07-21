@@ -72,6 +72,7 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * current user is set as the record's author.
      *
      * @param records Records to import
+     * @param targetPhase Phase to be set to all imported records.
      * @return Instance representing the import result
      * @throws cz.cvut.kbss.study.exception.RecordAuthorNotFoundException Thrown when importing a record whose author
      *                                                                    does not exist in this application instance's
