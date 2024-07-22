@@ -76,7 +76,6 @@ public class UserController extends BaseController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-
     @PreAuthorize(
             "hasRole('" + SecurityConstants.ROLE_ADMIN + "') " +
                     "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
