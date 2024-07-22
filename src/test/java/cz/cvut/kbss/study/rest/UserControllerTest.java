@@ -63,6 +63,7 @@ public class UserControllerTest extends BaseControllerTestRunner {
         assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
 
+
     @Test
     public void getUserByUsernameFoundUser() throws Exception {
         final String username = "tom";
