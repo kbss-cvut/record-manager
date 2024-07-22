@@ -7,6 +7,7 @@ import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
+import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
@@ -17,6 +18,7 @@ import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.ExcelRecordConverter;
 import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Constants;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,16 +54,19 @@ public class PatientRecordController extends BaseController {
     private final RestTemplate restTemplate;
     private final ConfigReader configReader;
     private ObjectMapper objectMapper;
+    private final UserService userService;
 
     public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher,
                                    ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate,
-                                   ConfigReader configReader, ObjectMapper objectMapper)  {
+                                   ConfigReader configReader, ObjectMapper objectMapper,
+                                   UserService userService)  {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
         this.excelRecordConverter = excelRecordConverter;
         this.restTemplate = restTemplate;
         this.configReader = configReader;
         this.objectMapper = objectMapper;
+        this.userService = userService;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
@@ -150,9 +155,15 @@ public class PatientRecordController extends BaseController {
         return record;
     }
 
+
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createRecord(@RequestBody PatientRecord record) {
+    public ResponseEntity<String> createRecord(@RequestBody PatientRecord record) {
+
+        if(userService.getCurrentUser().getInstitution() == null)
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is not assigned to any institution");
+
         recordService.persist(record);
         if (LOG.isTraceEnabled()) {
             LOG.trace("Patient record {} successfully created.", record);

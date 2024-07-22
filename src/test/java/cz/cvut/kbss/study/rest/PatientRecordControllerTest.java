@@ -16,6 +16,7 @@ import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,6 +66,9 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     @Mock
     private ApplicationEventPublisher eventPublisherMock;
+
+    @Mock
+    private UserService userService;
 
     @Spy
     private ObjectMapper objectMapper = Environment.getObjectMapper();
@@ -178,6 +182,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     @Test
     public void createRecordReturnsResponseStatusCreated() throws Exception {
         PatientRecord record = Generator.generatePatientRecord(user);
+        when(userService.getCurrentUser()).thenReturn(user);
 
         final MvcResult result = mockMvc.perform(post("/records").content(toJson(record))
                                                                  .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -185,6 +190,22 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
         assertEquals(HttpStatus.CREATED, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
+
+    @Test
+    public void createRecordWithoutInstitutionReturnsResponseStatusBadRequest() throws Exception {
+        user.setInstitution(null);
+
+        PatientRecord record = Generator.generatePatientRecord(user);
+
+        when(userService.getCurrentUser()).thenReturn(user);
+
+        final MvcResult result = mockMvc.perform(post("/records").content(toJson(record))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn();
+
+        assertEquals(HttpStatus.CONFLICT, HttpStatus.valueOf(result.getResponse().getStatus()));
+    }
+
 
     @Test
     public void updateRecordReturnsResponseStatusNoContent() throws Exception {
