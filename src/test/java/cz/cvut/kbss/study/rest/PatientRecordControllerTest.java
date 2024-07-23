@@ -340,7 +340,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                 MediaType.MULTIPART_FORM_DATA_VALUE, toJson(records).getBytes());
 
         final MvcResult mvcResult = mockMvc.perform(
-                multipart("/records/import/json")
+                multipart("/records/import")
                         .file(file)
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
         ).andReturn();
@@ -370,7 +370,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
             MediaType.MULTIPART_FORM_DATA_VALUE, toJson(records).getBytes());
 
         mockMvc.perform(
-            multipart("/records/import/json")
+            multipart("/records/import")
                 .file(file)
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 .param("phase", targetPhase.getIri())
@@ -389,7 +389,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                 MediaType.MULTIPART_FORM_DATA_VALUE, toJson(records).getBytes());
 
         mockMvc.perform(
-                multipart("/records/import/json")
+                multipart("/records/import")
                         .file(file)
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
         ).andExpect(status().isConflict());
