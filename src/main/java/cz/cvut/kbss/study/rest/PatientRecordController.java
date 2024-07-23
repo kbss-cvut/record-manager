@@ -253,7 +253,7 @@ public class PatientRecordController extends BaseController {
         return responseEntity.getBody();
     }
 
-    @PermitAll
+    @PreAuthorize("permitAll()")
     @PostMapping(value = "/import/json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public RecordImportResult importRecordsJson(@RequestPart("file") MultipartFile file,
                                             @RequestParam(name = "phase", required = false) String phase) {
