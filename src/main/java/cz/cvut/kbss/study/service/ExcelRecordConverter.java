@@ -43,7 +43,9 @@ public class ExcelRecordConverter {
 
     private List<ExportRecord> findExportRecordsData(List<RawRecord> rawRecords){
         Map<URI, String> translatorMap = new HashMap<>();
-        List<Path> paths = codeListValuesDao.getBroaderPath(rawRecords.stream().map(r -> r.getAc_comp()).collect(Collectors.toSet()));
+        List<Path> paths = codeListValuesDao.getBroaderPath(rawRecords.stream().map(r -> r.getAc_comp())
+                .filter(u -> u != null)
+                .collect(Collectors.toSet()));
         Set<URI> uris = rawRecords.stream().flatMap(r -> Stream.of(
                         r.getClassificationOfOccurrence(), r.getConsequence(), r.getFailureAscertainmentCircumstances(),
                         r.getFailureCause(), r.getAc_comp(), r.getFhaEvent(), r.getMission(), r.getRepair(),
