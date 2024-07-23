@@ -109,6 +109,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
                                              PatientRecord record) {
         if (!currentUser.isAdmin()) {
             record.setAuthor(currentUser);
+            record.setLastModifiedBy(currentUser);
             record.setInstitution(currentUser.getInstitution());
             record.setDateCreated(now);
             targetPhase.ifPresentOrElse(record::setPhase, () -> record.setPhase(RecordPhase.open));
