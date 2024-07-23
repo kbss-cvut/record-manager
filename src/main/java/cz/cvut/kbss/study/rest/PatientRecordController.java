@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
@@ -41,6 +42,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.sql.Array;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -61,7 +63,7 @@ public class PatientRecordController extends BaseController {
     public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher,
                                    ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate,
                                    ConfigReader configReader, ObjectMapper objectMapper,
-                                   UserService userService)  {
+                                   UserService userService) {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
         this.excelRecordConverter = excelRecordConverter;
@@ -78,7 +80,7 @@ public class PatientRecordController extends BaseController {
             @RequestParam MultiValueMap<String, String> params,
             UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         final Page<PatientRecordDto> result = recordService.findAll(RecordFilterMapper.constructRecordFilter(params),
-                                                                    RestUtils.resolvePaging(params));
+                RestUtils.resolvePaging(params));
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
         return result.getContent();
     }
@@ -98,17 +100,17 @@ public class PatientRecordController extends BaseController {
                 .map(o -> o.filter(l -> !l.isEmpty()))
                 .filter(Optional::isPresent)
                 .map(o -> o.map(l -> l.stream().flatMap(s ->
-                                MediaType.parseMediaTypes(s).stream()
-                                        .filter(RestUtils::isSupportedExportType)
-                        ).max(Comparator.comparing(MediaType::getQualityValue)).orElse(null)))
+                        MediaType.parseMediaTypes(s).stream()
+                                .filter(RestUtils::isSupportedExportType)
+                ).max(Comparator.comparing(MediaType::getQualityValue)).orElse(null)))
                 .filter(Optional::isPresent)
                 .map(o -> o.orElse(null))
                 .findFirst()
                 .orElse(MediaType.APPLICATION_JSON)
                 .removeQualityValue();
 
-        return switch (exportType.toString()){
-            case Constants.MEDIA_TYPE_EXCEL ->  exportRecordsExcel(params, uriBuilder, response);
+        return switch (exportType.toString()) {
+            case Constants.MEDIA_TYPE_EXCEL -> exportRecordsExcel(params, uriBuilder, response);
             case MediaType.APPLICATION_JSON_VALUE -> exportRecordsAsJson(params, uriBuilder, response);
             default -> throw new IllegalArgumentException("Unsupported export type: " + exportType);
         };
@@ -116,7 +118,7 @@ public class PatientRecordController extends BaseController {
 
     protected ResponseEntity<List<PatientRecord>> exportRecordsAsJson(
             MultiValueMap<String, String> params,
-            UriComponentsBuilder uriBuilder, HttpServletResponse response){
+            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         final Page<PatientRecord> result = recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
                 RestUtils.resolvePaging(params));
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
@@ -126,7 +128,7 @@ public class PatientRecordController extends BaseController {
     }
 
     public ResponseEntity<InputStreamResource> exportRecordsExcel(MultiValueMap<String, String> params,
-                                                                  UriComponentsBuilder uriBuilder, HttpServletResponse response){
+                                                                  UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         RecordFilterParams filterParams = new RecordFilterParams();
         filterParams.setMinModifiedDate(null);
         filterParams.setMaxModifiedDate(null);
@@ -157,13 +159,11 @@ public class PatientRecordController extends BaseController {
         return record;
     }
 
-
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> createRecord(@RequestBody PatientRecord record) {
 
-        if(userService.getCurrentUser().getInstitution() == null)
+        if (userService.getCurrentUser().getInstitution() == null)
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User is not assigned to any institution");
 
         recordService.persist(record);
@@ -176,22 +176,22 @@ public class PatientRecordController extends BaseController {
     }
 
     @PreAuthorize(
-        "hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
+            "hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @PostMapping(value = "/publish", produces = {MediaType.APPLICATION_JSON_VALUE})
     public RecordImportResult publishRecords(
-        @RequestParam(name = "institution", required = false) String institutionKey,
-        @RequestParam(required = false) MultiValueMap<String, String> params,
-        HttpServletRequest request) {
+            @RequestParam(name = "institution", required = false) String institutionKey,
+            @RequestParam(required = false) MultiValueMap<String, String> params,
+            HttpServletRequest request) {
 
         String onPublishRecordsServiceUrl = configReader.getConfig(ConfigParam.ON_PUBLISH_RECORDS_SERVICE_URL);
-        if(onPublishRecordsServiceUrl == null || onPublishRecordsServiceUrl.isBlank()) {
+        if (onPublishRecordsServiceUrl == null || onPublishRecordsServiceUrl.isBlank()) {
             LOG.info("No publish service url provided, noop.");
             RecordImportResult result = new RecordImportResult(0);
             result.addError("Cannot publish completed records. Publish server not configured.");
             return result;
         }
 
-       // export
+        // export
         final Page<PatientRecord> result = recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
                 RestUtils.resolvePaging(params));
         List<PatientRecord> records = result.getContent();
@@ -227,7 +227,7 @@ public class PatientRecordController extends BaseController {
         // Call the import endpoint
         LOG.debug("Publishing records.");
         ResponseEntity<RecordImportResult> responseEntity = restTemplate.postForEntity(
-            onPublishRecordsServiceUrl, requestEntity, RecordImportResult.class);
+                onPublishRecordsServiceUrl, requestEntity, RecordImportResult.class);
 
         // TODO make records published
 
@@ -235,31 +235,57 @@ public class PatientRecordController extends BaseController {
         return responseEntity.getBody();
     }
 
-    @PostMapping(value = "/import/json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public RecordImportResult importRecordsJson(@RequestPart("file") MultipartFile file,
-                                            @RequestParam(name = "phase", required = false) String phase) {
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public RecordImportResult importRecords(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(name = "phase", required = false) String phase) {
+
+        if (file.isEmpty()) {
+            throw new ValidationException("Cannot import records, missing input file");
+        }
+
+        String filename = file.getOriginalFilename();
+
+        if (filename == null) {
+            throw new ValidationException("Cannot import records, missing filename");
+        }
 
         List<PatientRecord> records;
 
-        if(file.isEmpty())
-            throw new IllegalArgumentException("Cannot import records, missing input file");
+        if (filename.endsWith(".json")) {
+            records = getRecordsFromJson(file, phase);
+        } else if (filename.endsWith(".xls") || filename.endsWith(".xlsx")) {
+            records = getRecordsFromExcel(file, phase);
+        } else if (filename.endsWith(".tsv")) {
+            records = getRecordsFromTsv(file, phase);
+        } else {
+            throw new IllegalArgumentException("Unsupported file type: " + filename);
+        }
+
+        final RecordImportResult importResult;
+        if (phase != null) {
+            final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
+            importResult = recordService.importRecords(records, targetPhase);
+        } else {
+            importResult = recordService.importRecords(records);
+        }
+        LOG.trace("Records imported with result: {}.", importResult);
+        return importResult;
+    }
+
+    private List<PatientRecord> getRecordsFromJson(MultipartFile file, String phase) {
+        List<PatientRecord> records;
         try {
-            records =  objectMapper.readValue(file.getBytes(), new TypeReference<List<PatientRecord>>(){});
+            return objectMapper.readValue(file.getBytes(), new TypeReference<List<PatientRecord>>() {
+            });
         } catch (IOException e) {
             throw new RuntimeException("Failed to parse JSON content", e);
         }
-        return importRecords(records, phase);
     }
 
-    @PostMapping(value = "/import/excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public RecordImportResult importRecordsExcel(
-        @RequestPart("file") MultipartFile file,
-        @RequestParam(name = "phase", required = false) String phase) {
+    private List<PatientRecord> getRecordsFromExcel(MultipartFile file, String phase) {
 
         List<PatientRecord> records;
-
-        if(file.isEmpty())
-            throw new IllegalArgumentException("Cannot import records, missing input file");
 
         String excelImportServiceUrl = configReader.getConfig(ConfigParam.EXCEL_IMPORT_SERVICE_URL);
 
@@ -273,8 +299,8 @@ public class PatientRecordController extends BaseController {
         body.add("files", file.getResource());
 
         String request = UriComponentsBuilder.fromHttpUrl(excelImportServiceUrl)
-            .queryParam("datasetResource", "@%s".formatted(file.getOriginalFilename()))
-            .toUriString();
+                .queryParam("datasetResource", "@%s".formatted(file.getOriginalFilename()))
+                .toUriString();
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
@@ -282,20 +308,17 @@ public class PatientRecordController extends BaseController {
                 URI.create(request),
                 HttpMethod.POST,
                 requestEntity,
-                new ParameterizedTypeReference<List<PatientRecord>>() {}
+                new ParameterizedTypeReference<List<PatientRecord>>() {
+                }
         );
-        records = responseEntity.getBody();
-        return importRecords(records, phase);
+        return responseEntity.getBody();
     }
 
-    @PostMapping(value = "/import/tsv", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public RecordImportResult importRecordsTsv(
-        @RequestPart("file") MultipartFile file,
-        @RequestParam(name = "phase", required = false) String phase) {
+    private List<PatientRecord> getRecordsFromTsv(MultipartFile file, String phase) {
 
         List<PatientRecord> records;
 
-        if(file.isEmpty())
+        if (file.isEmpty())
             throw new IllegalArgumentException("Cannot import records, missing input file");
 
         String excelImportServiceUrl = configReader.getConfig(ConfigParam.EXCEL_IMPORT_SERVICE_URL);
@@ -310,15 +333,15 @@ public class PatientRecordController extends BaseController {
         body.add("files", file.getResource());
 
         String request = UriComponentsBuilder.fromHttpUrl(excelImportServiceUrl)
-            .queryParam("datasetResource", "@%s".formatted(file.getOriginalFilename()))
-            .toUriString();
+                .queryParam("datasetResource", "@%s".formatted(file.getOriginalFilename()))
+                .toUriString();
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         ResponseEntity<byte[]> responseEntity = restTemplate.postForEntity(
-            URI.create(request),
-            requestEntity,
-            byte[].class
+                URI.create(request),
+                requestEntity,
+                byte[].class
         );
 
         LOG.info("Import finished with status {}", responseEntity.getStatusCode());
@@ -327,19 +350,7 @@ public class PatientRecordController extends BaseController {
             LOG.debug("Response body length is {}", responseBody.length);
         }
 
-        return new RecordImportResult();
-    }
-
-    public RecordImportResult importRecords(List<PatientRecord> records, String phase) {
-        final RecordImportResult importResult;
-        if (phase != null) {
-            final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
-            importResult = recordService.importRecords(records, targetPhase);
-        } else {
-            importResult = recordService.importRecords(records);
-        }
-        LOG.trace("Records imported with result: {}.", importResult);
-        return importResult;
+        return new ArrayList<PatientRecord>();
     }
 
 
@@ -359,13 +370,13 @@ public class PatientRecordController extends BaseController {
         onUpdateRecord(record.getUri());
     }
 
-    private void onUpdateRecord(URI uri){
+    private void onUpdateRecord(URI uri) {
         Objects.nonNull(uri);
         String onRecordUpdateServiceUrl = Optional.ofNullable(configReader)
                 .map(r -> r.getConfig(ConfigParam.ON_UPDATE_RECORD_SERVICE_URL))
                 .orElse(null);
 
-        if(onRecordUpdateServiceUrl == null || onRecordUpdateServiceUrl.isBlank()) {
+        if (onRecordUpdateServiceUrl == null || onRecordUpdateServiceUrl.isBlank()) {
             LOG.debug("No onRecordUpdateServiceUrl service url provided, noop.");
             return;
         }
@@ -374,7 +385,7 @@ public class PatientRecordController extends BaseController {
         String requestUrl = UriComponentsBuilder.fromHttpUrl(onRecordUpdateServiceUrl)
                 .queryParam("record", uri)
                 .toUriString();
-        restTemplate.getForObject(requestUrl,String.class);
+        restTemplate.getForObject(requestUrl, String.class);
     }
 
     @DeleteMapping(value = "/{key}")
