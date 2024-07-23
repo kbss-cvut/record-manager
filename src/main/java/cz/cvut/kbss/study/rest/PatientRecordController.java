@@ -42,6 +42,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.sql.Array;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -252,11 +253,11 @@ public class PatientRecordController extends BaseController {
         List<PatientRecord> records;
 
         if (filename.endsWith(".json")) {
-            records = getRecordsJson(file, phase);
+            records = getRecordsFromJson(file, phase);
         } else if (filename.endsWith(".xls") || filename.endsWith(".xlsx")) {
-            records = getRecordsExcel(file, phase);
+            records = getRecordsFromExcel(file, phase);
         } else if (filename.endsWith(".tsv")) {
-            records = getRecordsTsv(file, phase)
+            records = getRecordsFromTsv(file, phase);
         } else {
             throw new IllegalArgumentException("Unsupported file type: " + filename);
         }
@@ -272,7 +273,7 @@ public class PatientRecordController extends BaseController {
         return importResult;
     }
 
-    private List<PatientRecord> getRecordsJson(MultipartFile file, String phase) {
+    private List<PatientRecord> getRecordsFromJson(MultipartFile file, String phase) {
         List<PatientRecord> records;
         try {
             return objectMapper.readValue(file.getBytes(), new TypeReference<List<PatientRecord>>() {
@@ -282,7 +283,7 @@ public class PatientRecordController extends BaseController {
         }
     }
 
-    private List<PatientRecord> getRecordsExcel(MultipartFile file, String phase) {
+    private List<PatientRecord> getRecordsFromExcel(MultipartFile file, String phase) {
 
         List<PatientRecord> records;
 
@@ -313,7 +314,7 @@ public class PatientRecordController extends BaseController {
         return responseEntity.getBody();
     }
 
-    private RecordImportResult getRecordsTsv(MultipartFile file, String phase) {
+    private List<PatientRecord> getRecordsFromTsv(MultipartFile file, String phase) {
 
         List<PatientRecord> records;
 
@@ -349,7 +350,7 @@ public class PatientRecordController extends BaseController {
             LOG.debug("Response body length is {}", responseBody.length);
         }
 
-        return new RecordImportResult();
+        return new ArrayList<PatientRecord>();
     }
 
 
