@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
+import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.User;
@@ -157,14 +158,13 @@ public class PatientRecordController extends BaseController {
         return record;
     }
 
-
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> createRecord(@RequestBody PatientRecord record) {
 
         if(userService.getCurrentUser().getInstitution() == null)
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is not assigned to any institution");
+            throw new ValidationException("record.save-error.user-not-assigned-to-institution",
+                    "User is not assigned to any institution.");
 
         recordService.persist(record);
         if (LOG.isTraceEnabled()) {
