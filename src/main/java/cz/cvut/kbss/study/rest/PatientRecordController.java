@@ -31,6 +31,8 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -71,12 +73,21 @@ public class PatientRecordController extends BaseController {
         this.userService = userService;
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #institutionKey==null or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecordDto> getRecords(
             @RequestParam(value = "institution", required = false) String institutionKey,
             @RequestParam MultiValueMap<String, String> params,
             UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean hasAdminRole = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals(SecurityConstants.ROLE_ADMIN));
+
+        if (!hasAdminRole && institutionKey == null) {
+            throw new ValidationException("record.save-error.user-not-assigned-to-institution",
+                    "User is not assigned to any institution.");
+        }
         final Page<PatientRecordDto> result = recordService.findAll(RecordFilterMapper.constructRecordFilter(params),
                                                                     RestUtils.resolvePaging(params));
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
