@@ -39,9 +39,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static cz.cvut.kbss.study.environment.util.ContainsSameEntities.containsSameEntities;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -95,6 +93,24 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         final MvcResult result = mockMvc.perform(get("/records/" + key)).andReturn();
         assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(patientRecordServiceMock).findByKey(key);
+    }
+
+    @Test
+    public void testGetAvailableRecordPhases() throws Exception{
+        Set<RecordPhase> phases = new HashSet<>(Arrays.asList(RecordPhase.completed, RecordPhase.valid));
+        PatientRecord record1 = Generator.generatePatientRecord(user);
+        record1.setPhase(RecordPhase.completed);
+        PatientRecord record2 = Generator.generatePatientRecord(user);
+        record2.setPhase(RecordPhase.valid);
+        List<PatientRecord> records = Arrays.asList(record1, record2);
+
+        when(patientRecordServiceMock.findAll()).thenReturn(records);
+
+        final MvcResult result = mockMvc.perform(get("/records/availablePhases"))
+                .andReturn();
+        assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
+        final Set<RecordPhase> body = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+        assertEquals(phases, body);
     }
 
     @Test
