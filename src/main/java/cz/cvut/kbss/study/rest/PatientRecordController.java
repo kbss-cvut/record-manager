@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
@@ -83,6 +84,16 @@ public class PatientRecordController extends BaseController {
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
         return result.getContent();
     }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
+    @GetMapping(value="availablePhases", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Set<RecordPhase> getAvailableRecordPhases(@RequestParam(value = "institution", required = false) String institutionKey){
+        List<PatientRecord> records = recordService.findAll();
+        return records.stream()
+                        .map(PatientRecord::getPhase)
+                        .collect(Collectors.toSet());
+    }
+
 
     @PreAuthorize(
             "hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
