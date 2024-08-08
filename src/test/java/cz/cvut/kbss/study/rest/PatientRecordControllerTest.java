@@ -97,14 +97,10 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     @Test
     public void testGetAvailableRecordPhases() throws Exception{
-        Set<RecordPhase> phases = new HashSet<>(Arrays.asList(RecordPhase.completed, RecordPhase.valid));
-        PatientRecord record1 = Generator.generatePatientRecord(user);
-        record1.setPhase(RecordPhase.completed);
-        PatientRecord record2 = Generator.generatePatientRecord(user);
-        record2.setPhase(RecordPhase.valid);
-        List<PatientRecord> records = Arrays.asList(record1, record2);
 
-        when(patientRecordServiceMock.findAll()).thenReturn(records);
+        Set<RecordPhase> phases = new HashSet<>(Arrays.asList(RecordPhase.completed, RecordPhase.valid));
+
+        when(patientRecordServiceMock.findAllAvailableRecordsPhases()).thenReturn(phases);
 
         final MvcResult result = mockMvc.perform(get("/records/availablePhases"))
                 .andReturn();
