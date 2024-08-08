@@ -92,7 +92,7 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
 
 
     /**
-     * Retrieves a set of all distinct phases that records can be in.
+     * Retrieves a set of all distinct phases where each occurs at least in one record.
      * <p>
      * This method provides a way to get a comprehensive list of the various phases
      * associated with records. Phases typically represent different stages or statuses
