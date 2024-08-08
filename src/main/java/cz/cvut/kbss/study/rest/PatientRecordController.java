@@ -9,7 +9,6 @@ import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
-import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
@@ -43,7 +42,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
@@ -87,8 +85,8 @@ public class PatientRecordController extends BaseController {
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(value="availablePhases", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Set<RecordPhase> getAvailableRecordPhases(@RequestParam(value = "institution", required = false) String institutionKey){
-        return recordService.findAllAvailableRecordsPhases();
+    public Set<RecordPhase> getUsedRecordsPhases(@RequestParam(value = "institution", required = false) String institutionKey){
+        return recordService.findUsedRecordsPhases();
     }
 
 

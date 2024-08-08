@@ -134,7 +134,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
 
     @Transactional(readOnly = true)
     @Override
-    public Set<RecordPhase> findAllAvailableRecordsPhases() {
-        return recordDao.findAllAvailableRecordsPhases();
+    public Set<RecordPhase> findUsedRecordsPhases() {
+        return recordDao.findUsedRecordsPhases();
     }
 }
