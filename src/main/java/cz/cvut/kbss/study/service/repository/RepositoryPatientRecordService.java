@@ -21,10 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RepositoryPatientRecordService extends KeySupportingRepositoryService<PatientRecord>
@@ -133,5 +130,11 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Override
     public Page<RawRecord> exportRecords(RecordFilterParams filters, Pageable pageSpec){
         return patientRecordDao.findAllRecordsRaw(filters, pageSpec);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Set<RecordPhase> findAllAvailableRecordsPhases() {
+        return recordDao.findAllAvailableRecordsPhases();
     }
 }

@@ -11,10 +11,7 @@ import cz.cvut.kbss.ontodriver.model.LangString;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.exception.PersistenceException;
 import cz.cvut.kbss.study.exception.ValidationException;
-import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.PatientRecord;
-import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
@@ -31,11 +28,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.net.URI;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -241,6 +234,16 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         setQueryParameters(countQuery, queryParams);
         final Integer totalCount = countQuery.getSingleResult();
         return new PageImpl<>(records, pageSpec, totalCount);
+    }
+
+    public Set<RecordPhase> findAllAvailableRecordsPhases(){
+        return em.createNativeQuery("SELECT ?o WHERE { ?s ?p ?o } ", String.class)
+                .setParameter("p", URI.create(Vocabulary.s_p_has_phase))
+                .getResultList()
+                .stream()
+                .map(RecordPhase::fromIri)
+                .collect(Collectors.toSet());
+
     }
 
     public Page<RawRecord> findAllRecordsRaw(RecordFilterParams filters, Pageable pageSpec){

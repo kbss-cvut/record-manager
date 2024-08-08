@@ -88,10 +88,7 @@ public class PatientRecordController extends BaseController {
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(value="availablePhases", produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<RecordPhase> getAvailableRecordPhases(@RequestParam(value = "institution", required = false) String institutionKey){
-        List<PatientRecord> records = recordService.findAll();
-        return records.stream()
-                        .map(PatientRecord::getPhase)
-                        .collect(Collectors.toSet());
+        return recordService.findAllAvailableRecordsPhases();
     }
 
 
