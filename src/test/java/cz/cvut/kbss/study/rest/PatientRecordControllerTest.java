@@ -96,13 +96,13 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    public void testGetUsedRecordsPhases() throws Exception{
+    public void  testGetUsedRecordPhases() throws Exception{
 
         Set<RecordPhase> phases = new HashSet<>(Arrays.asList(RecordPhase.completed, RecordPhase.valid));
 
-        when(patientRecordServiceMock.findUsedRecordsPhases()).thenReturn(phases);
+        when(patientRecordServiceMock.findUsedRecordPhases()).thenReturn(phases);
 
-        final MvcResult result = mockMvc.perform(get("/records/availablePhases"))
+        final MvcResult result = mockMvc.perform(get("/records/used-record-phases"))
                 .andReturn();
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final Set<RecordPhase> body = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});

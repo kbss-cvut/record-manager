@@ -236,7 +236,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         return new PageImpl<>(records, pageSpec, totalCount);
     }
 
-    public Set<RecordPhase> findUsedRecordsPhases(){
+    public Set<RecordPhase> findUsedRecordPhases(){
         return em.createNativeQuery("SELECT ?phase WHERE { ?record ?hasPhase ?phase } ", String.class)
                 .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
                 .getResultList()
