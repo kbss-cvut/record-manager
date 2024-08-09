@@ -100,7 +100,7 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      *
      * @return Set of all available record phases
      */
-    Set<RecordPhase> findUsedRecordsPhases();
+    Set<RecordPhase> findUsedRecordPhases();
 
 
 }

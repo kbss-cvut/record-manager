@@ -84,9 +84,9 @@ public class PatientRecordController extends BaseController {
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
-    @GetMapping(value="availablePhases", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Set<RecordPhase> getUsedRecordsPhases(@RequestParam(value = "institution", required = false) String institutionKey){
-        return recordService.findUsedRecordsPhases();
+    @GetMapping(value="used-record-phases", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Set<RecordPhase> getUsedRecordPhases(@RequestParam(value = "institution", required = false) String institutionKey){
+        return recordService.findUsedRecordPhases();
     }
 
 
