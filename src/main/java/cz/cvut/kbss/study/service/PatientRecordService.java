@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface PatientRecordService extends BaseService<PatientRecord> {
 
@@ -87,4 +88,19 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @return List of matching records
      */
     Page<RawRecord> exportRecords(RecordFilterParams filters, Pageable pageSpec);
+
+
+
+    /**
+     * Retrieves a set of all distinct phases where each occurs at least in one record.
+     * <p>
+     * This method provides a way to get a comprehensive list of the various phases
+     * associated with records. Phases typically represent different stages or statuses
+     * that a record might go through in its lifecycle.
+     *
+     * @return Set of all available record phases
+     */
+    Set<RecordPhase> findUsedRecordPhases();
+
+
 }

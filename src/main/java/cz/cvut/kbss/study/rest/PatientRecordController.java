@@ -9,7 +9,6 @@ import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
-import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
@@ -83,6 +82,13 @@ public class PatientRecordController extends BaseController {
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
         return result.getContent();
     }
+
+    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
+    @GetMapping(value="used-record-phases", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Set<RecordPhase> getUsedRecordPhases(@RequestParam(value = "institution", required = false) String institutionKey){
+        return recordService.findUsedRecordPhases();
+    }
+
 
     @PreAuthorize(
             "hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
