@@ -128,7 +128,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(
                 Page.empty());
 
-        final MvcResult result = mockMvc.perform(get("/records/")).andReturn();
+        final MvcResult result = mockMvc.perform(get("/records/").param("institution", user.getInstitution().toString())).andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<PatientRecord> body = objectMapper.readValue(result.getResponse().getContentAsString(),
@@ -151,14 +151,15 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(
                 new PageImpl<>(records));
 
-        final MvcResult result = mockMvc.perform(get("/records")).andReturn();
+
+        final MvcResult result = mockMvc.perform(get("/records/").param("institution", user.getInstitution().toString())).andReturn();
 
         assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
         final List<PatientRecordDto> body = objectMapper.readValue(result.getResponse().getContentAsString(),
                                                                    new TypeReference<>() {
                                                                    });
         assertEquals(3, body.size());
-        verify(patientRecordServiceMock).findAll(new RecordFilterParams(), Pageable.unpaged());
+        verify(patientRecordServiceMock).findAll(any(RecordFilterParams.class), any(Pageable.class));
     }
 
     @Test
@@ -443,7 +444,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
         final Page<PatientRecordDto> page = new PageImpl<>(records, PageRequest.of(0, 5), 3);
         when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(page);
-        final MvcResult result = mockMvc.perform(get("/records").queryParam(Constants.PAGE_PARAM, "0")
+        final MvcResult result = mockMvc.perform(get("/records").param("institution", user.getInstitution().toString()).queryParam(Constants.PAGE_PARAM, "0")
                                                                 .queryParam(Constants.PAGE_SIZE_PARAM, "5"))
                                         .andReturn();
 
@@ -452,7 +453,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                                                                    new TypeReference<>() {
                                                                    });
         assertEquals(3, body.size());
-        verify(patientRecordServiceMock).findAll(new RecordFilterParams(), PageRequest.of(0, 5));
+        verify(patientRecordServiceMock).findAll(any(RecordFilterParams.class), eq(PageRequest.of(0, 5)));
         final ArgumentCaptor<PaginatedResultRetrievedEvent> captor = ArgumentCaptor.forClass(
                 PaginatedResultRetrievedEvent.class);
         verify(eventPublisherMock).publishEvent(captor.capture());
