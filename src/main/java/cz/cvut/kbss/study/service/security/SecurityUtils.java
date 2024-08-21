@@ -9,9 +9,15 @@ import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.model.Role;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
+import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.oidc.OidcGrantedAuthoritiesExtractor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -19,8 +25,12 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.server.authentication.SwitchUserWebFilter;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -31,11 +41,13 @@ public class SecurityUtils {
     private final PatientRecordDao patientRecordDao;
 
     private final ConfigReader config;
+    private final RestTemplate restTemplate;
 
-    public SecurityUtils(UserDao userDao, PatientRecordDao patientRecordDao, ConfigReader config) {
+    public SecurityUtils(UserDao userDao, PatientRecordDao patientRecordDao, ConfigReader config, RestTemplate restTemplate) {
         this.userDao = userDao;
         this.patientRecordDao = patientRecordDao;
         this.config = config;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -127,5 +139,47 @@ public class SecurityUtils {
         final User user = getCurrentUser();
         final List<User> users = userDao.findByInstitution(user.getInstitution());
         return users.stream().anyMatch(o -> o.getUsername().equals(username));
+    }
+
+    public String getCurrentToken(){
+        // Retrieve token from security context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Check if token is Jwt
+        if(! (authentication.getPrincipal() instanceof Jwt))
+            throw new IllegalArgumentException("Cannot process request, authentication principal type \"%s\" is not supported.".formatted(authentication.getPrincipal().getClass()));
+
+        // This is only for Jwt type tokens
+        return ((Jwt)authentication.getPrincipal()).getTokenValue();
+    }
+
+    public String getPublishToken(){
+        // TODO - The exchanged token does not contain an IDP field, so the supplier won't know the original identity provider
+        String accessToken = getCurrentToken();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange");
+        map.add("subject_token", accessToken);
+        map.add("subject_token_type", "urn:ietf:params:oauth:token-type:jwt"); // specify that the
+//        map.add("subject_issuer", "vpaf-keycloak-oidc"); // TODO - check if needed
+//        map.add("subject_issuer", "https://kbss.felk.cvut.cz/vietnam-peoples-air-force/services/auth/realms/record-manager");
+//        map.add("requested_token_type", "urn:ietf:params:oauth:token-type:access_token"); // TODO - check if needed
+//        map.add("requested_issuer", "vpaf-keycloak-oidc"); // TODO - attempt to include idp field in the exchanged token, not working.
+        map.add("client_id", "record-manager-server"); // The client_id of the publishing service, i.e. the suppliers record-manager-server
+        map.add("client_secret", config.getConfig(ConfigParam.PUBLISH_RECORDS_SERVICE_SECRET)); // the client secret for the client_id
+//        map.add("audience", "record-manager-server"); // TODO - check if needed, without it the aud field in the token does not contain record-manager-server
+
+        String exchangedToken = null;
+        ResponseEntity<Map> response = null;
+        try {
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+            response = restTemplate.postForEntity(config.getConfig(ConfigParam.EXCHANGE_TOKEN_SERVICE_URL), request, Map.class);
+//            response = restTemplate.postForEntity("https://kbss.felk.cvut.cz/ava/services/auth/realms/record-manager/protocol/openid-connect/token", request, Map.class);
+
+            return response.getBody().get("access_token").toString();
+
+        }catch(Exception e){
+            throw new SecurityException("Error exchanging token", e);
+        }
     }
 }

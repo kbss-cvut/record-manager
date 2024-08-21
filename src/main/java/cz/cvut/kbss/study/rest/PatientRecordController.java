@@ -20,6 +20,7 @@ import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.ExcelRecordConverter;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.UserService;
+import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Constants;
 import jakarta.annotation.security.PermitAll;
@@ -58,13 +59,14 @@ public class PatientRecordController extends BaseController {
     private final ExcelRecordConverter excelRecordConverter;
     private final RestTemplate restTemplate;
     private final ConfigReader configReader;
+    private final SecurityUtils securityUtils;
     private ObjectMapper objectMapper;
     private final UserService userService;
 
     public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher,
                                    ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate,
                                    ConfigReader configReader, ObjectMapper objectMapper,
-                                   UserService userService)  {
+                                   UserService userService, SecurityUtils securityUtils)  {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
         this.excelRecordConverter = excelRecordConverter;
@@ -72,6 +74,7 @@ public class PatientRecordController extends BaseController {
         this.configReader = configReader;
         this.objectMapper = objectMapper;
         this.userService = userService;
+        this.securityUtils = securityUtils;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #institutionKey==null or @securityUtils.isMemberOfInstitution(#institutionKey)")
@@ -234,11 +237,11 @@ public class PatientRecordController extends BaseController {
         // Create HttpEntity
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authHeader = securityUtils.getPublishToken();
         if (authHeader != null && !authHeader.isBlank()) {
-            headers.set(HttpHeaders.AUTHORIZATION, authHeader);
+            headers.setBearerAuth(authHeader);
         } else {
-            throw new RuntimeException("Authorization header missing in request");
+            throw new SecurityException("Could not retrieve publish token.");
         }
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
