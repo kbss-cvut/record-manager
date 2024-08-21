@@ -11,6 +11,8 @@ public enum ConfigParam {
 
     ON_UPDATE_RECORD_SERVICE_URL("onRecordUpdateServiceUrl"),
     ON_PUBLISH_RECORDS_SERVICE_URL("onPublishRecordsServiceUrl"),
+    PUBLISH_RECORDS_SERVICE_SECRET("publishRecordsServiceSecret"),
+    EXCHANGE_TOKEN_SERVICE_URL("exchangeTokenServiceUrl"),
     EXCEL_IMPORT_SERVICE_URL("excelImportServiceUrl"),
 
     APP_CONTEXT("appContext"),
