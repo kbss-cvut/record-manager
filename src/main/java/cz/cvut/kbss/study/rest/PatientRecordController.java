@@ -23,7 +23,6 @@ import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Constants;
-import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationEventPublisher;
@@ -256,7 +255,6 @@ public class PatientRecordController extends BaseController {
         return responseEntity.getBody();
     }
 
-    @PreAuthorize("permitAll()")
     @PostMapping(value = "/import/json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public RecordImportResult importRecordsJson(@RequestPart("file") MultipartFile file,
                                             @RequestParam(name = "phase", required = false) String phase) {
