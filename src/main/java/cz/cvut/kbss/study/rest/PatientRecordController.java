@@ -255,7 +255,11 @@ public class PatientRecordController extends BaseController {
         // TODO make records published
 
         LOG.debug("Publish server response: ", responseEntity.getBody());
-        return responseEntity.getBody();
+        RecordImportResult importResult = responseEntity.getBody();
+
+        recordService.setPhase(importResult.getImportedRecords(), RecordPhase.published);
+
+        return importResult;
     }
 
     @PreAuthorize("permitAll()")
