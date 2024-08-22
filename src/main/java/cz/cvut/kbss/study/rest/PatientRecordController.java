@@ -212,8 +212,10 @@ public class PatientRecordController extends BaseController {
             return result;
         }
 
-       // export
-        final Page<PatientRecord> result = recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
+        RecordFilterParams filterParameters = RecordFilterMapper.constructRecordFilter(params);
+        filterParameters.setPhaseIds(new HashSet<>());
+        filterParameters.getPhaseIds().add(RecordPhase.completed.getIri());
+        final Page<PatientRecord> result = recordService.findAllFull(filterParameters,
                 RestUtils.resolvePaging(params));
         List<PatientRecord> records = result.getContent();
 
