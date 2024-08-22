@@ -1,6 +1,5 @@
 package cz.cvut.kbss.study.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
@@ -16,19 +15,13 @@ import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RecordFilterMapper;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
-import cz.cvut.kbss.study.service.ConfigReader;
-import cz.cvut.kbss.study.service.ExcelRecordConverter;
-import cz.cvut.kbss.study.service.PatientRecordService;
-import cz.cvut.kbss.study.service.UserService;
-import cz.cvut.kbss.study.service.security.SecurityUtils;
+import cz.cvut.kbss.study.service.*;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Constants;
-import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
@@ -59,14 +52,14 @@ public class PatientRecordController extends BaseController {
     private final ExcelRecordConverter excelRecordConverter;
     private final RestTemplate restTemplate;
     private final ConfigReader configReader;
-    private final SecurityUtils securityUtils;
+    private final PublishRecordsService publishRecordsService;
     private ObjectMapper objectMapper;
     private final UserService userService;
 
     public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher,
                                    ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate,
                                    ConfigReader configReader, ObjectMapper objectMapper,
-                                   UserService userService, SecurityUtils securityUtils)  {
+                                   UserService userService, PublishRecordsService publishRecordsService)  {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
         this.excelRecordConverter = excelRecordConverter;
@@ -74,7 +67,7 @@ public class PatientRecordController extends BaseController {
         this.configReader = configReader;
         this.objectMapper = objectMapper;
         this.userService = userService;
-        this.securityUtils = securityUtils;
+        this.publishRecordsService = publishRecordsService;
     }
 
     @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #institutionKey==null or @securityUtils.isMemberOfInstitution(#institutionKey)")
@@ -204,61 +197,8 @@ public class PatientRecordController extends BaseController {
         @RequestParam(required = false) MultiValueMap<String, String> params,
         HttpServletRequest request) {
 
-        String onPublishRecordsServiceUrl = configReader.getConfig(ConfigParam.ON_PUBLISH_RECORDS_SERVICE_URL);
-        if(onPublishRecordsServiceUrl == null || onPublishRecordsServiceUrl.isBlank()) {
-            LOG.info("No publish service url provided, noop.");
-            RecordImportResult result = new RecordImportResult(0);
-            result.addError("Cannot publish completed records. Publish server not configured.");
-            return result;
-        }
-
         RecordFilterParams filterParameters = RecordFilterMapper.constructRecordFilter(params);
-        filterParameters.setPhaseIds(new HashSet<>());
-        filterParameters.getPhaseIds().add(RecordPhase.completed.getIri());
-        final Page<PatientRecord> result = recordService.findAllFull(filterParameters,
-                RestUtils.resolvePaging(params));
-        List<PatientRecord> records = result.getContent();
-
-        // Convert the records to JSON
-        String recordsJson;
-        try {
-            recordsJson = objectMapper.writeValueAsString(records);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to convert records to JSON", e);
-        }
-
-        // Create a MultiValueMap to hold the file part
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new ByteArrayResource(recordsJson.getBytes()) {
-            @Override
-            public String getFilename() {
-                return "records.json";
-            }
-        });
-
-        // Create HttpEntity
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        String authHeader = securityUtils.getPublishToken();
-        if (authHeader != null && !authHeader.isBlank()) {
-            headers.setBearerAuth(authHeader);
-        } else {
-            throw new SecurityException("Could not retrieve publish token.");
-        }
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        // Call the import endpoint
-        LOG.debug("Publishing records.");
-        ResponseEntity<RecordImportResult> responseEntity = restTemplate.postForEntity(
-            onPublishRecordsServiceUrl, requestEntity, RecordImportResult.class);
-
-        // TODO make records published
-
-        LOG.debug("Publish server response: ", responseEntity.getBody());
-        RecordImportResult importResult = responseEntity.getBody();
-
-        recordService.setPhase(importResult.getImportedRecords(), RecordPhase.published);
-
+        RecordImportResult importResult = publishRecordsService.publishRecords(filterParameters, RestUtils.resolvePaging(params));
         return importResult;
     }
 
