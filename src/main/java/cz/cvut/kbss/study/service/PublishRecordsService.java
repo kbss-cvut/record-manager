@@ -2,16 +2,15 @@ package cz.cvut.kbss.study.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.cvut.kbss.study.config.WebAppConfig;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
-import cz.cvut.kbss.study.service.repository.RepositoryPatientRecordService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.ConfigParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,15 +31,15 @@ public class PublishRecordsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PublishRecordsService.class);
 
-    private final RepositoryPatientRecordService recordService;
+    private final PatientRecordService recordService;
     private final ObjectMapper objectMapper;
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
     private final ConfigReader configReader;
 
-    public PublishRecordsService(RepositoryPatientRecordService recordService, @Qualifier("objectMapper") ObjectMapper objectMapper, SecurityUtils securityUtils, RestTemplate restTemplate, ConfigReader configReader) {
+    public PublishRecordsService(PatientRecordService recordService, SecurityUtils securityUtils, RestTemplate restTemplate, ConfigReader configReader) {
         this.recordService = recordService;
-        this.objectMapper = objectMapper;
+        this.objectMapper = WebAppConfig.createJsonObjectMapper();
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
         this.configReader = configReader;
@@ -63,7 +62,7 @@ public class PublishRecordsService {
 
         ResponseEntity<RecordImportResult> responseEntity = executePublishRequest(onPublishRecordsServiceUrl, records);
 
-        LOG.debug("Publish server response: ", responseEntity.getBody());
+        LOG.debug("Publish server response: {}", responseEntity.getBody());
         RecordImportResult importResult = responseEntity.getBody();
         if(importResult != null && importResult.getImportedRecords() != null)
             recordService.setPhase(importResult.getImportedRecords(), RecordPhase.published);
