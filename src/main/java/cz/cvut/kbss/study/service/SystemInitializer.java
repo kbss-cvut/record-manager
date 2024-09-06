@@ -3,6 +3,7 @@ package cz.cvut.kbss.study.service;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.util.Constants;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ public class SystemInitializer {
             admin.setPassword("5y5t3mAdm1n.");
             admin.setInstitution(institutionService.findByName(INSTITUTION_NAME));
             admin.setIsInvited(true);
+            admin.setRoleGroup(Constants.OPERATOR_ADMIN);
             admin.getTypes().add(Vocabulary.s_c_administrator);
             LOG.debug("Persisting default administrator {}", admin);
             userService.persist(admin);

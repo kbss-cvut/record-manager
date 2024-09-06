@@ -66,6 +66,10 @@ rm:has-question rdf:type owl:ObjectProperty ;
 rm:is-member-of rdf:type owl:ObjectProperty ;
                 rdfs:subPropertyOf rm:relates-to .
 
+###  http://onto.fel.cvut.cz/ontologies/record-manager/role-group
+rm:role-group rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf rm:relates-to .
+
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/relates-to
 rm:relates-to rdf:type owl:ObjectProperty .

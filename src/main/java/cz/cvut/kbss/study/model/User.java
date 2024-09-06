@@ -11,6 +11,7 @@ import cz.cvut.kbss.jopa.model.annotations.Types;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
+import cz.cvut.kbss.study.util.RoleAssignmentUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.Serializable;
@@ -61,8 +62,21 @@ public class User implements HasDerivableUri, Serializable {
     @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
     private Institution institution;
 
+    @OWLDataProperty(iri = Vocabulary.s_p_role_group)
+    private String roleGroup;
+
     @Types
     private Set<String> types;
+
+    public String getRoleGroup() {
+        return roleGroup;
+    }
+
+    public void setRoleGroup(String roleGroup) {
+        this.roleGroup = roleGroup;
+        this.types.clear();
+        this.types = RoleAssignmentUtil.assignRolesForGroup(this.roleGroup);
+    }
 
     public User() {
         this.types = new HashSet<>();
@@ -216,7 +230,7 @@ public class User implements HasDerivableUri, Serializable {
         copy.setInstitution(institution);
         copy.setIsInvited(isInvited);
         copy.setToken(token);
-        types.forEach(copy::addType);
+        copy.setRoleGroup(roleGroup);
         return copy;
     }
 

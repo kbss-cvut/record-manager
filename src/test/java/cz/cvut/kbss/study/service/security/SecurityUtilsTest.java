@@ -12,6 +12,7 @@ import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
+import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,6 +67,7 @@ public class SecurityUtilsTest {
         Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
         this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", institution);
+        this.user.setRoleGroup(Constants.OPERATOR_ADMIN);
         user.generateUri();
     }
 

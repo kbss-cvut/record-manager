@@ -68,4 +68,10 @@ public final class Constants {
      * Excel MIME type
      */
     public static final String MEDIA_TYPE_EXCEL = "application/vnd.ms-excel";
+
+    public static final String OPERATOR_ADMIN = "OPERATOR_ADMIN";
+    public static final String OPERATOR_USER = "OPERATOR_USER";
+    public static final String SUPPLIER_ADMIN = "SUPPLIER_ADMIN";
+    public static final String SUPPLIER_USER = "SUPPLIER_USER";
+    public static final String EXTERNAL_USER = "EXTERNAL_USER";
 }
