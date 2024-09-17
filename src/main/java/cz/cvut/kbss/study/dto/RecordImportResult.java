@@ -1,7 +1,9 @@
 package cz.cvut.kbss.study.dto;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the result of importing records to this instance.
@@ -17,6 +19,8 @@ public class RecordImportResult {
      * Number of successfully imported records.
      */
     private int importedCount;
+
+    private Set<String> importedRecords;
 
     /**
      * Errors that occurred during import.
@@ -44,6 +48,24 @@ public class RecordImportResult {
 
     public void setImportedCount(int importedCount) {
         this.importedCount = importedCount;
+    }
+
+
+    public Set<String> getImportedRecords() {
+        return importedRecords;
+    }
+
+    public void setImportedRecords(Set<String> importedRecords) {
+        this.importedRecords = importedRecords;
+    }
+
+    public void addImportedRecord(String recordIRI) {
+        if(recordIRI == null)
+            return;
+        if(importedRecords == null)
+            importedRecords = new HashSet<>();
+        importedRecords.add(recordIRI);
+        importedCount = importedRecords.size();
     }
 
     public void incrementImportedCount() {

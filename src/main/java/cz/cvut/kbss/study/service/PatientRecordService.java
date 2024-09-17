@@ -103,4 +103,12 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
     Set<RecordPhase> findUsedRecordPhases();
 
 
+    /**
+     * For all records identified but recordsUris sets record phase to targetPhase.
+     * @param recordUris
+     * @param targetPhase
+     */
+    void setPhase(Set<String> recordUris, RecordPhase targetPhase);
+
+
 }

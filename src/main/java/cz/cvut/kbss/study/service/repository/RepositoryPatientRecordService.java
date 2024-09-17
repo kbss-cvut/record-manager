@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
 import java.util.*;
 
 @Service
@@ -96,7 +97,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
                 result.addError("Record " + Utils.uriToString(r.getUri()) + " already exists.");
             } else {
                 recordDao.persist(r);
-                result.incrementImportedCount();
+                result.addImportedRecord(r.getUri().toString());
             }
         });
         return result;
@@ -118,6 +119,16 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         }
     }
 
+    @Transactional
+    @Override
+    public void setPhase(Set<String> recordUris, RecordPhase targetPhase){
+        for(String uri : recordUris){
+            PatientRecord record = find(URI.create(uri));
+            if (record == null)
+                continue;
+            record.setPhase(targetPhase);
+        }
+    }
 
     @Transactional
     @Override
