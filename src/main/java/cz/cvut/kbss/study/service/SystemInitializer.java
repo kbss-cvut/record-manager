@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.util.Constants;
@@ -10,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+
 @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal", matchIfMissing = true)
 @Service
 public class SystemInitializer {
@@ -18,15 +21,19 @@ public class SystemInitializer {
 
     private static final String ADMIN_USERNAME = "admin";
     private static final String INSTITUTION_NAME = "admin_institution";
+    private static final String ROLE_GROUP_NAME = "admin-role-group";
 
     private final UserService userService;
 
     private final InstitutionService institutionService;
 
+    private final RoleGroupService roleGroupService;
+
     public SystemInitializer(UserService userService,
-                             InstitutionService institutionService) {
+                             InstitutionService institutionService, RoleGroupService roleGroupService) {
         this.userService = userService;
         this.institutionService = institutionService;
+        this.roleGroupService = roleGroupService;
     }
 
     @PostConstruct
@@ -55,6 +62,7 @@ public class SystemInitializer {
             admin.setIsInvited(true);
             admin.setRoleGroup(Constants.OPERATOR_ADMIN);
             admin.getTypes().add(Vocabulary.s_c_administrator);
+            admin.setRg(roleGroupService.findByName(ROLE_GROUP_NAME));
             LOG.debug("Persisting default administrator {}", admin);
             userService.persist(admin);
         }

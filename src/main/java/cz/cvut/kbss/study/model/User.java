@@ -62,8 +62,11 @@ public class User implements HasDerivableUri, Serializable {
     @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
     private Institution institution;
 
-    @OWLDataProperty(iri = Vocabulary.s_p_role_group)
+    @OWLDataProperty(iri = Vocabulary.s_p_has_role_group)
     private String roleGroup;
+
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_role_group)
+    private RoleGroup rg;
 
     @Types
     private Set<String> types;
@@ -81,6 +84,13 @@ public class User implements HasDerivableUri, Serializable {
     public User() {
         this.types = new HashSet<>();
         types.add(Vocabulary.s_c_doctor);
+    }
+
+    public void setRg(RoleGroup rg) {
+        this.rg = rg;
+    }
+    public RoleGroup getRg() {
+        return rg;
     }
 
     @Override
@@ -231,6 +241,7 @@ public class User implements HasDerivableUri, Serializable {
         copy.setIsInvited(isInvited);
         copy.setToken(token);
         copy.setRoleGroup(roleGroup);
+        copy.setRg(rg);
         return copy;
     }
 

@@ -10,20 +10,20 @@ public class RoleAssignmentUtil {
             Set.of(
                     Vocabulary.s_c_administrator,
                     Vocabulary.s_c_doctor,
-                    Vocabulary.s_c_edit_users,
-                    Vocabulary.s_c_publish_records,
-                    Vocabulary.s_c_reject_records,
-                    Vocabulary.s_c_view_organization_records,
-                    Vocabulary.s_c_edit_organization_records,
-                    Vocabulary.s_c_delete_organization_records,
-                    Vocabulary.s_c_complete_records,
-                    Vocabulary.s_c_import_codelists
+                    Vocabulary.s_i_edit_users_role,
+                    Vocabulary.s_i_publish_records_role,
+                    Vocabulary.s_i_reject_records_role,
+                    Vocabulary.s_i_view_organization_records_role,
+                    Vocabulary.s_i_edit_organization_records_role,
+                    Vocabulary.s_i_delete_organization_records_role,
+                    Vocabulary.s_i_complete_records_role,
+                    Vocabulary.s_i_import_codelists_role
             )
     );
 
     public static final Set<String> OPERATOR_USER_ROLES = new HashSet<>(
             Set.of(
-                    Vocabulary.s_c_complete_records
+                    Vocabulary.s_i_complete_records_role
             )
     );
 
@@ -31,22 +31,22 @@ public class RoleAssignmentUtil {
             Set.of(
                     Vocabulary.s_c_administrator,
                     Vocabulary.s_c_doctor,
-                    Vocabulary.s_c_edit_users,
-                    Vocabulary.s_c_reject_records,
-                    Vocabulary.s_c_view_organization_records,
-                    Vocabulary.s_c_edit_organization_records,
-                    Vocabulary.s_c_delete_organization_records,
-                    Vocabulary.s_c_complete_records,
-                    Vocabulary.s_c_import_codelists,
-                    Vocabulary.s_c_edit_all_records,
-                    Vocabulary.s_c_delete_all_records,
-                    Vocabulary.s_c_view_all_records
+                    Vocabulary.s_i_edit_users_role,
+                    Vocabulary.s_i_reject_records_role,
+                    Vocabulary.s_i_view_organization_records_role,
+                    Vocabulary.s_i_edit_organization_records_role,
+                    Vocabulary.s_i_delete_organization_records_role,
+                    Vocabulary.s_i_complete_records_role,
+                    Vocabulary.s_i_import_codelists_role,
+                    Vocabulary.s_i_edit_all_records_role,
+                    Vocabulary.s_i_delete_all_records_role,
+                    Vocabulary.s_i_view_all_records_role
             )
     );
 
     public static final Set<String> SUPPLIER_USER_ROLES = new HashSet<>(
             Set.of(
-                    Vocabulary.s_c_complete_records
+                    Vocabulary.s_i_complete_records_role
             )
     );
 
