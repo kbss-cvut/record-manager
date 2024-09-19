@@ -23,7 +23,7 @@ public class UserTest {
 
     @Test
     public void newInstanceHasAgentInTypes() {
-        assertTrue(user.getTypes().contains(Vocabulary.s_c_doctor));
+        assertTrue(user.getRoleGroup().getRoles().contains(Role.user));
     }
 
     @Test
@@ -105,6 +105,6 @@ public class UserTest {
     @Test
     public void newUserHasRoleDoctor() {
         User user = new User();
-        assertTrue(user.getTypes().toString().contains(Vocabulary.s_c_doctor));
+        assertTrue(user.getRoleGroup().getRoles().contains(Role.user));
     }
 }
