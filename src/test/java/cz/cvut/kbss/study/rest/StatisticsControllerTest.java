@@ -3,6 +3,7 @@ package cz.cvut.kbss.study.rest;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.service.StatisticsService;
 import org.junit.jupiter.api.BeforeEach;
