@@ -119,7 +119,7 @@ public class Generator {
      * @param institution
      * @return user based on params
      */
-    public static User getUser(String username, String password, String firstName, String lastName, String email, Institution institution) {
+    public static User getUser(String username, String password, String firstName, String lastName, String email, Institution institution, RoleGroup roleGroup) {
         final User person = new User();
         person.setUsername(username);
         person.setPassword(password);
@@ -127,15 +127,16 @@ public class Generator {
         person.setLastName(lastName);
         person.setEmailAddress(email);
         person.setInstitution(institution);
+        person.setRoleGroup(roleGroup);
         return person;
     }
 
     /**
-     * Generators a (pseudo) random institution.
+     * Generators a (pseudo) random user.
      *
      * @return Random user
      */
-    public static User generateUser(Institution institution){
+    public static User generateUser(Institution institution) {
         final User person = new User();
         person.setUsername("RandomUsername" + randomInt());
         person.setPassword("RandomPassword" + randomInt());
@@ -143,7 +144,23 @@ public class Generator {
         person.setLastName("RandomLastName" + randomInt());
         person.setEmailAddress("RandomEmail" + randomInt() + "@random.rand");
         person.setInstitution(institution);
+        person.setRoleGroup(generateRoleGroupWithOneRole(Role.administrator));
         return person;
+    }
+
+    public static RoleGroup generateRoleGroup() {
+        final RoleGroup roleGroup = new RoleGroup();
+        roleGroup.setName("RandomRoleGroup" + randomInt());
+        roleGroup.generateUri();
+        return roleGroup;
+    }
+
+
+    public static RoleGroup generateRoleGroupWithOneRole(Role role) {
+        final RoleGroup roleGroup = new RoleGroup();
+        roleGroup.setName("RandomRoleGroup" + randomInt());
+        roleGroup.addRole(role);
+        return roleGroup;
     }
 
     /**

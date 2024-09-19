@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import cz.cvut.kbss.jopa.model.annotations.CascadeType;
 import cz.cvut.kbss.jopa.model.annotations.FetchType;
 import cz.cvut.kbss.jopa.model.annotations.Id;
 import cz.cvut.kbss.jopa.model.annotations.OWLClass;
@@ -61,12 +62,15 @@ public class User implements HasDerivableUri, Serializable {
     @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
     private Institution institution;
 
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_role_group, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    private RoleGroup roleGroup;
+
     @Types
     private Set<String> types;
 
     public User() {
         this.types = new HashSet<>();
-        types.add(Vocabulary.s_c_doctor);
+        types.add(Vocabulary.s_c_doctor_role_group);
     }
 
     @Override
@@ -137,6 +141,14 @@ public class User implements HasDerivableUri, Serializable {
         this.institution = institution;
     }
 
+    public RoleGroup getRoleGroup() {
+        return roleGroup;
+    }
+
+    public void setRoleGroup(RoleGroup roleGroup) {
+        this.roleGroup = roleGroup;
+    }
+
     public Set<String> getTypes() {
         return types;
     }
@@ -158,8 +170,7 @@ public class User implements HasDerivableUri, Serializable {
      * @return {@code true} if this is admin, {@code false} otherwise
      */
     public boolean isAdmin() {
-        assert types != null;
-        return getTypes().contains(Vocabulary.s_c_administrator);
+        return roleGroup.getRoles().contains(Role.administrator);
     }
 
     public String getToken() {
@@ -216,7 +227,7 @@ public class User implements HasDerivableUri, Serializable {
         copy.setInstitution(institution);
         copy.setIsInvited(isInvited);
         copy.setToken(token);
-        types.forEach(copy::addType);
+        copy.setRoleGroup(roleGroup);
         return copy;
     }
 
