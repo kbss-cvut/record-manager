@@ -2,6 +2,7 @@ package cz.cvut.kbss.study.persistence.dao;
 
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
@@ -121,11 +122,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
         User user2 = Generator.generateUser(institution);
         User user3 = Generator.generateUser(institution);
 
-        Set<String> types = new HashSet<>();
-        types.add(Vocabulary.s_c_administrator);
-        types.add(Vocabulary.s_c_doctor);
-
-        user3.setTypes(types);
+        user3.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.administrator));
 
         transactional(() -> {
             institutionDao.persist(institution);

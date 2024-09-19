@@ -4,6 +4,8 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Role;
+import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
@@ -65,7 +67,8 @@ public class SecurityUtilsTest {
     public void setUp() {
         Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
-        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", institution);
+        RoleGroup roleGroup = new RoleGroup();
+        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", institution, roleGroup);
         user.generateUri();
     }
 
@@ -186,7 +189,7 @@ public class SecurityUtilsTest {
         when(userDao.findByUsername(user.getUsername())).thenReturn(user);
 
         final User result = sut.getCurrentUser();
-        assertThat(result.getTypes(), hasItem(Vocabulary.s_c_administrator));
+        assertThat(result.getRoleGroup().getRoles(), hasItem(Role.administrator));
     }
 
     @Test
@@ -197,7 +200,7 @@ public class SecurityUtilsTest {
         when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         final User result = sut.getCurrentUser();
         assertEquals(user, result);
-        assertThat(result.getTypes(), hasItem(Vocabulary.s_c_impersonator));
+        assertThat(result.getRoleGroup().getRoles(), hasItem(Role.impersonate));
     }
 
     @Test
