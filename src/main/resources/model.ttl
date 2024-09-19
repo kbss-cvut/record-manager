@@ -66,6 +66,10 @@ rm:has-question rdf:type owl:ObjectProperty ;
 rm:is-member-of rdf:type owl:ObjectProperty ;
                 rdfs:subPropertyOf rm:relates-to .
 
+###  http://onto.fel.cvut.cz/ontologies/record-manager/role-group
+rm:role-group rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf rm:relates-to .
+
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/relates-to
 rm:relates-to rdf:type owl:ObjectProperty .
@@ -80,6 +84,15 @@ rm:has-phase rdf:type owl:ObjectProperty ;
                 rdfs:subPropertyOf rdf:type ;
                 rdfs:label "has phase"@en .
 
+###  http://onto.fel.cvut.cz/ontologies/record-manager/has-role-group
+rm:has-role-group rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf rm:relates-to;
+                rdfs:label "has role group"@en.
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/has-role
+rm:has-role  rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf rm:relates-to;
+                rdfs:label "has role"@en.
 
 #################################################################
 #    Data properties
@@ -148,13 +161,13 @@ rm:action-history rdf:type owl:Class ;
                   rdfs:label "ActionHistory"@en .
 
 
-###  http://onto.fel.cvut.cz/ontologies/record-manager/administrator
-rm:administrator rdf:type owl:Class ;
+###  http://onto.fel.cvut.cz/ontologies/record-manager/administrator-role-group
+rm:administrator-role-group rdf:type owl:Class ;
                  rdfs:label "Administrator"@en .
 
 
-###  http://onto.fel.cvut.cz/ontologies/record-manager/doctor
-rm:doctor rdf:type owl:Class ;
+###  http://onto.fel.cvut.cz/ontologies/record-manager/doctor-role-group
+rm:doctor-role-group rdf:type owl:Class ;
           rdfs:label "Doctor"@en .
 
 
@@ -205,5 +218,75 @@ rm:published-record-phase rdf:type owl:Class ;
 rm:rejected-record-phase rdf:type owl:Class ;
         rdfs:subClassOf rm:record-phase ;
         rdfs:label "rejected record phase"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/role
+rm:role rdf:type owl:Class;
+        rdfs:label "user role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/role-group
+rm:role-group rdf:type owl:Class;
+        rdfs:label "user role group" .
+
+#################################################################
+#   Roles
+#################################################################
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/administrator
+### TODO deprecated
+rm:administrator rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "administrator"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/user
+### TODO deprecated
+rm:user rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "user"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/complete-records-role
+rm:complete-records-role rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "complete records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/delete-all-records-role
+rm:delete-all-records-role rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "delete all records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/edit-all-records-role
+rm:edit-all-records-role rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "edit all records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/view-all-records-role
+rm:view-all-records-role rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "view all records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/delete-organization-records-role
+rm:delete-organization-records-role rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "delete organization records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/edit-organization-records-role
+rm:edit-organization-records-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "edit organization records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/view-organization-records-role
+rm:view-organization-records-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "view organization records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/edit-users-role
+rm:edit-users-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "edit users role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/import-codelists-role
+rm:import-codelists-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "import codelists role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/publish-records-role
+rm:publish-records-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "publish records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/reject-records-role
+rm:reject-records-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "reject records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/impersonate-role
+rm:impersonate-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "impersonate role"@en .
 
 ###  Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi

@@ -6,6 +6,7 @@ import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
@@ -97,7 +98,7 @@ class RepositoryPatientRecordServiceTest {
     void importRecordsRetainsRecordProvenanceDataWhenCurrentUserIsAdmin() {
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
-        user.addType(Vocabulary.s_c_administrator);
+        user.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.user));
         Environment.setCurrentUser(user);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
         when(recordDao.exists(any())).thenReturn(false);
@@ -120,7 +121,7 @@ class RepositoryPatientRecordServiceTest {
     void importRecordsThrowsRecordAuthorNotFoundExceptionWhenAdminImportsRecordsAndRecordAuthorIsNotFound() {
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
-        user.addType(Vocabulary.s_c_administrator);
+        user.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.administrator));
         Environment.setCurrentUser(user);
 
         assertThrows(RecordAuthorNotFoundException.class, () -> sut.importRecords(toImport));

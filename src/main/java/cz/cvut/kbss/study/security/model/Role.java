@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public enum Role {
-    USER(SecurityConstants.ROLE_USER, Vocabulary.s_c_doctor),
-    ADMIN(SecurityConstants.ROLE_ADMIN, Vocabulary.s_c_administrator);
+    USER(SecurityConstants.ROLE_USER, Vocabulary.s_i_user),
+    ADMIN(SecurityConstants.ROLE_ADMIN, Vocabulary.s_i_administrator);
 
     private final String name;
     private final String type;

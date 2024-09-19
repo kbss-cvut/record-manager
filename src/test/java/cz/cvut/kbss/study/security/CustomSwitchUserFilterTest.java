@@ -2,6 +2,7 @@ package cz.cvut.kbss.study.security;
 
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
@@ -36,7 +37,7 @@ class CustomSwitchUserFilterTest {
     @Test
     void attemptSwitchUserSwitchesCurrentUserToTarget() {
         final User source = Generator.generateUser(null);
-        source.addType(Vocabulary.s_c_administrator);
+        source.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.administrator));
         Environment.setCurrentUser(source);
         final User target = Generator.generateUser(null);
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
@@ -49,10 +50,10 @@ class CustomSwitchUserFilterTest {
     @Test
     void attemptSwitchUserThrowsBadRequestExceptionWhenTargetUserIsAdmin() {
         final User source = Generator.generateUser(null);
-        source.addType(Vocabulary.s_c_administrator);
+        source.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.administrator));
         Environment.setCurrentUser(source);
         final User target = Generator.generateUser(null);
-        target.addType(Vocabulary.s_c_administrator);
+        target.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.administrator));
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("username", target.getUsername());
