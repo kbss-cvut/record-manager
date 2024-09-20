@@ -42,7 +42,7 @@ class HateoasPagingListenerTest {
         this.listener = new HateoasPagingListener();
         this.uriBuilder = UriComponentsBuilder.newInstance().scheme("http").host("localhost").path("rest/records");
         this.responseMock = new MockHttpServletResponse();
-        final User author = Generator.generateUser(null);
+        final User author = Generator.generateUser(null, null);
         this.records = IntStream.range(0, 10).mapToObj(i -> Generator.generatePatientRecordDto(author))
                                 .collect(Collectors.toList());
     }

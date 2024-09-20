@@ -3,6 +3,7 @@ package cz.cvut.kbss.study.security;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Role;
+import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
@@ -36,10 +37,10 @@ class CustomSwitchUserFilterTest {
 
     @Test
     void attemptSwitchUserSwitchesCurrentUserToTarget() {
-        final User source = Generator.generateUser(null);
-        source.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.administrator));
+        final User source = Generator.generateUser(null, null);
+        source.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
         Environment.setCurrentUser(source);
-        final User target = Generator.generateUser(null);
+        final User target = Generator.generateUser(null, null);
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("username", target.getUsername());
@@ -49,11 +50,13 @@ class CustomSwitchUserFilterTest {
 
     @Test
     void attemptSwitchUserThrowsBadRequestExceptionWhenTargetUserIsAdmin() {
-        final User source = Generator.generateUser(null);
-        source.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.administrator));
+        RoleGroup roleGroup = Generator.generateRoleGroupWithRoles(Role.administrator);
+        final User source = Generator.generateUser(null, roleGroup);
+        source.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
         Environment.setCurrentUser(source);
-        final User target = Generator.generateUser(null);
-        target.setRoleGroup(Generator.generateRoleGroupWithOneRole(Role.administrator));
+        final User target = Generator.generateUser(null, roleGroup);
+        target.addType(Vocabulary.s_i_administrator);
+        target.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("username", target.getUsername());

@@ -19,7 +19,7 @@ public class RoleGroup implements Serializable, HasUri {
     private String name;
 
     @Enumerated(EnumType.OBJECT_ONE_OF)
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_role, cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_role)
     private Set<Role> roles = new HashSet<>();
 
     public void addRole(Role role){
@@ -52,6 +52,6 @@ public class RoleGroup implements Serializable, HasUri {
     }
 
     public void generateUri() {
-        this.uri = URI.create(Constants.BASE_URI + name);
+        this.uri = URI.create(Constants.BASE_URI + "sdfsf");
     }
 }

@@ -6,11 +6,9 @@ import cz.cvut.kbss.study.model.qam.Answer;
 import cz.cvut.kbss.study.model.qam.Question;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+
+import static org.apache.commons.lang3.BooleanUtils.forEach;
 
 public class Generator {
 
@@ -136,7 +134,7 @@ public class Generator {
      *
      * @return Random user
      */
-    public static User generateUser(Institution institution) {
+    public static User generateAdministrator(Institution institution) {
         final User person = new User();
         person.setUsername("RandomUsername" + randomInt());
         person.setPassword("RandomPassword" + randomInt());
@@ -144,22 +142,38 @@ public class Generator {
         person.setLastName("RandomLastName" + randomInt());
         person.setEmailAddress("RandomEmail" + randomInt() + "@random.rand");
         person.setInstitution(institution);
-        person.setRoleGroup(generateRoleGroupWithOneRole(Role.administrator));
+        person.setRoleGroup(generateRoleGroupWithRoles(Role.administrator));
+        person.setUri(generateUri());
+        return person;
+    }
+
+    public static User generateUser(Institution institution, RoleGroup roleGroup) {
+        final User person = new User();
+        person.setUsername("RandomUsername" + randomInt());
+        person.setPassword("RandomPassword" + randomInt());
+        person.setFirstName("RandomFirstName" + randomInt());
+        person.setLastName("RandomLastName" + randomInt());
+        person.setEmailAddress("RandomEmail" + randomInt() + "@random.rand");
+        person.setInstitution(institution);
+        person.setRoleGroup(roleGroup);
+        person.setUri(generateUri());
         return person;
     }
 
     public static RoleGroup generateRoleGroup() {
         final RoleGroup roleGroup = new RoleGroup();
         roleGroup.setName("RandomRoleGroup" + randomInt());
-        roleGroup.generateUri();
+        roleGroup.setUri(generateUri());
+        roleGroup.addRole(Role.administrator);
         return roleGroup;
     }
 
 
-    public static RoleGroup generateRoleGroupWithOneRole(Role role) {
+    public static RoleGroup generateRoleGroupWithRoles(Role ... roles) {
         final RoleGroup roleGroup = new RoleGroup();
         roleGroup.setName("RandomRoleGroup" + randomInt());
-        roleGroup.addRole(role);
+        roleGroup.setUri(generateUri());
+        Arrays.stream(roles).forEach(roleGroup::addRole);
         return roleGroup;
     }
 
