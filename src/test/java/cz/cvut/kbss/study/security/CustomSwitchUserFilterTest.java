@@ -41,6 +41,7 @@ class CustomSwitchUserFilterTest {
         source.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
         Environment.setCurrentUser(source);
         final User target = Generator.generateUser(null, null);
+        target.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.user));
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("username", target.getUsername());
@@ -55,7 +56,6 @@ class CustomSwitchUserFilterTest {
         source.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
         Environment.setCurrentUser(source);
         final User target = Generator.generateUser(null, roleGroup);
-        target.addType(Vocabulary.s_i_administrator);
         target.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
         final MockHttpServletRequest request = new MockHttpServletRequest();
