@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-@PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+@PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
 @RestController
 @RequestMapping("/statistics")
 public class StatisticsController extends BaseController {
@@ -22,7 +22,7 @@ public class StatisticsController extends BaseController {
         this.statisticsService = statisticsService;
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Integer> getStatistics() {
         Map<String, Integer> data = new HashMap<>();
