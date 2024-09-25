@@ -1,27 +1,22 @@
 package cz.cvut.kbss.study.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cz.cvut.kbss.jopa.model.annotations.CascadeType;
 import cz.cvut.kbss.jopa.model.annotations.FetchType;
 import cz.cvut.kbss.jopa.model.annotations.Id;
 import cz.cvut.kbss.jopa.model.annotations.OWLClass;
 import cz.cvut.kbss.jopa.model.annotations.OWLDataProperty;
 import cz.cvut.kbss.jopa.model.annotations.OWLObjectProperty;
 import cz.cvut.kbss.jopa.model.annotations.ParticipationConstraints;
-import cz.cvut.kbss.jopa.model.annotations.Types;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @OWLClass(iri = Vocabulary.s_c_Person)
 public class User implements HasDerivableUri, Serializable {
@@ -65,12 +60,8 @@ public class User implements HasDerivableUri, Serializable {
     @OWLObjectProperty(iri = Vocabulary.s_p_has_role_group)
     private RoleGroup roleGroup;
 
-    @Types
-    private Set<String> types;
-
     public User() {
-        this.types = new HashSet<>();
-        types.add(Vocabulary.s_c_doctor_role_group);
+
     }
 
     @Override
@@ -147,19 +138,6 @@ public class User implements HasDerivableUri, Serializable {
 
     public void setRoleGroup(RoleGroup roleGroup) {
         this.roleGroup = roleGroup;
-    }
-
-    public Set<String> getTypes() {
-        return types;
-    }
-
-    public void setTypes(Set<String> types) {
-        this.types = types;
-    }
-
-    public void addType(String type) {
-        assert types != null;
-        getTypes().add(type);
     }
 
     /**
