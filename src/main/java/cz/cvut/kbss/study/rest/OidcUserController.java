@@ -38,14 +38,14 @@ public class OidcUserController extends BaseController {
         this.institutionService = institutionService;
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.user + "')")
     @GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getCurrent() {
         return userService.getCurrentUser();
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name or " +
-            "hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.areFromSameInstitution(#username)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "') or #username == authentication.name or " +
+            "hasAuthority('" + SecurityConstants.user + "') and @securityUtils.areFromSameInstitution(#username)")
     @GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getByUsername(@PathVariable("username") String username) {
         final User user = userService.findByUsername(username);
@@ -56,14 +56,14 @@ public class OidcUserController extends BaseController {
     }
 
     @PreAuthorize(
-            "hasRole('" + SecurityConstants.ROLE_ADMIN + "') " +
-                    "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
+            "hasAuthority('" + SecurityConstants.administrator + "') " +
+                    "or hasAuthority('" + SecurityConstants.administrator + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> getUsers(@RequestParam(value = "institution", required = false) String institutionKey) {
         return institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or #username == authentication.name")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "') or #username == authentication.name")
     @PutMapping(value = "/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUser(@PathVariable("username") String username, @RequestBody User user,
