@@ -203,7 +203,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     protected void preUpdate(User instance) {
         final User currentUser = securityUtils.getCurrentUser();
         if (!currentUser.isAdmin()
-            && (!instance.getTypes().equals(currentUser.getTypes()) || (instance.getInstitution() != null
+            && (!instance.getRoleGroup().getRoles().equals(currentUser.getRoleGroup().getRoles()) || (instance.getInstitution() != null
             && !instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey())))) {
             throw new UnauthorizedException("Cannot update user.");
         }
