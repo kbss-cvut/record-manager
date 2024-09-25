@@ -1,13 +1,9 @@
 package cz.cvut.kbss.study.service.security;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.model.PatientRecord;
-import cz.cvut.kbss.study.model.RoleGroup;
-import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
-import cz.cvut.kbss.study.security.model.Role;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
@@ -106,8 +102,7 @@ public class SecurityUtils {
 
         RoleGroup roleGroup = new RoleGroup();
         user.setRoleGroup(roleGroup);
-        roles.stream().map(Role::forName).filter(Optional::isPresent).map(Optional::get)
-            .forEach(r ->  roleGroup.addRole(cz.cvut.kbss.study.model.Role.getFromSecurityRole(r)));
+        roles.forEach(r ->  roleGroup.addRole(Role.fromIriOrName(r)));
         return user;
     }
 
