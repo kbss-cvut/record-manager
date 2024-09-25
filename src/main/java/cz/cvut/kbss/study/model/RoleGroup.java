@@ -7,6 +7,7 @@ import cz.cvut.kbss.study.util.Constants;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @OWLClass(iri = Vocabulary.s_c_role_group)
@@ -53,5 +54,18 @@ public class RoleGroup implements Serializable, HasUri {
 
     public void generateUri() {
         this.uri = URI.create(Constants.BASE_URI + "sdfsf");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RoleGroup roleGroup = (RoleGroup) o;
+        return Objects.equals(name, roleGroup.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }
