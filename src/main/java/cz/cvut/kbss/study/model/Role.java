@@ -55,12 +55,7 @@ public enum Role {
         this.iri = iri;
     }
 
-    public static Role getFromSecurityRole(cz.cvut.kbss.study.security.model.Role r) {
-        return switch (r) {
-            case USER -> user;
-            case ADMIN -> administrator;
-        };
-    }
+
 
     public String getIri() {
         return iri;
