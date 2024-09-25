@@ -54,7 +54,7 @@ public class ActionHistoryController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ActionHistory> getActions(@RequestParam(value = "author", required = false) String authorUsername,
                                           @RequestParam(value = "type", required = false) String type,
@@ -73,7 +73,7 @@ public class ActionHistoryController extends BaseController {
         return result.getContent();
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
     @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ActionHistory getByKey(@PathVariable("key") String key) {
         final ActionHistory action = actionHistoryService.findByKey(key);
