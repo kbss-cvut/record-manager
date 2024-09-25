@@ -79,7 +79,7 @@ public class OAuth2SecurityConfig {
             assert extractedRoles != null;
             final Set<SimpleGrantedAuthority> authorities = new HashSet<>(extractedRoles);
             // Add default role if it is not present
-            authorities.add(new SimpleGrantedAuthority(SecurityConstants.ROLE_USER));
+            authorities.add(new SimpleGrantedAuthority(SecurityConstants.user));
             return new JwtAuthenticationToken(source, authorities);
         };
     }

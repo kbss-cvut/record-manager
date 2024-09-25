@@ -27,11 +27,32 @@ public class SecurityConstants {
      */
     public static final int SESSION_TIMEOUT = 12 * 60 * 60;
 
-    public static final String ROLE_USER = "ROLE_USER";
+    public static final String user = "user";
 
-    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String administrator = "administrator";
 
-    public static final String ROLE_GROUP_USER = "ROLE_GROUP_USER";;
+    public static final String impersonate = "impersonate";
 
-    public static final Object ROLE_GROUP_ADMIN = "ROLE_GROUP_ADMIN";
+    public static final String deleteAllRecords = "deleteAllRecords";
+
+    public static final String viewAllRecords = "viewAllRecords";
+
+    public static final String editAllRecords = "editAllRecords";
+
+    public static final String deleteOrganizationRecords = "deleteOrganizationRecords";
+
+    public static final String viewOrganizationRecords = "viewOrganizationRecords";
+
+    public static final String editOrganizationRecords = "editOrganizationRecords";
+
+    public static final String editUsers = "editUsers";
+
+    public static final String completeRecords = "completeRecords";
+
+    public static final String rejectRecords = "rejectRecords";
+
+    public static final String publishRecords = "publishRecords";
+
+    public static final String importCodelists = "importCodelists";
+
 }

@@ -30,7 +30,7 @@ import java.util.List;
 import static cz.cvut.kbss.study.rest.util.RecordFilterMapper.constructRecordFilter;
 
 @RestController
-@PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
+@PreAuthorize("hasAuthority('" + SecurityConstants.user + "')")
 @RequestMapping("/institutions")
 public class InstitutionController extends BaseController {
 
@@ -44,7 +44,7 @@ public class InstitutionController extends BaseController {
         this.recordService = recordService;
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Institution> getAllInstitutions() {
         final List<Institution> institutions = institutionService.findAll();
@@ -52,8 +52,8 @@ public class InstitutionController extends BaseController {
         return institutions;
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') " +
-     "or hasRole('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfInstitution(#key)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "') " +
+     "or hasAuthority('" + SecurityConstants.user + "') and @securityUtils.isMemberOfInstitution(#key)")
     @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Institution findByKey(@PathVariable("key") String key) {
         return findInternal(key);
@@ -67,7 +67,7 @@ public class InstitutionController extends BaseController {
         return result;
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "') or @securityUtils.isRecordInUsersInstitution(#key)")
     @GetMapping(value = "/{key}/patients", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecordDto> getTreatedPatientRecords(@PathVariable("key") String key) {
         final Institution inst = findInternal(key);
@@ -75,7 +75,7 @@ public class InstitutionController extends BaseController {
         return recordService.findAll(constructRecordFilter("institution", key), Pageable.unpaged()).getContent();
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createInstitution(@RequestBody Institution institution) {
@@ -88,7 +88,7 @@ public class InstitutionController extends BaseController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
     @PutMapping(value = "/{key}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateInstitution(@PathVariable("key") String key, @RequestBody Institution institution) {
@@ -104,7 +104,7 @@ public class InstitutionController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasRole('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
     @DeleteMapping(value = "/{key}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteInstitution(@PathVariable("key") String key) {
