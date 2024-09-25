@@ -8,5 +8,4 @@ public interface RoleGroupService extends BaseService<RoleGroup> {
 
     RoleGroup findByName(String name);
 
-
 }
