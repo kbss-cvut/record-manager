@@ -57,7 +57,7 @@ public class User implements HasDerivableUri, Serializable {
     @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
     private Institution institution;
 
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_role_group)
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_role_group, fetch = FetchType.EAGER)
     private RoleGroup roleGroup;
 
     public User() {
