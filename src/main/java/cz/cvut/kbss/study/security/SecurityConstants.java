@@ -27,32 +27,32 @@ public class SecurityConstants {
      */
     public static final int SESSION_TIMEOUT = 12 * 60 * 60;
 
-    public static final String user = "user";
+    public static final String user = "ROLE_USER";
 
-    public static final String administrator = "administrator";
+    public static final String administrator = "ROLE_ADMIN";
 
     public static final String impersonate = "impersonate";
 
-    public static final String deleteAllRecords = "deleteAllRecords";
+    public static final String deleteAllRecords = "delete-all-records";
 
-    public static final String viewAllRecords = "viewAllRecords";
+    public static final String viewAllRecords = "view-all-records";
 
-    public static final String editAllRecords = "editAllRecords";
+    public static final String editAllRecords = "edit-all-records";
 
-    public static final String deleteOrganizationRecords = "deleteOrganizationRecords";
+    public static final String deleteOrganizationRecords = "delete-organization-records";
 
-    public static final String viewOrganizationRecords = "viewOrganizationRecords";
+    public static final String viewOrganizationRecords = "view-organization-records";
 
-    public static final String editOrganizationRecords = "editOrganizationRecords";
+    public static final String editOrganizationRecords = "edit-organization-records";
 
-    public static final String editUsers = "editUsers";
+    public static final String editUsers = "edit-users";
 
-    public static final String completeRecords = "completeRecords";
+    public static final String completeRecords = "complete-records";
 
-    public static final String rejectRecords = "rejectRecords";
+    public static final String rejectRecords = "reject-records";
 
-    public static final String publishRecords = "publishRecords";
+    public static final String publishRecords = "publish-records";
 
-    public static final String importCodelists = "importCodelists";
+    public static final String importCodelists = "import-codelists";
 
 }

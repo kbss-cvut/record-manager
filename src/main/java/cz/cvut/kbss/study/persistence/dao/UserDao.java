@@ -111,7 +111,7 @@ public class UserDao extends DerivableUriDao<User> {
             .setParameter("typeUser", URI.create(Vocabulary.s_c_Person))
             .setParameter("hasRoleGroup", URI.create(Vocabulary.s_p_has_role_group))
             .setParameter("hasRole", URI.create(Vocabulary.s_p_has_role))
-            .setParameter("typeAdmin", URI.create(Vocabulary.s_i_administrator)).getSingleResult()
+            .setParameter("typeAdmin", URI.create(Vocabulary.s_i_RM_ADMIN)).getSingleResult()
         ).intValue();
     }
 }

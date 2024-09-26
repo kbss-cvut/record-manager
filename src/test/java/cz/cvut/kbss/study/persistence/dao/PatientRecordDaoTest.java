@@ -64,7 +64,6 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     public void setUp() {
         this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
         transactional(() -> roleGroupDao.persist(roleGroupAdmin));
-        int a =4;
     }
 
     @Test

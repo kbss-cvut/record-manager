@@ -66,10 +66,6 @@ rm:has-question rdf:type owl:ObjectProperty ;
 rm:is-member-of rdf:type owl:ObjectProperty ;
                 rdfs:subPropertyOf rm:relates-to .
 
-###  http://onto.fel.cvut.cz/ontologies/record-manager/role-group
-rm:role-group rdf:type owl:ObjectProperty ;
-                rdfs:subPropertyOf rm:relates-to .
-
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/relates-to
 rm:relates-to rdf:type owl:ObjectProperty .
@@ -79,15 +75,18 @@ rm:relates-to rdf:type owl:ObjectProperty .
 rm:was-treated-at rdf:type owl:ObjectProperty ;
                   rdfs:subPropertyOf rm:relates-to .
 
+
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/has-phase
 rm:has-phase rdf:type owl:ObjectProperty ;
                 rdfs:subPropertyOf rdf:type ;
                 rdfs:label "has phase"@en .
 
+
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/has-role-group
 rm:has-role-group rdf:type owl:ObjectProperty ;
                 rdfs:subPropertyOf rm:relates-to;
                 rdfs:label "has role group"@en.
+
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/has-role
 rm:has-role  rdf:type owl:ObjectProperty ;
@@ -160,17 +159,6 @@ rm:reject-reason rdf:type owl:DatatypeProperty .
 rm:action-history rdf:type owl:Class ;
                   rdfs:label "ActionHistory"@en .
 
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/administrator-role-group
-rm:administrator-role-group rdf:type owl:Class ;
-                 rdfs:label "Administrator"@en .
-
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/doctor-role-group
-rm:doctor-role-group rdf:type owl:Class ;
-          rdfs:label "Doctor"@en .
-
-
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/institution
 rm:institution rdf:type owl:Class ;
                rdfs:label "Institution"@en .
@@ -233,12 +221,12 @@ rm:role-group rdf:type owl:Class;
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/administrator
 ### TODO deprecated
-rm:administrator rdf:type owl:NamedIndividual, rm:role ;
+rm:RM_ADMIN rdf:type owl:NamedIndividual, rm:role ;
         rdfs:label "administrator"@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/user
 ### TODO deprecated
-rm:user rdf:type owl:NamedIndividual, rm:role ;
+rm:RM_USER rdf:type owl:NamedIndividual, rm:role ;
         rdfs:label "user"@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/complete-records-role
