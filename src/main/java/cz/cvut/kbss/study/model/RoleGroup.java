@@ -53,7 +53,7 @@ public class RoleGroup implements Serializable, HasUri {
     }
 
     public void generateUri() {
-        this.uri = URI.create(Constants.BASE_URI + "sdfsf");
+        this.uri = URI.create(Constants.BASE_URI + name);
     }
 
     @Override
