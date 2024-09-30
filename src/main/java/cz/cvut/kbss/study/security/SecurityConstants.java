@@ -27,32 +27,32 @@ public class SecurityConstants {
      */
     public static final int SESSION_TIMEOUT = 12 * 60 * 60;
 
-    public static final String user = "ROLE_USER";
+    public static final String ROLE_USER = "ROLE_USER";
 
-    public static final String administrator = "ROLE_ADMIN";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-    public static final String impersonate = "impersonate";
+    public static final String impersonate = "rm-impersonate";
 
-    public static final String deleteAllRecords = "delete-all-records";
+    public static final String deleteAllRecords = "rm-delete-all-records";
 
-    public static final String viewAllRecords = "view-all-records";
+    public static final String viewAllRecords = "rm-view-all-records";
 
-    public static final String editAllRecords = "edit-all-records";
+    public static final String editAllRecords = "rm-edit-all-records";
 
-    public static final String deleteOrganizationRecords = "delete-organization-records";
+    public static final String deleteOrganizationRecords = "rm-delete-organization-records";
 
-    public static final String viewOrganizationRecords = "view-organization-records";
+    public static final String viewOrganizationRecords = "rm-view-organization-records";
 
-    public static final String editOrganizationRecords = "edit-organization-records";
+    public static final String editOrganizationRecords = "rm-edit-organization-records";
 
-    public static final String editUsers = "edit-users";
+    public static final String editUsers = "rm-edit-users";
 
-    public static final String completeRecords = "complete-records";
+    public static final String completeRecords = "rm-complete-records";
 
-    public static final String rejectRecords = "reject-records";
+    public static final String rejectRecords = "rm-reject-records";
 
-    public static final String publishRecords = "publish-records";
+    public static final String publishRecords = "rm-publish-records";
 
-    public static final String importCodelists = "import-codelists";
+    public static final String importCodelists = "rm-import-codelists";
 
 }

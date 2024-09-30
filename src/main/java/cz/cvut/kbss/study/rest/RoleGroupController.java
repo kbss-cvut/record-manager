@@ -29,13 +29,13 @@ public class RoleGroupController extends BaseController{
         this.roleGroupService = roleGroupService;
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RoleGroup> getRoleGroups() {
         return roleGroupService.findAll();
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.administrator + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "')")
     @GetMapping(value = "/{name}",produces = MediaType.APPLICATION_JSON_VALUE)
     public RoleGroup findByName(@PathVariable("name") String name) {
         RoleGroup result = roleGroupService.findByName(name);
