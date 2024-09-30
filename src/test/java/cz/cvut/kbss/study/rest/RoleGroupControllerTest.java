@@ -47,7 +47,7 @@ public class RoleGroupControllerTest extends BaseControllerTestRunner {
 
         when(roleGroupServiceMock.findAll()).thenReturn(List.of(roleGroup));
 
-        final MvcResult result =  mockMvc.perform(get("/roleGroup/")).andReturn();
+        final MvcResult result =  mockMvc.perform(get("/roleGroups/")).andReturn();
 
         final List<RoleGroup> body = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
@@ -65,7 +65,7 @@ public class RoleGroupControllerTest extends BaseControllerTestRunner {
 
         when(roleGroupServiceMock.findByName(roleName)).thenReturn(roleGroup);
 
-        final MvcResult result =  mockMvc.perform(get("/roleGroup/" + roleName)).andReturn();
+        final MvcResult result =  mockMvc.perform(get("/roleGroups/" + roleName)).andReturn();
 
         final RoleGroup body = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
@@ -81,7 +81,7 @@ public class RoleGroupControllerTest extends BaseControllerTestRunner {
 
         when(roleGroupServiceMock.findByName(roleName)).thenReturn(null);
 
-        mockMvc.perform(get("/roleGroup/{name}", roleName)
+        mockMvc.perform(get("/roleGroups/{name}", roleName)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
