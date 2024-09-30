@@ -24,13 +24,13 @@ class RoleTest {
 
     @Test
     void fromNameReturnsCorrectRole() {
-        assertEquals(Role.administrator, Role.fromName(SecurityConstants.administrator));
+        assertEquals(Role.administrator, Role.fromName(SecurityConstants.ROLE_ADMIN));
         assertEquals(Role.viewAllRecords, Role.fromName(SecurityConstants.viewAllRecords));
     }
 
     @Test
     void fromNameIsCaseInsensitive() {
-        assertEquals(Role.administrator, Role.fromName(SecurityConstants.administrator.toLowerCase()));
+        assertEquals(Role.administrator, Role.fromName(SecurityConstants.ROLE_ADMIN.toLowerCase()));
         assertEquals(Role.viewAllRecords, Role.fromName(SecurityConstants.viewAllRecords.toUpperCase()));
     }
 
@@ -52,13 +52,13 @@ class RoleTest {
 
     @Test
     void fromIriOrNameReturnsRoleByName() {
-        assertEquals(Role.administrator, Role.fromIriOrName(SecurityConstants.administrator));
+        assertEquals(Role.administrator, Role.fromIriOrName(SecurityConstants.ROLE_ADMIN));
         assertEquals(Role.viewAllRecords, Role.fromIriOrName(SecurityConstants.viewAllRecords));
     }
 
     @Test
     void fromIriOrNameIsCaseInsensitiveForName() {
-        assertEquals(Role.administrator, Role.fromIriOrName(SecurityConstants.administrator.toLowerCase()));
+        assertEquals(Role.administrator, Role.fromIriOrName(SecurityConstants.ROLE_ADMIN.toLowerCase()));
     }
 
     @Test

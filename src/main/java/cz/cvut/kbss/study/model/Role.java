@@ -8,10 +8,10 @@ public enum Role {
 
     // TODO deprecated -- should be removed.
     @Individual(iri=Vocabulary.s_i_RM_ADMIN)
-    administrator(SecurityConstants.administrator, Vocabulary.s_i_RM_ADMIN),
+    administrator(SecurityConstants.ROLE_ADMIN, Vocabulary.s_i_RM_ADMIN),
     // TODO deprecated -- should be removed.
     @Individual(iri = Vocabulary.s_i_RM_USER)
-    user(SecurityConstants.user, Vocabulary.s_i_RM_USER),
+    user(SecurityConstants.ROLE_USER, Vocabulary.s_i_RM_USER),
 
     @Individual(iri = Vocabulary.s_i_impersonate_role)
     impersonate(SecurityConstants.impersonate, Vocabulary.s_i_impersonate_role),
