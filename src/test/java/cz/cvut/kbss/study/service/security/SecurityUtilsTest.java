@@ -7,7 +7,6 @@ import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.SecurityConstants;
@@ -93,7 +92,7 @@ public class SecurityUtilsTest {
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")
-                             .claim("roles", List.of(SecurityConstants.user))
+                             .claim("roles", List.of(SecurityConstants.ROLE_USER))
                              .issuer("http://localhost:8080/termit")
                              .subject(USERNAME)
                              .claim("preferred_username", USERNAME)
@@ -179,7 +178,7 @@ public class SecurityUtilsTest {
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")
-                             .claim("roles", List.of(SecurityConstants.administrator))
+                             .claim("roles", List.of(SecurityConstants.ROLE_ADMIN))
                              .issuer("http://localhost:8080/termit")
                              .subject(USERNAME)
                              .claim("preferred_username", USERNAME)
