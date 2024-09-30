@@ -19,7 +19,7 @@ import java.util.List;
 
 @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal", matchIfMissing = true)
 @RestController
-@RequestMapping("/roleGroup")
+@RequestMapping("/roleGroups")
 public class RoleGroupController extends BaseController{
 
     private final RoleGroupService roleGroupService;
