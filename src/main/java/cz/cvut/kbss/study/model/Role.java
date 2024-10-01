@@ -3,11 +3,12 @@ package cz.cvut.kbss.study.model;
 import com.fasterxml.jackson.annotation.JsonValue;
 import cz.cvut.kbss.jopa.model.annotations.Individual;
 import cz.cvut.kbss.study.security.SecurityConstants;
+import java.util.Optional;
 
 public enum Role {
 
     // TODO deprecated -- should be removed.
-    @Individual(iri=Vocabulary.s_i_RM_ADMIN)
+    @Individual(iri = Vocabulary.s_i_RM_ADMIN)
     administrator(SecurityConstants.ROLE_ADMIN, Vocabulary.s_i_RM_ADMIN),
     // TODO deprecated -- should be removed.
     @Individual(iri = Vocabulary.s_i_RM_USER)
@@ -44,7 +45,7 @@ public enum Role {
     rejectRecords(SecurityConstants.rejectRecords, Vocabulary.s_i_reject_records_role),
 
     @Individual(iri = Vocabulary.s_i_publish_records_role)
-    publishRecords(SecurityConstants.publishRecords ,Vocabulary.s_i_publish_records_role),
+    publishRecords(SecurityConstants.publishRecords, Vocabulary.s_i_publish_records_role),
 
     @Individual(iri = Vocabulary.s_i_import_codelists_role)
     importCodelists(SecurityConstants.importCodelists, Vocabulary.s_i_import_codelists_role);
@@ -59,7 +60,7 @@ public enum Role {
     }
 
     @JsonValue
-    public String getRoleName(){
+    public String getRoleName() {
         return roleName;
     }
 
@@ -68,52 +69,60 @@ public enum Role {
     }
 
     /**
-     * Returns {@link Role} with the specified IRI.
+     * Retrieves a role based on its IRI.
      *
-     * @param iri role identifier
-     * @return matching {@code Role}
-     * @throws IllegalArgumentException When no matching role is found
+     * <p>This method iterates over all available roles and checks if any role's IRI
+     * matches the provided IRI string. If a match is found, the corresponding role
+     * is returned as an Optional. If no match is found, an empty Optional is returned.</p>
+     *
+     * @param iri the IRI of the role to retrieve
+     * @return an Optional containing the corresponding Role if found,
+     * or an empty Optional if no matching role exists
      */
-    public static Role fromIri(String iri) {
+    public static Optional<Role> fromIri(String iri) {
         for (Role r : values()) {
             if (r.getIri().equals(iri)) {
-                return r;
+                return Optional.of(r);
             }
         }
-        throw new IllegalArgumentException("Unknown role identifier '" + iri + "'.");
+        return Optional.empty();
     }
 
     /**
-     * Returns {@link Role} with the specified constant name.
+     * Retrieves a role based on its role name.
      *
-     * @param name role name
-     * @return matching {@code Role}
-     * @throws IllegalArgumentException When no matching role is found
+     * <p>This method iterates over all available roles and checks if any role's
+     * name matches the provided name string (case-insensitive). If a match is found,
+     * the corresponding role is returned as an Optional. If no match is found,
+     * an empty Optional is returned.</p>
+     *
+     * @param name the name of the role to retrieve
+     * @return an Optional containing the corresponding Role if found,
+     *         or an empty Optional if no matching role exists
      */
-    public static Role fromName(String name) {
+    public static Optional<Role> fromName(String name) {
         for (Role r : values()) {
             if (r.roleName.equalsIgnoreCase(name)) {
-                return r;
+                return Optional.of(r);
             }
         }
-        throw new IllegalArgumentException("Unknown role '" + name + "'.");
+        return Optional.empty();
     }
 
     /**
-     * Returns a {@link Role} with the specified IRI or constant name.
-     * <p>
-     * This function first tries to find the enum constant by IRI. If it is not found, constant name matching is
-     * attempted.
+     * Retrieves a role based on either its IRI or role name.
      *
-     * @param identification Constant IRI or name to find match by
-     * @return matching {@code Role}
-     * @throws IllegalArgumentException When no matching role is found
+     * <p>This method first attempts to find a role using the provided identification string
+     * as an IRI. If no role is found, it then attempts to find a role using the
+     * identification string as a role name. The first successful match will be returned
+     * as an Optional. If no match is found, an empty Optional is returned.</p>
+     *
+     * @param identification the IRI or role name of the role to retrieve
+     * @return an Optional containing the corresponding Role if found,
+     *         or an empty Optional if no matching role exists
      */
-    public static Role fromIriOrName(String identification) {
-        try {
-            return fromIri(identification);
-        } catch (IllegalArgumentException e) {
-            return fromName(identification);
-        }
+    public static Optional<Role> fromIriOrName(String identification) {
+        Optional<Role> role = fromIri(identification);
+        return role.isPresent() ? role : fromName(identification);
     }
 }

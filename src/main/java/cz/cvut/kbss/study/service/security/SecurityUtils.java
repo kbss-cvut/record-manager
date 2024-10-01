@@ -99,10 +99,13 @@ public class SecurityUtils {
             throw new NotFoundException(
                     "User with username '" + userInfo.getPreferredUsername() + "' not found in repository.");
         }
-
         RoleGroup roleGroup = new RoleGroup();
         user.setRoleGroup(roleGroup);
-        roles.forEach(r ->  roleGroup.addRole(Role.fromIriOrName(r)));
+        roles.stream()
+                .map(Role::fromIriOrName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(roleGroup::addRole);
         return user;
     }
 

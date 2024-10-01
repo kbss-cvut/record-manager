@@ -8,65 +8,37 @@ class RoleTest {
 
     @Test
     void fromIriReturnsCorrectRole() {
-        assertEquals(Role.administrator, Role.fromIri(Vocabulary.s_i_RM_ADMIN));
-        assertEquals(Role.viewAllRecords, Role.fromIri(Vocabulary.s_i_view_all_records_role));
+        assertEquals(Role.administrator, Role.fromIri(Vocabulary.s_i_RM_ADMIN).get());
+        assertEquals(Role.viewAllRecords, Role.fromIri(Vocabulary.s_i_view_all_records_role).get());
     }
-
-    @Test
-    void fromIriThrowsExceptionForUnknownIri() {
-        String unknownIri = "unknown_iri";
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            Role.fromIri(unknownIri);
-        });
-        assertEquals("Unknown role identifier '" + unknownIri + "'.", exception.getMessage());
-    }
-
 
     @Test
     void fromNameReturnsCorrectRole() {
-        assertEquals(Role.administrator, Role.fromName(SecurityConstants.ROLE_ADMIN));
-        assertEquals(Role.viewAllRecords, Role.fromName(SecurityConstants.viewAllRecords));
+        assertEquals(Role.administrator, Role.fromName(SecurityConstants.ROLE_ADMIN).get());
+        assertEquals(Role.viewAllRecords, Role.fromName(SecurityConstants.viewAllRecords).get());
     }
 
     @Test
     void fromNameIsCaseInsensitive() {
-        assertEquals(Role.administrator, Role.fromName(SecurityConstants.ROLE_ADMIN.toLowerCase()));
-        assertEquals(Role.viewAllRecords, Role.fromName(SecurityConstants.viewAllRecords.toUpperCase()));
+        assertEquals(Role.administrator, Role.fromName(SecurityConstants.ROLE_ADMIN.toLowerCase()).get());
+        assertEquals(Role.viewAllRecords, Role.fromName(SecurityConstants.viewAllRecords.toUpperCase()).get());
     }
-
-    @Test
-    void fromNameThrowsExceptionForUnknownName() {
-        String unknownName = "unknown_role";
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            Role.fromName(unknownName);
-        });
-        assertEquals("Unknown role '" + unknownName + "'.", exception.getMessage());
-    }
-
 
     @Test
     void fromIriOrNameReturnsRoleByIri() {
-        assertEquals(Role.administrator, Role.fromIriOrName(Vocabulary.s_i_RM_ADMIN));
-        assertEquals(Role.viewAllRecords, Role.fromIriOrName(Vocabulary.s_i_view_all_records_role));
+        assertEquals(Role.administrator, Role.fromIriOrName(Vocabulary.s_i_RM_ADMIN).get());
+        assertEquals(Role.viewAllRecords, Role.fromIriOrName(Vocabulary.s_i_view_all_records_role).get());
     }
 
     @Test
     void fromIriOrNameReturnsRoleByName() {
-        assertEquals(Role.administrator, Role.fromIriOrName(SecurityConstants.ROLE_ADMIN));
-        assertEquals(Role.viewAllRecords, Role.fromIriOrName(SecurityConstants.viewAllRecords));
+        assertEquals(Role.administrator, Role.fromIriOrName(SecurityConstants.ROLE_ADMIN).get());
+        assertEquals(Role.viewAllRecords, Role.fromIriOrName(SecurityConstants.viewAllRecords).get());
     }
 
     @Test
     void fromIriOrNameIsCaseInsensitiveForName() {
-        assertEquals(Role.administrator, Role.fromIriOrName(SecurityConstants.ROLE_ADMIN.toLowerCase()));
+        assertEquals(Role.administrator, Role.fromIriOrName(SecurityConstants.ROLE_ADMIN.toLowerCase()).get());
     }
 
-    @Test
-    void fromIriOrNameThrowsExceptionForUnknownIdentifier() {
-        String unknownIdentifier = "unknown_identifier";
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            Role.fromIriOrName(unknownIdentifier);
-        });
-        assertEquals("Unknown role '" + unknownIdentifier + "'.", exception.getMessage());
-    }
 }
