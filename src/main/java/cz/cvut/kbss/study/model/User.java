@@ -148,7 +148,7 @@ public class User implements HasDerivableUri, Serializable {
      * @return {@code true} if this is admin, {@code false} otherwise
      */
     public boolean isAdmin() {
-        return roleGroup.getRoles().contains(Role.administrator);
+        return roleGroup != null && roleGroup.getRoles().contains(Role.administrator);
     }
 
     public String getToken() {
