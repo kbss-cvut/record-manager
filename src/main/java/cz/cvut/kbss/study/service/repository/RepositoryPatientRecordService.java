@@ -123,10 +123,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Override
     public void setPhase(Set<String> recordUris, RecordPhase targetPhase){
         for(String uri : recordUris){
-            PatientRecord record = find(URI.create(uri));
-            if (record == null)
-                continue;
-            record.setPhase(targetPhase);
+            patientRecordDao.updateStatus(URI.create(uri), targetPhase);
         }
     }
 

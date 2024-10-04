@@ -113,6 +113,15 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         em.getEntityManagerFactory().getCache().evict(PatientRecordDto.class, entity.getUri(), null);
     }
 
+    public void updateStatus(URI entityUri, RecordPhase targetPhase){
+        PatientRecord entity = find(entityUri);
+        if(entity == null)
+             return;
+        entity.setPhase(targetPhase);
+        em.getEntityManagerFactory().getCache().evict(PatientRecord.class, entity.getUri(), null);
+        em.getEntityManagerFactory().getCache().evict(PatientRecordDto.class, entity.getUri(), null);
+    }
+
     public List<PatientRecordDto> findAllRecords() {
         return em.createNativeQuery("SELECT ?x WHERE { ?x a ?type . }", PatientRecordDto.class)
                  .setParameter("type", typeUri)
