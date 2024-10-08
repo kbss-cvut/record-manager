@@ -56,7 +56,7 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
     private Question question;
 
     @Enumerated(EnumType.OBJECT_ONE_OF)
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_phase)
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_phase, cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     private RecordPhase phase;
 
     @Override
