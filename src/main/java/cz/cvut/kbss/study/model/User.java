@@ -7,20 +7,16 @@ import cz.cvut.kbss.jopa.model.annotations.OWLClass;
 import cz.cvut.kbss.jopa.model.annotations.OWLDataProperty;
 import cz.cvut.kbss.jopa.model.annotations.OWLObjectProperty;
 import cz.cvut.kbss.jopa.model.annotations.ParticipationConstraints;
-import cz.cvut.kbss.jopa.model.annotations.Types;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @OWLClass(iri = Vocabulary.s_c_Person)
 public class User implements HasDerivableUri, Serializable {
@@ -61,12 +57,11 @@ public class User implements HasDerivableUri, Serializable {
     @OWLObjectProperty(iri = Vocabulary.s_p_is_member_of, fetch = FetchType.EAGER)
     private Institution institution;
 
-    @Types
-    private Set<String> types;
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_role_group, fetch = FetchType.EAGER)
+    private RoleGroup roleGroup;
 
     public User() {
-        this.types = new HashSet<>();
-        types.add(Vocabulary.s_c_doctor);
+
     }
 
     @Override
@@ -137,17 +132,12 @@ public class User implements HasDerivableUri, Serializable {
         this.institution = institution;
     }
 
-    public Set<String> getTypes() {
-        return types;
+    public RoleGroup getRoleGroup() {
+        return roleGroup;
     }
 
-    public void setTypes(Set<String> types) {
-        this.types = types;
-    }
-
-    public void addType(String type) {
-        assert types != null;
-        getTypes().add(type);
+    public void setRoleGroup(RoleGroup roleGroup) {
+        this.roleGroup = roleGroup;
     }
 
     /**
@@ -158,8 +148,7 @@ public class User implements HasDerivableUri, Serializable {
      * @return {@code true} if this is admin, {@code false} otherwise
      */
     public boolean isAdmin() {
-        assert types != null;
-        return getTypes().contains(Vocabulary.s_c_administrator);
+        return roleGroup != null && roleGroup.getRoles().contains(Role.administrator);
     }
 
     public String getToken() {
@@ -216,7 +205,7 @@ public class User implements HasDerivableUri, Serializable {
         copy.setInstitution(institution);
         copy.setIsInvited(isInvited);
         copy.setToken(token);
-        types.forEach(copy::addType);
+        copy.setRoleGroup(roleGroup);
         return copy;
     }
 

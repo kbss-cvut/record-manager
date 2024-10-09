@@ -1,8 +1,11 @@
 package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.Role;
+import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.util.Constants;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,21 +20,35 @@ public class SystemInitializer {
 
     private static final String ADMIN_USERNAME = "admin";
     private static final String INSTITUTION_NAME = "admin_institution";
+    private static final String ADMIN_ROLE_GROUP_NAME = "admin-role-group";
 
     private final UserService userService;
 
     private final InstitutionService institutionService;
 
+    private final RoleGroupService roleGroupService;
+
     public SystemInitializer(UserService userService,
-                             InstitutionService institutionService) {
+                             InstitutionService institutionService,
+                             RoleGroupService roleGroupService) {
         this.userService = userService;
         this.institutionService = institutionService;
+        this.roleGroupService = roleGroupService;
     }
 
     @PostConstruct
     private void initializeSystem() {
-        addDefaultInstitution();
-        addDefaultAdministrator();
+        if (noAdminExists()) {
+            addAdminRoleGroup();
+            addDefaultInstitution();
+            addDefaultAdministrator();
+        }
+    }
+
+    private boolean noAdminExists() {
+        return userService.findAll().stream().filter(
+            user -> user.getRoleGroup().getRoles().contains(Role.administrator)
+        ).findAny().isEmpty();
     }
 
     private void addDefaultInstitution() {
@@ -52,9 +69,19 @@ public class SystemInitializer {
             admin.setPassword("5y5t3mAdm1n.");
             admin.setInstitution(institutionService.findByName(INSTITUTION_NAME));
             admin.setIsInvited(true);
-            admin.getTypes().add(Vocabulary.s_c_administrator);
+            admin.setRoleGroup(roleGroupService.findByName(ADMIN_ROLE_GROUP_NAME));
             LOG.debug("Persisting default administrator {}", admin);
             userService.persist(admin);
+        }
+    }
+
+    private void addAdminRoleGroup() {
+        if (roleGroupService.findByName(ADMIN_ROLE_GROUP_NAME) == null) {
+            final RoleGroup roleGroup = new RoleGroup();
+            roleGroup.setName(ADMIN_ROLE_GROUP_NAME);
+            roleGroup.addRole(Role.administrator);
+            roleGroup.generateUri();
+            roleGroupService.persist(roleGroup);
         }
     }
 }
