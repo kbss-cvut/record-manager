@@ -39,6 +39,8 @@ public enum ConfigParam {
     E_PROFILE_UPDATE_SUBJECT("email.profileUpdateSubject"),
     E_PROFILE_UPDATE_CONTENT("email.profileUpdateContent"),
 
+    SECURITY_PROVIDER("security.provider"),
+
     OIDC_ROLE_CLAIM("security.oidc.roleClaim"),
 
     CORS_ALLOWED_ORIGINS("security.cors.allowedOrigins"),
