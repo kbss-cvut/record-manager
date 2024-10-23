@@ -9,7 +9,7 @@
 
 ### Application Configuration
 
-The application uses `src/main/resources/config.properties` to configure:
+The application uses `src/main/resources/application.properties` to configure:
 * connection to internal triple store
 * REST endpoint of Form service
 * SMTP configuration for sending emails
@@ -54,7 +54,7 @@ SForms service is configured in `formGenServiceUrl`, the call to the service sho
 ### OpenID Connect Authentication
 
 RecordManager can work with an external authentication service implementing the OpenID Connect protocol. To use it,
-set the `security.provider` (in `config.properties` or via `SECURITY_PROVIDER` via an environment variable) configuration to `oidc` 
+set the `security.provider` (in `application.properties` or via `SECURITY_PROVIDER` via an environment variable) configuration to `oidc` 
 and configure the `spring.security.oauth2.resourceserver.jwt.issuer-uri` (in `application.properties` or using an environment variable)
 parameter to the URI of the OAuth2 token issuer. When using Keycloak, this corresponds to the URI of the realm through
 which Record Manager users authenticate their requests. For example, the value may be `http://localhost:8080/realms/record-manager`.
