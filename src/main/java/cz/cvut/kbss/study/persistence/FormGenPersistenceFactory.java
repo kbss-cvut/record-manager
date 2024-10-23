@@ -19,7 +19,6 @@ import static cz.cvut.kbss.study.util.ConfigParam.DRIVER;
 import static cz.cvut.kbss.study.util.ConfigParam.FORM_GEN_REPOSITORY_URL;
 
 @Configuration
-@PropertySource("classpath:config.properties")
 public class FormGenPersistenceFactory {
 
     private final Environment environment;
