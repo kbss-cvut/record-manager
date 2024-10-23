@@ -4,7 +4,7 @@ Frontend of the application is developed separately.
 
 The setup requires the following steps:
 1) configure the application according to [Setup Guide](setup.md)
-2) configure `config.properties` to contain `security.sameSite=None`    
+2) configure `application.properties` to contain `security.sameSite=None`    
    This is important if you are running the application over HTTP so 
    web browser would not block requests to the server due to CORS policy.
 3) build the backend `mvn clean package`

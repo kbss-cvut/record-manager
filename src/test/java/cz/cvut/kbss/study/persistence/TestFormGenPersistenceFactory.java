@@ -16,7 +16,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@PropertySource("classpath:config.properties")
+@PropertySource("classpath:application.properties")
 @Profile("test")
 public class TestFormGenPersistenceFactory {
 
