@@ -24,7 +24,7 @@ import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_PA
 import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_USERNAME;
 
 @Configuration
-@PropertySource("classpath:config.properties")
+@PropertySource("classpath:application.properties")
 @Profile("test")
 public class TestPersistenceFactory {
 
