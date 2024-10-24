@@ -15,8 +15,10 @@ import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
 import cz.cvut.kbss.study.rest.util.RestUtils;
+import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.UserService;
+import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,6 +66,9 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     @Mock
     private ApplicationEventPublisher eventPublisherMock;
+
+    @Mock
+    private ConfigReader configReaderMock;
 
     @Mock
     private UserService userService;
@@ -486,5 +491,31 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         verify(eventPublisherMock).publishEvent(captor.capture());
         final PaginatedResultRetrievedEvent event = captor.getValue();
         assertEquals(page, event.getPage());
+    }
+
+    @Test
+    void getAllowedRejectMessageTrue() throws Exception {
+        String expectedValue = "true";
+        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_MESSAGE)).thenReturn(expectedValue);
+          final MvcResult result = mockMvc.perform(get("/records/allowedRejectMessage").param("institution", user.getInstitution().toString())).andReturn();
+
+        final String body = objectMapper.readValue(result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+        assertEquals(result.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(expectedValue, body);
+    }
+
+    @Test
+    void getAllowedRejectMessageFalse() throws Exception {
+        String expectedValue = "false";
+        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_MESSAGE)).thenReturn(expectedValue);
+        final MvcResult result = mockMvc.perform(get("/records/allowedRejectMessage").param("institution", user.getInstitution().toString())).andReturn();
+
+        final String body = objectMapper.readValue(result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+        assertEquals(result.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(expectedValue, body);
     }
 }
