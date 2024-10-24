@@ -354,4 +354,9 @@ public class PatientRecordController extends BaseController {
             LOG.trace("Patient record {} successfully removed.", toRemove);
         }
     }
+
+    @GetMapping(value = "/allowedRejectMessage", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean getAllowRejectMessageEnabled(){
+        return configReader.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_MESSAGE).equals("true");
+    }
 }
