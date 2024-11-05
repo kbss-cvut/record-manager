@@ -74,7 +74,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Override
     protected void preUpdate(PatientRecord instance) {
         if(instance.getPhase() != RecordPhase.rejected) {
-            instance.setRejectMessage(null);
+            instance.setRejectReason(null);
         }
         instance.setLastModifiedBy(securityUtils.getCurrentUser());
         instance.setLastModified(new Date());

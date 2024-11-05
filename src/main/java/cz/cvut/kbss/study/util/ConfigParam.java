@@ -43,7 +43,7 @@ public enum ConfigParam {
 
     CORS_ALLOWED_ORIGINS("cors.allowedOrigins"),
 
-    RECORDS_ALLOWED_REJECT_MESSAGE("records.allowedRejectMessage");
+    RECORDS_ALLOWED_REJECT_REASON("records.allowedRejectReason");
 
 
     private final String name;

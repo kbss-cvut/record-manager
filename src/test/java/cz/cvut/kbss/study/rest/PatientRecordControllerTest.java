@@ -494,10 +494,10 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    void getAllowedRejectMessageTrue() throws Exception {
+    void getAllowedRejectReasonTrue() throws Exception {
         String expectedValue = "true";
-        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_MESSAGE)).thenReturn(expectedValue);
-          final MvcResult result = mockMvc.perform(get("/records/allowedRejectMessage").param("institution", user.getInstitution().toString())).andReturn();
+        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_REASON)).thenReturn(expectedValue);
+          final MvcResult result = mockMvc.perform(get("/records/allowedRejectReason").param("institution", user.getInstitution().toString())).andReturn();
 
         final String body = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
@@ -507,10 +507,10 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    void getAllowedRejectMessageFalse() throws Exception {
+    void getAllowedRejectReasonFalse() throws Exception {
         String expectedValue = "false";
-        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_MESSAGE)).thenReturn(expectedValue);
-        final MvcResult result = mockMvc.perform(get("/records/allowedRejectMessage").param("institution", user.getInstitution().toString())).andReturn();
+        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_REASON)).thenReturn(expectedValue);
+        final MvcResult result = mockMvc.perform(get("/records/allowedRejectReason").param("institution", user.getInstitution().toString())).andReturn();
 
         final String body = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {

@@ -59,8 +59,8 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
     @OWLObjectProperty(iri = Vocabulary.s_p_has_phase, cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     private RecordPhase phase;
 
-   @OWLDataProperty(iri = Vocabulary.s_p_has_reject_message)
-    private String rejectMessage;
+   @OWLDataProperty(iri = Vocabulary.s_p_reject_reason)
+    private String rejectReason;
 
     @Override
     public URI getUri() {
@@ -149,12 +149,12 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
         return phase;
     }
 
-    public String getRejectMessage() {
-        return rejectMessage;
+    public String getRejectReason() {
+        return rejectReason;
     }
 
-    public void setRejectMessage(String rejectMessage) {
-        this.rejectMessage = rejectMessage;
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
     }
 
 

@@ -355,8 +355,8 @@ public class PatientRecordController extends BaseController {
         }
     }
 
-    @GetMapping(value = "/allowedRejectMessage", produces = MediaType.APPLICATION_JSON_VALUE)
-    public boolean getAllowedRejectMessage(){
-        return configReader.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_MESSAGE).equals("true");
+    @GetMapping(value = "/allowedRejectReason", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean getAllowedRejectReason(){
+        return configReader.getConfig(ConfigParam.RECORDS_ALLOWED_REJECT_REASON).equals("true");
     }
 }
