@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.service;
 
+ import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.export.ExportRecord;
 import cz.cvut.kbss.study.model.export.Path;
 import cz.cvut.kbss.study.model.export.RawRecord;
@@ -63,6 +64,11 @@ public class ExcelRecordConverter {
         codeListValuesDao.findItems(uris).forEach(i -> translatorMap.put(i.getUri(), i.getName()));
         codeListValuesDao.findAircraft().forEach(i -> translatorMap.put(i.getUri(), i.getName()));
         codeListValuesDao.findInstitutions().forEach(i -> translatorMap.put(i.getUri(), i.getName()));
+        rawRecords.stream().map(r -> r.getPhase()).filter(p -> p != null)
+                .forEach(pUri ->
+                        Optional.of(RecordPhase.fromIri(pUri.toString()))
+                                .ifPresent(pStr -> translatorMap.put(pUri, pStr.name()))
+                );
 
         Map<URI, List<String>> pathMap = new HashMap<>();
         paths.forEach(p -> pathMap.put(p.getUri(), Arrays.asList(
@@ -78,6 +84,7 @@ public class ExcelRecordConverter {
         for(RawRecord r : rawRecords){
             ExportRecord er = new ExportRecord();
             exportRecords.add(er);
+            er.setPhase(translatorMap.get(r.getPhase()));
             er.setPath(pathMap.get(r.getAc_comp()));
             er.setInstitution(translatorMap.get(r.getInstitution()));
             er.setAircraftType(translatorMap.get(r.getAircraftType()));
@@ -118,7 +125,7 @@ public class ExcelRecordConverter {
         for(ExportRecord rec : data) {
             XSSFRow r = s.createRow(rowIndex++);
             r.createCell(0).setCellValue(rowIndex);
-//            r.createCell(1).setCellValue(rowIndex);
+            r.createCell(1).setCellValue(rec.getPhase());
             r.createCell(2).setCellValue(rec.getCreated());
 //            r.createCell(3).setCellValue(rec.ed);
             r.createCell(4).setCellValue(rec.getLastModified());
