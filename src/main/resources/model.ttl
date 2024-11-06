@@ -132,6 +132,9 @@ rm:token rdf:type owl:DatatypeProperty .
 <http://xmlns.com/foaf/0.1/mbox> rdf:type owl:DatatypeProperty .
 
 
+###  http://onto.fel.cvut.cz/ontologies/record-manager/reject-reason
+rm:reject-reason rdf:type owl:DatatypeProperty .
+
 #################################################################
 #    Classes
 #################################################################

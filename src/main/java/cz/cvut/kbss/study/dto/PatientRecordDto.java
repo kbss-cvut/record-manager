@@ -41,6 +41,10 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
     @OWLObjectProperty(iri = Vocabulary.s_p_has_phase)
     private RecordPhase phase;
 
+    @OWLDataProperty(iri = Vocabulary.s_p_reject_reason)
+    private String rejectReason;
+
+
     @Override
     public String getKey() {
         return key;
@@ -113,6 +117,14 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
 
     public void setPhase(RecordPhase phase) {
         this.phase = phase;
+    }
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
     }
 
     @Override

@@ -41,7 +41,10 @@ public enum ConfigParam {
 
     OIDC_ROLE_CLAIM("oidc.roleClaim"),
 
-    CORS_ALLOWED_ORIGINS("cors.allowedOrigins");
+    CORS_ALLOWED_ORIGINS("cors.allowedOrigins"),
+
+    RECORDS_ALLOWED_REJECT_REASON("records.allowedRejectReason");
+
 
     private final String name;
 
