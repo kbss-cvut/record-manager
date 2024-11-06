@@ -16,7 +16,7 @@ The system can be split into two parts. __Main application__ provides management
 ### Further Record Manager Configuration
 
 The following table lists the names of environment variables that can be
-passed to TermIt backend either directly in `docker-compose.yml`, in
+passed to Record Manager backend either directly in `docker-compose.yml`, in
 an [env_file](https://docs.docker.com/compose/compose-file/compose-file-v3/#env_file), or via command line.
 
 | Variable                                           | Explanation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
