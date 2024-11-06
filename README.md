@@ -27,8 +27,3 @@ an [env_file](https://docs.docker.com/compose/compose-file/compose-file-v3/#env_
 
 Build configuration and deployment are described in [Setup Guide](doc/setup.md).
 Development is described in [Development notes](doc/development.md).
-
------
-
-Tento repozitář je udržován v rámci projektu OPZ č. CZ.03.4.74/0.0/0.0/15_025/0004172.
-![Evropská unie - Evropský sociální fond - Operační program Zaměstnanost](https://data.gov.cz/images/ozp_logo_cz.jpg)
