@@ -13,7 +13,7 @@ The setup of this backend requires the following steps:
 
 Alternatively, to step 2, a browser plugin can be used to disable CORS policy.
 
-## Running with Dockerized Services
+## Developing with Dockerized Services
 
 It is possible to run all related services, including the frontend, as described in the [frontend development guide](https://github.com/kbss-cvut/record-manager-ui/blob/main/doc/development.md#additional-configuration-parameters). The guide also describes how to use local backend with the dockerized services using variable `INTERNAL_RECORD_MANAGER_SERVER_SERVICE`.
 
