@@ -2,7 +2,7 @@
 
 Frontend of the application is developed separately.
 
-The setup requires the following steps:
+The setup of this backend requires the following steps:
 1) configure the application according to [Setup Guide](setup.md)
 2) configure `application.properties` to contain `security.sameSite=None`    
    This is important if you are running the application over HTTP so 
@@ -11,7 +11,7 @@ The setup requires the following steps:
 4) Run the created application archive (`./target/record-manager.jar`)
 5) Checkout and run frontend
 
-Alternatively to step 2, a browser plugin can be used to disable CORS policy.
+Alternatively, to step 2, a browser plugin can be used to disable CORS policy.
 
 ## Health check
 
