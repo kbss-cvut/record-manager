@@ -78,6 +78,12 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
     @Transactional(readOnly = true)
     @Override
+    public User findCurrentUser() {
+        return userDao.findByUsername(securityUtils.getCurrentUser().getUsername());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public List<User> findByInstitution(Institution institution) {
         Objects.requireNonNull(institution);
         return userDao.findByInstitution(institution);
