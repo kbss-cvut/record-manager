@@ -162,7 +162,18 @@
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${org.mapstruct.version}</version>
                         </path>
+                        <path>
+                            <groupId>cz.lukaskabc.cvut.processor</groupId>
+                            <artifactId>spring-boot-configuration-docgen-processor</artifactId>
+                            <version>1.0</version>
+                        </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-Aconfigurationdoc.output_file=./doc/configuration.md</arg>
+                        <arg>-Aconfigurationdoc.format=MD</arg>
+                        <arg>-Aconfigurationdoc.prepend_required=true</arg>
+                        <arg>-Aconfigurationdoc.configuration_package=cz.cvut.kbss.study</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
