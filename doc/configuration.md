@@ -1,9 +1,9 @@
 | Variable | Description |
 | --- | --- |
-| ```APPCONTEXT``` | Url of the website for password reset emails. e.g. https://study.com/ (must have "/" at the end) |
+| ```APPCONTEXT``` | Public URL of the frontend of record-manager application that is used for password reset emails. e.g. https://study.example.com/record-manager/ (must have "/" at the end) |
 | ```DRIVER``` | Driver to manage triple stores |
-| ```EMAIL_BCC``` |  |
-| ```EMAIL_CC``` |  |
+| ```EMAIL_BCC``` | Email addresses to be blind carbon-copied, separated by a comma (optional, can be empty). |
+| ```EMAIL_CC``` | Email addresses to be carbon-copied, separated by a comma (optional, can be empty). |
 | ```EMAIL_DISPLAYNAME``` | Email display name |
 | ```EMAIL_FROM``` | if email.from is not entered, smtp.user is used instead |
 | ```EMAIL_INVITATIONCONTENT``` | UserInvite email html content, variables: username, link, name, appContext |
