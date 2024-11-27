@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class Configuration {
 
     /**
-     * Url of the website for password reset emails. e.g. https://study.com/ (must have "/" at the end)
+     * Public URL of the frontend of record-manager application that is used for password reset emails. e.g. https://study.example.com/record-manager/ (must have "/" at the end)
      */
     String appContext;
 
@@ -180,12 +180,12 @@ public class Configuration {
         String replyTo;
 
         /**
-         *
+         * Email addresses to be carbon-copied, separated by a comma (optional, can be empty).
          */
         String cc;
 
         /**
-         *
+         * Email addresses to be blind carbon-copied, separated by a comma (optional, can be empty).
          */
         String bcc;
 
