@@ -8,8 +8,6 @@ RUN mvn -B de.qaware.maven:go-offline-maven-plugin:resolve-dependencies
 
 COPY src src
 
-RUN mkdir /record-manager/doc
-
 RUN mvn package -B -DskipTests=true
 
 FROM eclipse-temurin:17-jdk-alpine as runtime
