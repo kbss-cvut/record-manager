@@ -1,7 +1,6 @@
 | Variable | Description |
 | --- | --- |
 | ```APPCONTEXT``` | Public URL of the frontend of record-manager application that is used for password reset emails. e.g. https://study.example.com/record-manager/ (must have "/" at the end) |
-| ```DRIVER``` | Driver to manage triple stores |
 | ```EMAIL_BCC``` | Email addresses to be blind carbon-copied, separated by a comma (optional, can be empty). |
 | ```EMAIL_CC``` | Email addresses to be carbon-copied, separated by a comma (optional, can be empty). |
 | ```EMAIL_DISPLAYNAME``` | Email display name |
@@ -17,6 +16,7 @@
 | ```EMAIL_REPLYTO``` | Email cc addresses where all invitations will be sent. For more use delimiter "," (can remain empty) |
 | ```FORMGENREPOSITORYURL``` | URL of repository where output and configuration of form-generator should be held |
 | ```FORMGENSERVICEURL``` | REST endpoint of form generator service |
+| ```PERSISTENCEDRIVER``` | Persistence driver to manage triple stores |
 | ```RECORDS_ALLOWEDREJECTREASON``` | it indicates functionality allowing users to specify a reason for rejection is enabled. |
 | ```REPOSITORYURL``` | URL of repository that holds main data of the application |
 | ```SECURITY_CORD_ALLOWEDORIGINS``` | Configures allowed origins for CORS (e.g. http://localhost:3000). Use a comma to separate multiple values |

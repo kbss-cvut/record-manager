@@ -11,9 +11,9 @@ public class Configuration {
     String appContext;
 
     /**
-     * Driver to manage triple stores
+     * Persistence driver to manage triple stores
      */
-    String driver;
+    String persistenceDriver;
 
     /**
      * URL of repository that holds main data of the application
@@ -43,12 +43,12 @@ public class Configuration {
         this.appContext = appContext;
     }
 
-    public String getDriver() {
-        return driver;
+    public String getPersistenceDriver() {
+        return persistenceDriver;
     }
 
-    public void setDriver(String driver) {
-        this.driver = driver;
+    public void setPersistenceDriver(String persistenceDriver) {
+        this.persistenceDriver = persistenceDriver;
     }
 
     public String getRepositoryUrl() {
