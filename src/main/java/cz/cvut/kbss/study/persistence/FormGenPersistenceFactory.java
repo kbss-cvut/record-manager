@@ -6,7 +6,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 import java.util.HashMap;
@@ -15,7 +14,7 @@ import java.util.Map;
 import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.CACHE_ENABLED;
 import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.DATA_SOURCE_CLASS;
 import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.ONTOLOGY_PHYSICAL_URI_KEY;
-import static cz.cvut.kbss.study.util.ConfigParam.DRIVER;
+import static cz.cvut.kbss.study.util.ConfigParam.PERSISTENCE_DRIVER;
 import static cz.cvut.kbss.study.util.ConfigParam.FORM_GEN_REPOSITORY_URL;
 
 @Configuration
@@ -38,7 +37,7 @@ public class FormGenPersistenceFactory {
     private void init() {
         final Map<String, String> properties = new HashMap<>(PersistenceFactory.getDefaultParams());
         properties.put(ONTOLOGY_PHYSICAL_URI_KEY, environment.getProperty(FORM_GEN_REPOSITORY_URL.toString()));
-        properties.put(DATA_SOURCE_CLASS, environment.getProperty(DRIVER.toString()));
+        properties.put(DATA_SOURCE_CLASS, environment.getProperty(PERSISTENCE_DRIVER.toString()));
         properties.put(CACHE_ENABLED, Boolean.FALSE.toString());
         this.emf = Persistence.createEntityManagerFactory("formGenPU", properties);
     }

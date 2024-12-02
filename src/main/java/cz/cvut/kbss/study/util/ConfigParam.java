@@ -5,7 +5,7 @@ public enum ConfigParam {
     SECURITY_SAME_SITE("security.sameSite"),
 
     REPOSITORY_URL("repositoryUrl"),
-    DRIVER("driver"),
+    PERSISTENCE_DRIVER("persistenceDriver"),
     FORM_GEN_REPOSITORY_URL("formGenRepositoryUrl"),
     FORM_GEN_SERVICE_URL("formGenServiceUrl"),
 

@@ -29,7 +29,7 @@ import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_US
 public class TestPersistenceFactory {
 
     private static final String URL_PROPERTY = "test." + ConfigParam.REPOSITORY_URL;
-    private static final String DRIVER_PROPERTY = "test." + ConfigParam.DRIVER;
+    private static final String DRIVER_PROPERTY = "test." + ConfigParam.PERSISTENCE_DRIVER;
     private static final String USERNAME_PROPERTY = "test.username";
     private static final String PASSWORD_PROPERTY = "test.password";
 

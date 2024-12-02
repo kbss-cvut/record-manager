@@ -22,7 +22,7 @@ import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.ONTOLOGY_PHYSICA
 import static cz.cvut.kbss.jopa.model.JOPAPersistenceProperties.SCAN_PACKAGE;
 import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_PASSWORD;
 import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_USERNAME;
-import static cz.cvut.kbss.study.util.ConfigParam.DRIVER;
+import static cz.cvut.kbss.study.util.ConfigParam.PERSISTENCE_DRIVER;
 import static cz.cvut.kbss.study.util.ConfigParam.REPOSITORY_URL;
 
 /**
@@ -54,7 +54,7 @@ public class PersistenceFactory {
     private void init() {
         final Map<String, String> properties = new HashMap<>(DEFAULT_PARAMS);
         properties.put(ONTOLOGY_PHYSICAL_URI_KEY, environment.getProperty(REPOSITORY_URL.toString()));
-        properties.put(DATA_SOURCE_CLASS, environment.getProperty(DRIVER.toString()));
+        properties.put(DATA_SOURCE_CLASS, environment.getProperty(PERSISTENCE_DRIVER.toString()));
         if (environment.getProperty(USERNAME_PROPERTY) != null) {
             properties.put(DATA_SOURCE_USERNAME, environment.getProperty(USERNAME_PROPERTY));
             properties.put(DATA_SOURCE_PASSWORD, environment.getProperty(PASSWORD_PROPERTY));

@@ -21,7 +21,7 @@ import org.springframework.core.env.Environment;
 public class TestFormGenPersistenceFactory {
 
     private static final String URL_PROPERTY = "test." + ConfigParam.FORM_GEN_REPOSITORY_URL;
-    private static final String DRIVER_PROPERTY = "test." + ConfigParam.DRIVER;
+    private static final String DRIVER_PROPERTY = "test." + ConfigParam.PERSISTENCE_DRIVER;
 
     @Autowired
     private Environment environment;
