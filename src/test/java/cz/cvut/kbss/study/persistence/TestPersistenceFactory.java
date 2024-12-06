@@ -10,6 +10,7 @@ import cz.cvut.kbss.study.util.Constants;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,14 +25,15 @@ import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_PA
 import static cz.cvut.kbss.ontodriver.config.OntoDriverProperties.DATA_SOURCE_USERNAME;
 
 @Configuration
-@PropertySource("classpath:application.properties")
+@EnableConfigurationProperties(cz.cvut.kbss.study.util.Configuration.class)
 @Profile("test")
 public class TestPersistenceFactory {
 
-    private static final String URL_PROPERTY = "test." + ConfigParam.REPOSITORY_URL;
-    private static final String DRIVER_PROPERTY = "test." + ConfigParam.PERSISTENCE_DRIVER;
-    private static final String USERNAME_PROPERTY = "test.username";
-    private static final String PASSWORD_PROPERTY = "test.password";
+    private static final String USERNAME_PROPERTY = "username";
+    private static final String PASSWORD_PROPERTY = "password";
+
+    @Autowired
+    private cz.cvut.kbss.study.util.Configuration config;
 
     @Autowired
     private Environment environment;
@@ -47,8 +49,8 @@ public class TestPersistenceFactory {
     @PostConstruct
     private void init() {
         final Map<String, String> properties = getDefaultProperties();
-        properties.put(JOPAPersistenceProperties.ONTOLOGY_PHYSICAL_URI_KEY, environment.getProperty(URL_PROPERTY));
-        properties.put(JOPAPersistenceProperties.DATA_SOURCE_CLASS, environment.getProperty(DRIVER_PROPERTY));
+        properties.put(JOPAPersistenceProperties.ONTOLOGY_PHYSICAL_URI_KEY, config.getRepositoryUrl());
+        properties.put(JOPAPersistenceProperties.DATA_SOURCE_CLASS,config.getPersistenceDriver());
         if (environment.getProperty(USERNAME_PROPERTY) != null) {
             properties.put(DATA_SOURCE_USERNAME, environment.getProperty(USERNAME_PROPERTY));
             properties.put(DATA_SOURCE_PASSWORD, environment.getProperty(PASSWORD_PROPERTY));
