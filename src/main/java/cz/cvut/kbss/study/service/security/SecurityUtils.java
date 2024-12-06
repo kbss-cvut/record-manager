@@ -1,12 +1,9 @@
 package cz.cvut.kbss.study.service.security;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.model.PatientRecord;
-import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
-import cz.cvut.kbss.study.security.model.Role;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
@@ -88,7 +85,7 @@ public class SecurityUtils {
             final User user = userDao.findByUsername(username).copy();
             if (context.getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(
                     SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR))) {
-                user.addType(Vocabulary.s_c_impersonator);
+                user.getRoleGroup().addRole(cz.cvut.kbss.study.model.Role.impersonate);
             }
             return user;
         }
@@ -102,7 +99,13 @@ public class SecurityUtils {
             throw new NotFoundException(
                     "User with username '" + userInfo.getPreferredUsername() + "' not found in repository.");
         }
-        roles.stream().map(Role::forName).filter(Optional::isPresent).forEach(r -> user.addType(r.get().getType()));
+        RoleGroup roleGroup = new RoleGroup();
+        user.setRoleGroup(roleGroup);
+        roles.stream()
+                .map(Role::fromIriOrName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(roleGroup::addRole);
         return user;
     }
 

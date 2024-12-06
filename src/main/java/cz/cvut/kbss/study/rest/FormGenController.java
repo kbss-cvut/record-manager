@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("hasRole('" + SecurityConstants.ROLE_USER + "')")
+@PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_USER + "')")
 @RequestMapping("/formGen")
 public class FormGenController extends BaseController {
 

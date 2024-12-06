@@ -7,16 +7,14 @@ import cz.cvut.kbss.jopa.model.metamodel.EntityType;
 import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
-import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.PatientRecord;
-import cz.cvut.kbss.study.model.RecordPhase;
-import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.model.qam.Answer;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
 import cz.cvut.kbss.study.util.IdentificationUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -57,12 +55,23 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Autowired
     private InstitutionDao institutionDao;
 
+    @Autowired
+    private RoleGroupDao roleGroupDao;
+
+    RoleGroup roleGroupAdmin;
+
+    @BeforeEach
+    public void setUp() {
+        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
+        transactional(() -> roleGroupDao.persist(roleGroupAdmin));
+    }
+
     @Test
     public void findByInstitutionReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
         Institution institutionOther = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution);
-        User user2 = Generator.generateUser(institutionOther);
+        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user2 = Generator.generateUser(institutionOther, this.roleGroupAdmin);
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord recordOther = Generator.generatePatientRecord(user2);
@@ -88,8 +97,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     public void findAllRecordsReturnAllRecords() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution1);
-        User user2 = Generator.generateUser(institution2);
+        User user1 = Generator.generateUser(institution1, this.roleGroupAdmin);
+        User user2 = Generator.generateUser(institution2, this.roleGroupAdmin);
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord record3 = Generator.generatePatientRecord(user2);
@@ -112,7 +121,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     public void getNumberOfProcessedRecords() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
+        User user = Generator.generateUser(institution, this.roleGroupAdmin);
         PatientRecord record1 = Generator.generatePatientRecord(user);
         PatientRecord record2 = Generator.generatePatientRecord(user);
         transactional(() -> {
@@ -130,8 +139,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     public void findByAuthorReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution);
-        User user2 = Generator.generateUser(institution);
+        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord record3 = Generator.generatePatientRecord(user2);
@@ -156,7 +165,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     void persistGeneratesIdentifierBeforeSavingRecord() {
         final Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
-        final User author = Generator.generateUser(institution);
+        final User author = Generator.generateUser(institution, this.roleGroupAdmin);
         author.generateUri();
         transactional(() -> {
             em.persist(author);
@@ -175,7 +184,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     private User generateAuthorWithInstitution() {
         final Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
-        final User author = Generator.generateUser(institution);
+        final User author = Generator.generateUser(institution, this.roleGroupAdmin);
         author.generateUri();
         transactional(() -> {
             em.persist(author);
