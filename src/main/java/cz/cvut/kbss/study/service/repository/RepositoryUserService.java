@@ -1,11 +1,11 @@
 package cz.cvut.kbss.study.service.repository;
 
+import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.study.exception.EntityExistsException;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
@@ -46,18 +46,22 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
     private final ConfigReader config;
 
+    private final EntityManager em;
+
     public RepositoryUserService(SecurityUtils securityUtils,
                                  PasswordEncoder passwordEncoder,
                                  UserDao userDao,
                                  PatientRecordDao patientRecordDao,
                                  EmailService email,
-                                 ConfigReader config) {
+                                 ConfigReader config,
+                                 EntityManager em) {
         this.securityUtils = securityUtils;
         this.passwordEncoder = passwordEncoder;
         this.userDao = userDao;
         this.patientRecordDao = patientRecordDao;
         this.email = email;
         this.config = config;
+        this.em = em;
     }
 
     @Override
@@ -79,7 +83,9 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Transactional(readOnly = true)
     @Override
     public User findCurrentUser() {
-        return userDao.findByUsername(securityUtils.getCurrentUser().getUsername());
+        User currentUser = securityUtils.getCurrentUser();
+        em.detach(currentUser);
+        return userDao.findByUsername(currentUser.getUsername());
     }
 
     @Transactional(readOnly = true)
