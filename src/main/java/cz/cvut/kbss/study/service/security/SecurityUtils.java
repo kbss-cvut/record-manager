@@ -110,6 +110,27 @@ public class SecurityUtils {
     }
 
     /**
+     * Gets the currently authenticated user username.
+     *
+     * @return Current user username
+     */
+    public String getCurrentUserUsername() {
+        final SecurityContext context = SecurityContextHolder.getContext();
+        assert context != null;
+        final Object principal = context.getAuthentication().getPrincipal();
+        if (principal instanceof Jwt) {
+            return resolveAccountUsernameFromOAuthPrincipal((Jwt) principal);
+        } else {
+            return context.getAuthentication().getName();
+        }
+    }
+
+    private String resolveAccountUsernameFromOAuthPrincipal(Jwt principal) {
+        final OidcUserInfo userInfo = new OidcUserInfo(principal.getClaims());
+        return userDao.findByUsername(userInfo.getPreferredUsername()).getUsername();
+    }
+
+    /**
      * Checks whether the current user is a member of a institution with the specified key.
      *
      * @param institutionKey Institution identifier

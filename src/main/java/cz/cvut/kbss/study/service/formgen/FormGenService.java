@@ -6,6 +6,7 @@ import cz.cvut.kbss.study.persistence.dao.formgen.FormGenDao;
 import cz.cvut.kbss.study.rest.dto.RawJson;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.persistence.data.DataLoader;
+import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.Utils;
@@ -44,16 +45,17 @@ public class FormGenService {
 
     private final Environment environment;
 
-    private final SecurityUtils securityUtils;
+    private final UserService userService;
 
     public FormGenService(FormGenDao formGenDao,
                           DataLoader dataLoader,
                           Environment environment,
-                          SecurityUtils securityUtils) {
+                          SecurityUtils securityUtils,
+                          UserService userService) {
         this.formGenDao = formGenDao;
         this.dataLoader = dataLoader;
         this.environment = environment;
-        this.securityUtils = securityUtils;
+        this.userService = userService;
     }
 
     @PostConstruct
@@ -72,7 +74,7 @@ public class FormGenService {
      */
     public RawJson generateForm(PatientRecord record) {
         Objects.requireNonNull(record);
-        final User author = securityUtils.getCurrentUser();
+        final User author = userService.findCurrentUser();
         if (author.getInstitution() != null) {
             author.getInstitution().setMembers(null);
         }
