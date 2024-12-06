@@ -5,7 +5,6 @@ import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
@@ -79,7 +78,8 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Transactional(readOnly = true)
     @Override
     public User findCurrentUser() {
-        return userDao.findByUsername(securityUtils.getCurrentUser().getUsername());
+        String currentUserName = securityUtils.getCurrentUserUsername();
+        return userDao.findByUsername(currentUserName);
     }
 
     @Transactional(readOnly = true)
