@@ -46,10 +46,10 @@ public class SystemInitializer {
     }
 
     private boolean noAdminExists() {
-        return userService.findAll().stream().filter(
-            user -> user.getRoleGroup().getRoles().contains(Role.administrator)
-        ).findAny().isEmpty();
+        return userService.findAll().stream()
+                .noneMatch(user -> user.getRoleGroup() != null && user.getRoleGroup().getRoles().contains(Role.administrator));
     }
+
 
     private void addDefaultInstitution() {
         if (institutionService.findByName(INSTITUTION_NAME) == null) {
