@@ -1,0 +1,56 @@
+server:
+  servlet:
+    context-path: /record-manager
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+persistenceDriver: cz.cvut.kbss.ontodriver.rdf4j.Rdf4jDataSou# URL of repository that holds main data of the application
+
+repositoryUrl: http://localhost:7200/repositories/record-manager-app
+
+formGenRepositoryUrl: http://localhost:7200/repositories/record-manager-formgen
+
+formGenServiceUrl: http://localhost:8080/s-pipes/service?_pId=transform&sgovRepositoryUrl=https%3A%2F%2Fgraphdb.onto.fel.cvut.cz%2Frepositories%2Fkodi-slovnik-gov-cz
+
+security:
+  sameSite: ""
+  provider: internal
+  oidc:
+    roleClaim: realm_access.roles
+  cors:
+    allowedOrigins: ""
+
+appContext: http://localhost:3000/record-manager
+
+smtp:
+  host: smtp.gmail.com
+  port: 587
+  user: recordmanager@gmail.com
+  password: AdminOrganization123
+
+email:
+  displayName: Record Manager
+  from: ""
+  replyTo: ""
+  cc: ""
+  bcc: ""
+  passwordResetSubject: Password Reset
+  passwordResetContent: >-
+    <div><p>Dear user {{username}}, </p><p>please set your new password here: {{link}} </p><p>Best regards, <br>StudyManager</p></div>
+  invitationSubject: Welcome to study
+  invitationContent: >-
+    <div><p>Dear {{name}}, </p><p>you have been invited to a study running at {{appContext}}. </p><p>Your username is: {{username}}. </p>\
+    <p>Please set your password here: {{link}} </p><p>Best regards, <br>StudyManager</p></div>
+  passwordChangeSubject: Password Change
+  passwordChangeContent: >-
+    <div><p>Dear user {{username}}, </p><p>your password has been changed. </p><p>Best regards, <br>RecordManager</p></div>
+  profileUpdateSubject: Profile updated by a study coordinator
+  profileUpdateContent: >-
+    <div><p>Dear user {{username}}, </p><p>your profile at {{appContext}} has been updated by a study coordinator. </p><p>Best regards, <br>RecordManager</p></div>
+
+records:
+  allowedRejectReason: true

@@ -1,0 +1,4 @@
+persistenceDriver: cz.cvut.kbss.ontodriver.rdf4j.Rdf4jDataSource
+repositoryUrl: study-test-repository
+formGenRepositoryUrl: test-formGen-repository
+formGenServiceUrl: http://localhost:8081/formGenerator
