@@ -5,9 +5,12 @@ import cz.cvut.kbss.study.environment.config.TestPersistenceConfig;
 import cz.cvut.kbss.study.environment.config.TestServiceConfig;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.Role;
+import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.ConfigDataApplicationContextInitializer;
 import cz.cvut.kbss.study.persistence.dao.InstitutionDao;
+import cz.cvut.kbss.study.persistence.dao.RoleGroupDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +39,11 @@ public abstract class BaseServiceTestRunner extends TransactionalTestRunner {
 
     protected User user;
 
+    @Autowired
+    private RoleGroupDao roleGroupDao;
+
+    protected RoleGroup roleGroupAdmin;
+
     public static final String USERNAME = "halsey";
     public static final String PASSWORD = "john117";
     public static final String EMAIL = "john117@gmail.com";
@@ -43,8 +51,10 @@ public abstract class BaseServiceTestRunner extends TransactionalTestRunner {
     @BeforeEach
     public void setUp() throws Exception {
         Institution institution = Generator.generateInstitution();
-        user = Generator.getUser(USERNAME, PASSWORD, "John", "Grant", EMAIL, institution);
+        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
+        user = Generator.getUser(USERNAME, PASSWORD, "John", "Grant", EMAIL, institution, this.roleGroupAdmin);
         transactional(() -> {
+            roleGroupDao.persist(this.roleGroupAdmin);
             institutionDao.persist(institution);
             if (userDao.findByUsername(user.getUsername()) == null) {
                 user.encodePassword(passwordEncoder);

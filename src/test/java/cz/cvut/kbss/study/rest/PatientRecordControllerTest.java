@@ -7,10 +7,7 @@ import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
-import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.PatientRecord;
-import cz.cvut.kbss.study.model.RecordPhase;
-import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.persistence.dao.util.RecordSort;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
@@ -81,13 +78,17 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     private User user;
 
+    private RoleGroup roleGroupAdmin;
+
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
-        this.user = Generator.generateUser(institution);
+        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
+        this.user = Generator.generateUser(institution, roleGroupAdmin);
         Environment.setCurrentUser(user);
+
     }
 
     @Test
@@ -146,8 +147,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     public void getRecordsReturnsAllRecords() throws Exception {
         Institution institution = Generator.generateInstitution();
 
-        User user1 = Generator.generateUser(institution);
-        User user2 = Generator.generateUser(institution);
+        User user1 = Generator.generateUser(institution, roleGroupAdmin);
+        User user2 = Generator.generateUser(institution, roleGroupAdmin);
 
         List<PatientRecordDto> records =
                 List.of(Generator.generatePatientRecordDto(user1), Generator.generatePatientRecordDto(user1),
@@ -174,8 +175,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         Institution institution = Generator.generateInstitution();
         institution.setKey(key);
 
-        User user1 = Generator.generateUser(institution);
-        User user2 = Generator.generateUser(institution);
+        User user1 = Generator.generateUser(institution, roleGroupAdmin);
+        User user2 = Generator.generateUser(institution, roleGroupAdmin);
 
         PatientRecordDto record1 = Generator.generatePatientRecordDto(user1);
         PatientRecordDto record2 = Generator.generatePatientRecordDto(user2);

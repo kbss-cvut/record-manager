@@ -5,6 +5,8 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.Role;
+import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.InstitutionService;
@@ -46,11 +48,13 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
     @InjectMocks
     private InstitutionController controller;
 
+
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
+        RoleGroup roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
+        User user = Generator.generateUser(institution, roleGroupAdmin);
         Environment.setCurrentUser(user);
     }
 

@@ -1,6 +1,7 @@
 package cz.cvut.kbss.study.config;
 
 import cz.cvut.kbss.study.exception.RecordManagerException;
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.security.CsrfHeaderFilter;
 import cz.cvut.kbss.study.security.CustomSwitchUserFilter;
 import cz.cvut.kbss.study.security.SecurityConstants;
@@ -79,7 +80,7 @@ public class SecurityConfig {
         LOG.debug("Using internal security mechanisms.");
         final AuthenticationManager authManager = buildAuthenticationManager(http);
         http.authorizeHttpRequests(
-                    (auth) -> auth.requestMatchers("/rest/users/impersonate").hasAuthority(SecurityConstants.ROLE_ADMIN)
+                    (auth) -> auth.requestMatchers("/rest/users/impersonate").hasAuthority(Role.administrator.getRoleName())
                                   .anyRequest().permitAll())
             .cors((auth) -> auth.configurationSource(corsConfigurationSource(config)))
             .csrf(AbstractHttpConfigurer::disable)
