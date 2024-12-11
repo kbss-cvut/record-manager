@@ -57,7 +57,7 @@ public class OidcUserController extends BaseController {
 
     @PreAuthorize(
             "hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') " +
-                    "or hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
+                    "or hasAuthority('" + SecurityConstants.ROLE_USER + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> getUsers(@RequestParam(value = "institution", required = false) String institutionKey) {
         return institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
