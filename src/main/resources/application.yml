@@ -8,7 +8,7 @@ management:
       exposure:
         include: health
 
-persistenceDriver: cz.cvut.kbss.ontodriver.rdf4j.Rdf4jDataSou# URL of repository that holds main data of the application
+persistenceDriver: cz.cvut.kbss.ontodriver.rdf4j.Rdf4jDataSource
 
 repositoryUrl: http://localhost:7200/repositories/record-manager-app
 
