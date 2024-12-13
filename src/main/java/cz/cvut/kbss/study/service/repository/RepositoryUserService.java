@@ -5,7 +5,6 @@ import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
@@ -74,6 +73,13 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     public User getCurrentUser() {
         return securityUtils.getCurrentUser();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public User findCurrentUser() {
+        String currentUserName = securityUtils.getCurrentUserUsername();
+        return userDao.findByUsername(currentUserName);
     }
 
     @Transactional(readOnly = true)
@@ -202,8 +208,8 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void preUpdate(User instance) {
         final User currentUser = securityUtils.getCurrentUser();
-        if (!currentUser.getTypes().contains(Vocabulary.s_c_administrator)
-            && (!instance.getTypes().equals(currentUser.getTypes()) || (instance.getInstitution() != null
+        if (!currentUser.isAdmin()
+            && (!instance.getRoleGroup().getRoles().equals(currentUser.getRoleGroup().getRoles()) || (instance.getInstitution() != null
             && !instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey())))) {
             throw new UnauthorizedException("Cannot update user.");
         }

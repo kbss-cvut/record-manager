@@ -117,7 +117,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         } else {
             targetPhase.ifPresent(record::setPhase);
             if (!userService.exists(record.getAuthor().getUri())) {
-                throw new RecordAuthorNotFoundException("Author of record " + record + "not found during import.");
+                throw new RecordAuthorNotFoundException("Author of record " + record + " not found during import.");
             }
         }
     }
