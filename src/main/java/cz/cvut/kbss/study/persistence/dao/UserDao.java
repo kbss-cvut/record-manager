@@ -2,6 +2,10 @@ package cz.cvut.kbss.study.persistence.dao;
 
 import cz.cvut.kbss.jopa.exceptions.NoResultException;
 import cz.cvut.kbss.jopa.model.EntityManager;
+import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
+import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
+import cz.cvut.kbss.jopa.model.metamodel.EntityType;
+import cz.cvut.kbss.study.exception.PersistenceException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
@@ -9,9 +13,9 @@ import cz.cvut.kbss.study.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,6 +26,26 @@ public class UserDao extends DerivableUriDao<User> {
 
     public UserDao(EntityManager em) {
         super(User.class, em);
+    }
+
+    private Descriptor getDescriptor(URI ctx){
+        Descriptor descriptor =  new EntityDescriptor(ctx);
+        EntityType<User> et = em.getMetamodel().entity(User.class);
+        descriptor.addAttributeContext(et.getAttribute("institution"), null);
+        return descriptor;
+    }
+
+    @Override
+    public void persist(User entity) {
+        Objects.requireNonNull(entity);
+        try {
+            entity.generateUri();
+            Descriptor descriptor = getDescriptor(new URI(Vocabulary.s_c_Person));
+            em.persist(entity, descriptor);
+        } catch (RuntimeException | URISyntaxException e) {
+            LOG.error("Error when persisting entity.", e);
+            throw new PersistenceException(e);
+        }
     }
 
     public User findByUsername(String username) {
