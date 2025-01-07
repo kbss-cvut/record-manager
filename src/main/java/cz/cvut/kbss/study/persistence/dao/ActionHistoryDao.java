@@ -2,17 +2,23 @@ package cz.cvut.kbss.study.persistence.dao;
 
 import cz.cvut.kbss.jopa.exceptions.NoResultException;
 import cz.cvut.kbss.jopa.model.EntityManager;
+import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
+import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
+import cz.cvut.kbss.jopa.model.metamodel.EntityType;
 import cz.cvut.kbss.jopa.model.query.TypedQuery;
+import cz.cvut.kbss.study.exception.PersistenceException;
 import cz.cvut.kbss.study.model.ActionHistory;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.util.Constants;
+import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 @Repository
@@ -20,6 +26,26 @@ public class ActionHistoryDao extends OwlKeySupportingDao<ActionHistory> {
 
     public ActionHistoryDao(EntityManager em) {
         super(ActionHistory.class, em);
+    }
+
+    private Descriptor getDescriptor(URI ctx){
+        Descriptor descriptor =  new EntityDescriptor(ctx);
+        EntityType<ActionHistory> et = em.getMetamodel().entity(ActionHistory.class);
+        descriptor.addAttributeContext(et.getAttribute("author"), null);
+        return descriptor;
+    }
+
+    @Override
+    public void persist(ActionHistory entity) {
+        Objects.requireNonNull(entity);
+        try {
+            entity.setKey(IdentificationUtils.generateKey());
+            Descriptor descriptor = getDescriptor(new URI(Vocabulary.s_c_action_history));
+            em.persist(entity, descriptor);
+        } catch (RuntimeException | URISyntaxException e) {
+            LOG.error("Error when persisting entity.", e);
+            throw new PersistenceException(e);
+        }
     }
 
     public ActionHistory findByKey(String key) {
