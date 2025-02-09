@@ -4,7 +4,9 @@ import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.jopa.model.EntityManagerFactory;
 import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
 import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
+import cz.cvut.kbss.jopa.model.metamodel.EntityType;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.util.Constants;
@@ -66,6 +68,7 @@ public class FormGenDao {
     }
 
     private void persistRelatedFieldsIfNecessary(PatientRecord record, EntityManager em, Descriptor descriptor) {
+        em.persist(record.getAuthor().getRoleGroup(), descriptor);
         em.persist(record.getAuthor(), descriptor);
         if (record.getInstitution() != null) {
             em.persist(record.getInstitution(), descriptor);
