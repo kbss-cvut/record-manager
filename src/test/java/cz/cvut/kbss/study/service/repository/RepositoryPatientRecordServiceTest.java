@@ -4,10 +4,7 @@ import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
-import cz.cvut.kbss.study.model.PatientRecord;
-import cz.cvut.kbss.study.model.RecordPhase;
-import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
@@ -53,16 +50,21 @@ class RepositoryPatientRecordServiceTest {
 
     private User user;
 
+    private RoleGroup roleGroupAdmin;
+    private RoleGroup roleGroupUser;
+
     @BeforeEach
     void setUp() {
-        this.user = Generator.generateUser(Generator.generateInstitution());
+        this.roleGroupAdmin =  Generator.generateRoleGroupWithRoles(Role.administrator);
+        this.roleGroupUser = Generator.generateRoleGroupWithRoles(Role.user);
+        this.user = Generator.generateUser(Generator.generateInstitution(), roleGroupUser);
         Environment.setCurrentUser(user);
         when(securityUtils.getCurrentUser()).thenReturn(user);
     }
 
     @Test
     void importRecordsSetsCurrentUserAsAuthorWhenTheyAreRegularUserAndImportsSpecifiedRecords() {
-        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.roleGroupUser);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         when(recordDao.exists(any())).thenReturn(false);
 
@@ -95,10 +97,10 @@ class RepositoryPatientRecordServiceTest {
 
     @Test
     void importRecordsRetainsRecordProvenanceDataWhenCurrentUserIsAdmin() {
-        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.roleGroupAdmin);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
-        user.addType(Vocabulary.s_c_administrator);
         Environment.setCurrentUser(user);
+        user.getRoleGroup().addRole(Role.administrator);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
         when(recordDao.exists(any())).thenReturn(false);
 
@@ -118,9 +120,9 @@ class RepositoryPatientRecordServiceTest {
 
     @Test
     void importRecordsThrowsRecordAuthorNotFoundExceptionWhenAdminImportsRecordsAndRecordAuthorIsNotFound() {
-        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.roleGroupAdmin);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
-        user.addType(Vocabulary.s_c_administrator);
+        user.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
         Environment.setCurrentUser(user);
 
         assertThrows(RecordAuthorNotFoundException.class, () -> sut.importRecords(toImport));
@@ -128,7 +130,7 @@ class RepositoryPatientRecordServiceTest {
 
     @Test
     void importRecordsSkipsImportingRecordsThatAlreadyExist() {
-        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.roleGroupUser);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         final PatientRecord existing = toImport.get(Generator.randomIndex(toImport));
         when(recordDao.exists(any(URI.class))).thenReturn(false);
@@ -143,7 +145,7 @@ class RepositoryPatientRecordServiceTest {
 
     @Test
     void importRecordsWithPhaseSetsSpecifiedPhaseToAllRecords() {
-        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.roleGroupUser);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         final RecordPhase targetPhase = RecordPhase.values()[Generator.randomInt(0, RecordPhase.values().length)];
         when(recordDao.exists(any())).thenReturn(false);
@@ -156,7 +158,7 @@ class RepositoryPatientRecordServiceTest {
 
     @Test
     void importRecordsSetsRecordPhaseToOpenOnAllImportedRecordsWhenCurrentUserIsRegularUser() {
-        final User originalAuthor = Generator.generateUser(Generator.generateInstitution());
+        final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.roleGroupUser);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         when(recordDao.exists(any())).thenReturn(false);
 
