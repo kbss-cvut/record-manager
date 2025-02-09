@@ -32,6 +32,7 @@ public class UserDao extends DerivableUriDao<User> {
         Descriptor descriptor =  new EntityDescriptor(ctx);
         EntityType<User> et = em.getMetamodel().entity(User.class);
         descriptor.addAttributeContext(et.getAttribute("institution"), null);
+        descriptor.addAttributeContext(et.getAttribute("roleGroup"), null);
         return descriptor;
     }
 
