@@ -68,7 +68,9 @@ public class FormGenDao {
     }
 
     private void persistRelatedFieldsIfNecessary(PatientRecord record, EntityManager em, Descriptor descriptor) {
-        em.persist(record.getAuthor().getRoleGroup(), descriptor);
+        if(record.getAuthor().getRoleGroup() != null) {
+            em.persist(record.getAuthor().getRoleGroup(), descriptor);
+        }
         em.persist(record.getAuthor(), descriptor);
         if (record.getInstitution() != null) {
             em.persist(record.getInstitution(), descriptor);
