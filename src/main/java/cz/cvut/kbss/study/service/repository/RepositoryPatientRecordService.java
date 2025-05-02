@@ -71,6 +71,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         recordDao.requireUniqueNonEmptyLocalName(instance);
     }
 
+    @Transactional
     @Override
     public void updateFromExternal(PatientRecord instance) {
         if(instance.getPhase() != RecordPhase.rejected) {
