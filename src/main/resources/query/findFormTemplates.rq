@@ -6,7 +6,9 @@ CONSTRUCT {
     ?formTemplate rdfs:label ?formTemplateLabel .
     ?formTemplate rdfs:comment ?formTemplateComment .
 } WHERE {
+  GRAPH ?formTemplate {
     ?formTemplate a form:form-template .
     ?formTemplate rdfs:label ?formTemplateLabel .
     ?formTemplate rdfs:comment ?formTemplateComment .
+  }
 }
