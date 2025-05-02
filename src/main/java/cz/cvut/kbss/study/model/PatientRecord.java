@@ -51,6 +51,9 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
     @OWLDataProperty(iri = Vocabulary.s_p_has_form_template)
     private String formTemplate;
 
+    @OWLDataProperty(iri = Vocabulary.s_p_has_form_template_version)
+    private String formTemplateVersion;
+
     @OWLObjectProperty(iri = Vocabulary.s_p_has_question, cascade = {CascadeType.MERGE,
                                                                      CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private Question question;
@@ -143,6 +146,14 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
 
     public void setFormTemplate(String formTemplate) {
         this.formTemplate = formTemplate;
+    }
+
+    public String getFormTemplateVersion() {
+        return formTemplateVersion;
+    }
+
+    public void setFormTemplateVersion(String formTemplateVersion) {
+        this.formTemplateVersion = formTemplateVersion;
     }
 
     public RecordPhase getPhase() {
