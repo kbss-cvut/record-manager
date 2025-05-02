@@ -99,6 +99,10 @@ rm:isInvited rdf:type owl:DatatypeProperty .
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/has-form-template
 rm:has-form-template rdf:type owl:DatatypeProperty .
 
+###  http://onto.fel.cvut.cz/ontologies/record-manager/has-form-template-version
+rm:has-form-template-version rdf:type owl:DatatypeProperty ;
+    rdfs:comment "Optional property of a record to indicate concrete version of form template used to save the record." ;
+.
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/key
 rm:key rdf:type owl:DatatypeProperty .
