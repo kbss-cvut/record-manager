@@ -25,6 +25,14 @@ public class ExternalServicesController {
         recordService.updateFromExternal(record);
     }
 
+    @GetMapping(value = "/open/all")
+    public void openAllRecords() {
+        recordService.findAll().forEach(record -> {
+            record.setPhase(RecordPhase.open);
+            recordService.updateFromExternal(record);
+        });
+    }
+
     private PatientRecord findInternal(String key) {
         final PatientRecord record = recordService.findByKey(key);
         if (record == null) {
