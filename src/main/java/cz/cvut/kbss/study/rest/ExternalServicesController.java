@@ -22,7 +22,7 @@ public class ExternalServicesController {
     public void openRecord(@PathVariable("key") String recordId) {
         PatientRecord record = findInternal(recordId);
         record.setPhase(RecordPhase.open);
-        recordService.update(record);
+        recordService.updateFromExternal(record);
     }
 
     private PatientRecord findInternal(String key) {

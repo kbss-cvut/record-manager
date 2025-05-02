@@ -72,6 +72,16 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     }
 
     @Override
+    public void updateFromExternal(PatientRecord instance) {
+        if(instance.getPhase() != RecordPhase.rejected) {
+            instance.setRejectReason(null);
+        }
+        instance.setLastModified(new Date());
+        recordDao.requireUniqueNonEmptyLocalName(instance);
+        recordDao.update(instance);
+    }
+
+    @Override
     protected void preUpdate(PatientRecord instance) {
         if(instance.getPhase() != RecordPhase.rejected) {
             instance.setRejectReason(null);

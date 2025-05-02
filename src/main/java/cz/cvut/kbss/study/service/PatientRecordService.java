@@ -111,4 +111,5 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
     void setPhase(Set<String> recordUris, RecordPhase targetPhase);
 
 
+    void updateFromExternal(PatientRecord record);
 }
