@@ -1,16 +1,34 @@
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix form: <http://onto.fel.cvut.cz/ontologies/form/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX form: <http://onto.fel.cvut.cz/ontologies/form/>
+PREFIX dct: <http://purl.org/dc/terms/>
 
 CONSTRUCT {
-    ?formTemplate a form:form-template .
-    ?formTemplate rdfs:label ?formTemplateLabel .
-    ?formTemplate rdfs:comment ?formTemplateComment .
-    ?formTemplate <http://purl.org/dc/terms/hasVersion> ?formTemplateVersion .
+  ?formTemplate a form:form-template .
+  ?formTemplate rdfs:label ?formTemplateLabel .
+  ?formTemplate rdfs:comment ?formTemplateComment .
+  ?formTemplate dct:hasVersion ?formTemplateVersion .
 } WHERE {
-  GRAPH ?formTemplate {
-    ?formTemplate a form:form-template .
+  {
+    SELECT ?origin (MAX(?created) AS ?latestCreated)
+    WHERE {
+      GRAPH ?g {
+        ?template a form:form-template ;
+                  form:has-question-origin ?origin ;
+                  dct:created ?created .
+      }
+    }
+    GROUP BY ?origin
+  }
+
+  GRAPH ?g {
+    ?formTemplate a form:form-template ;
+                  form:has-question-origin ?origin ;
+                  dct:created ?created .
+
+    FILTER (?created = ?latestCreated)
+
     ?formTemplate rdfs:label ?formTemplateLabel .
     ?formTemplate rdfs:comment ?formTemplateComment .
-    OPTIONAL {?formTemplate <http://purl.org/dc/terms/hasVersion> ?formTemplateVersion .}
+    ?formTemplate dct:hasVersion ?formTemplateVersion .
   }
 }
