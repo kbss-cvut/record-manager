@@ -5,10 +5,12 @@ CONSTRUCT {
     ?formTemplate a form:form-template .
     ?formTemplate rdfs:label ?formTemplateLabel .
     ?formTemplate rdfs:comment ?formTemplateComment .
+    ?formTemplate <http://purl.org/dc/terms/hasVersion> ?formTemplateVersion .
 } WHERE {
   GRAPH ?formTemplate {
     ?formTemplate a form:form-template .
     ?formTemplate rdfs:label ?formTemplateLabel .
     ?formTemplate rdfs:comment ?formTemplateComment .
+    OPTIONAL {?formTemplate <http://purl.org/dc/terms/hasVersion> ?formTemplateVersion .}
   }
 }
