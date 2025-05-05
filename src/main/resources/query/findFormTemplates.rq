@@ -29,6 +29,6 @@ CONSTRUCT {
 
     ?formTemplate rdfs:label ?formTemplateLabel .
     ?formTemplate rdfs:comment ?formTemplateComment .
-    ?formTemplate dct:hasVersion ?formTemplateVersion .
+    OPTIONAL { ?formTemplate dct:hasVersion ?formTemplateVersion . }
   }
 }
