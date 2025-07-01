@@ -30,6 +30,9 @@ public class Question extends AbstractEntity {
     @OWLDataProperty(iri = Vocabulary.s_p_has_origin_path_id)
     private String originPathId;
 
+    @OWLObjectProperty(iri = Vocabulary.s_p_has_comment, cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    private Set<Comment> comments = new HashSet<>();;
+
     @Types
     private Set<String> types = new HashSet<>();
 
@@ -42,6 +45,9 @@ public class Question extends AbstractEntity {
         }
         if (other.answers != null) {
             this.answers = other.answers.stream().map(Answer::new).collect(Collectors.toSet());
+        }
+        if(other.comments != null) {
+            this.comments = other.comments.stream().map(Comment::new).collect(Collectors.toSet());
         }
         if (other.types != null) {
             this.types.addAll(other.types);
@@ -79,6 +85,14 @@ public class Question extends AbstractEntity {
 
     public void setTypes(Set<String> types) {
         this.types = types;
+    }
+
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 
     @Override
