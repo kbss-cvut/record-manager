@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.security.model;
 
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,12 +37,10 @@ public class UserDetails implements org.springframework.security.core.userdetail
 
     private void resolveRoles() {
         authorities.addAll(
-                user.getTypes().stream()
-                    .map(Role::forType)
-                    .filter(Optional::isPresent)
-                    .map(r -> new SimpleGrantedAuthority(r.get().getName()))
+                user.getRoleGroup().getRoles().stream()
+                    .map(r -> new SimpleGrantedAuthority(r.getRoleName()))
                     .toList());
-        authorities.add(new SimpleGrantedAuthority(SecurityConstants.ROLE_USER));
+        authorities.add(new SimpleGrantedAuthority(Role.user.getRoleName()));
     }
 
     public void eraseCredentials() {

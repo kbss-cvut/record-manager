@@ -4,8 +4,9 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Role;
+import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.SecurityConstants;
@@ -58,6 +59,8 @@ public class SecurityUtilsTest {
 
     private User user;
 
+    private RoleGroup roleGroupAdmin;
+
     public static final String USERNAME = "username";
     public static final String PASSWORD = "pass" + Generator.randomInt(0, 1000);
 
@@ -65,7 +68,8 @@ public class SecurityUtilsTest {
     public void setUp() {
         Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
-        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", institution);
+        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
+        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", institution, this.roleGroupAdmin);
         user.generateUri();
     }
 
@@ -122,7 +126,7 @@ public class SecurityUtilsTest {
         Environment.setCurrentUser(user);
         when(userDao.findByUsername(user.getUsername())).thenReturn(user);
 
-        User userFromSameInstitution = Generator.generateUser(user.getInstitution());
+        User userFromSameInstitution = Generator.generateUser(user.getInstitution(), this.roleGroupAdmin);
         when(userDao.findByInstitution(user.getInstitution())).thenReturn(List.of(user, userFromSameInstitution));
 
         assertTrue(sut.areFromSameInstitution(userFromSameInstitution.getUsername()));
@@ -135,7 +139,7 @@ public class SecurityUtilsTest {
 
         Institution institutionAnother = Generator.generateInstitution();
 
-        User userFromAnotherInstitution = Generator.generateUser(institutionAnother);
+        User userFromAnotherInstitution = Generator.generateUser(institutionAnother, this.roleGroupAdmin);
         when(userDao.findByInstitution(user.getInstitution())).thenReturn(List.of(user));
 
         assertFalse(sut.areFromSameInstitution(userFromAnotherInstitution.getUsername()));
@@ -159,7 +163,7 @@ public class SecurityUtilsTest {
         when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         Institution institutionAnother = Generator.generateInstitution();
         institutionAnother.setKey(IdentificationUtils.generateKey());
-        User userFromAnotherInstitution = Generator.generateUser(institutionAnother);
+        User userFromAnotherInstitution = Generator.generateUser(institutionAnother, this.roleGroupAdmin);
 
         PatientRecord record = Generator.generatePatientRecord(userFromAnotherInstitution);
         record.setKey(IdentificationUtils.generateKey());
@@ -186,7 +190,7 @@ public class SecurityUtilsTest {
         when(userDao.findByUsername(user.getUsername())).thenReturn(user);
 
         final User result = sut.getCurrentUser();
-        assertThat(result.getTypes(), hasItem(Vocabulary.s_c_administrator));
+        assertThat(result.getRoleGroup().getRoles(), hasItem(Role.administrator));
     }
 
     @Test
@@ -197,7 +201,7 @@ public class SecurityUtilsTest {
         when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         final User result = sut.getCurrentUser();
         assertEquals(user, result);
-        assertThat(result.getTypes(), hasItem(Vocabulary.s_c_impersonator));
+        assertThat(result.getRoleGroup().getRoles(), hasItem(Role.impersonate));
     }
 
     @Test

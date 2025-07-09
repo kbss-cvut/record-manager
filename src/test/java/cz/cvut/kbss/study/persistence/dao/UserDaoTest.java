@@ -1,10 +1,9 @@
 package cz.cvut.kbss.study.persistence.dao;
 
 import cz.cvut.kbss.study.environment.generator.Generator;
-import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,6 +22,22 @@ public class UserDaoTest extends BaseDaoTestRunner {
 
     @Autowired
     private InstitutionDao institutionDao;
+
+    @Autowired
+    private RoleGroupDao roleGroupDao;
+
+    private RoleGroup roleGroupAdmin;
+    private RoleGroup roleGroupUser;
+
+    @BeforeEach
+    public void setUp() {
+        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
+        this.roleGroupUser = Generator.generateRoleGroupWithRoles(Role.user);
+       transactional(() -> {
+            roleGroupDao.persist(this.roleGroupAdmin);
+            roleGroupDao.persist(this.roleGroupUser);
+        });
+    }
 
     @Test
     public void getUserByUsername() {
@@ -73,7 +88,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @Test
     public void getUsersByToken() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
+        User user = Generator.generateUser(institution, this.roleGroupAdmin);
         user.setToken("Token");
 
         transactional(() -> {
@@ -92,8 +107,8 @@ public class UserDaoTest extends BaseDaoTestRunner {
     public void getUsersByInstitution() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution1);
-        User user2 = Generator.generateUser(institution1);
+        User user1 = Generator.generateUser(institution1, this.roleGroupAdmin);
+        User user2 = Generator.generateUser(institution1, this.roleGroupAdmin);
 
         transactional(() -> {
             institutionDao.persist(institution1);
@@ -117,15 +132,10 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @Test
     public void getNumberOfInvestigators() {
         Institution institution = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution);
-        User user2 = Generator.generateUser(institution);
-        User user3 = Generator.generateUser(institution);
+        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user2 = Generator.generateUser(institution, this.roleGroupUser);
+        User user3 = Generator.generateUser(institution, this.roleGroupUser);
 
-        Set<String> types = new HashSet<>();
-        types.add(Vocabulary.s_c_administrator);
-        types.add(Vocabulary.s_c_doctor);
-
-        user3.setTypes(types);
 
         transactional(() -> {
             institutionDao.persist(institution);
@@ -140,7 +150,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
 
     private User getPersistedUser() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution);
+        User user = Generator.generateUser(institution, this.roleGroupAdmin);
         transactional(() -> {
             institutionDao.persist(institution);
             userDao.persist(user);

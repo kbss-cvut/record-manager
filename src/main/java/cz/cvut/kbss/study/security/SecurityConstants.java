@@ -30,4 +30,29 @@ public class SecurityConstants {
     public static final String ROLE_USER = "ROLE_USER";
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
+
+    public static final String impersonate = "rm-impersonate";
+
+    public static final String deleteAllRecords = "rm-delete-all-records";
+
+    public static final String viewAllRecords = "rm-view-all-records";
+
+    public static final String editAllRecords = "rm-edit-all-records";
+
+    public static final String deleteOrganizationRecords = "rm-delete-organization-records";
+
+    public static final String viewOrganizationRecords = "rm-view-organization-records";
+
+    public static final String editOrganizationRecords = "rm-edit-organization-records";
+
+    public static final String editUsers = "rm-edit-users";
+
+    public static final String completeRecords = "rm-complete-records";
+
+    public static final String rejectRecords = "rm-reject-records";
+
+    public static final String publishRecords = "rm-publish-records";
+
+    public static final String importCodelists = "rm-import-codelists";
+
 }

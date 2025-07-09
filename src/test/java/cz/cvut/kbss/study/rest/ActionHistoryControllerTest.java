@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.model.ActionHistory;
-import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.User;
+import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
 import cz.cvut.kbss.study.service.ActionHistoryService;
 import cz.cvut.kbss.study.service.UserService;
@@ -57,11 +55,14 @@ public class ActionHistoryControllerTest extends BaseControllerTestRunner {
 
     private User user;
 
+    private RoleGroup roleGroupAdmin;
+
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
+        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
         Institution institution = Generator.generateInstitution();
-        this.user = Generator.generateUser(institution);
+        this.user = Generator.generateUser(institution, roleGroupAdmin);
         Environment.setCurrentUser(user);
     }
 

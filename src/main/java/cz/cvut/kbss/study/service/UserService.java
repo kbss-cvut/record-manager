@@ -9,7 +9,20 @@ public interface UserService extends BaseService<User> {
 
     User findByUsername(String username);
 
+    /**
+     * Retrieve currently authenticated user. The returned <code>User</code> entity is populated
+     * with information from the security context.
+     * @return User currently authenticated user or null.
+     */
     User getCurrentUser();
+
+    /**
+     * Retrieve persisted user from the current authenticated user. The returned <code>User</code>
+     * entity is not populated with information from the security context. See
+     * {@link #getCurrentUser()} to retrieve security context as well.
+     * @return User currently authenticated user or null.
+     */
+    User findCurrentUser();
 
     User findByEmail(String email);
 
