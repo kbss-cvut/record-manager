@@ -20,7 +20,7 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal", matchIfMissing = true)
 @RestController
 @RequestMapping("/roleGroups")
-public class RoleGroupController extends BaseController{
+public class RoleGroupController extends BaseController {
 
     private final RoleGroupService roleGroupService;
 
@@ -29,13 +29,13 @@ public class RoleGroupController extends BaseController{
         this.roleGroupService = roleGroupService;
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.adminRoleGroups + "')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RoleGroup> getRoleGroups() {
         return roleGroupService.findAll();
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.adminRoleGroups + "')")
     @GetMapping(value = "/{name}",produces = MediaType.APPLICATION_JSON_VALUE)
     public RoleGroup findByName(@PathVariable("name") String name) {
         RoleGroup result = roleGroupService.findByName(name);

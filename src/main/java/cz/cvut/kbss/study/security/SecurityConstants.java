@@ -45,7 +45,7 @@ public class SecurityConstants {
 
     public static final String editOrganizationRecords = "rm-edit-organization-records";
 
-    public static final String editUsers = "rm-edit-users";
+    public static final String adminUsers = "rm-admin-users";
 
     public static final String completeRecords = "rm-complete-records";
 
@@ -54,5 +54,13 @@ public class SecurityConstants {
     public static final String publishRecords = "rm-publish-records";
 
     public static final String importCodelists = "rm-import-codelists";
+
+    public static final String adminStatistics = "rm-admin-statistics";
+
+    public static final String adminRoleGroups = "rm-admin-role-groups";
+
+    public static final String adminActionHistory = "rm-admin-action-history";
+
+    public static final String adminInstitution = "rm-admin-institution";
 
 }

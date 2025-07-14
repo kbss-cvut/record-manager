@@ -35,8 +35,8 @@ public enum Role {
     @Individual(iri = Vocabulary.s_i_edit_organization_records_role)
     editOrganizationRecords(SecurityConstants.editOrganizationRecords, Vocabulary.s_i_edit_organization_records_role),
 
-    @Individual(iri = Vocabulary.s_i_edit_users_role)
-    editUsers(SecurityConstants.editUsers, Vocabulary.s_i_edit_users_role),
+    @Individual(iri = Vocabulary.s_i_admin_users_role)
+    adminUsers(SecurityConstants.adminUsers, Vocabulary.s_i_admin_users_role),
 
     @Individual(iri = Vocabulary.s_i_complete_records_role)
     completeRecords(SecurityConstants.completeRecords, Vocabulary.s_i_complete_records_role),
@@ -48,7 +48,20 @@ public enum Role {
     publishRecords(SecurityConstants.publishRecords, Vocabulary.s_i_publish_records_role),
 
     @Individual(iri = Vocabulary.s_i_import_codelists_role)
-    importCodelists(SecurityConstants.importCodelists, Vocabulary.s_i_import_codelists_role);
+    importCodelists(SecurityConstants.importCodelists, Vocabulary.s_i_import_codelists_role),
+
+    @Individual(iri = Vocabulary.s_i_admin_institution_role)
+    adminInstitution(SecurityConstants.adminInstitution, Vocabulary.s_i_admin_institution_role),
+
+    @Individual(iri = Vocabulary.s_i_admin_statistics_role)
+    adminStatistics(SecurityConstants.adminStatistics, Vocabulary.s_i_admin_statistics_role),
+
+    @Individual(iri = Vocabulary.s_i_admin_role_groups_role)
+    adminRoleGroups(SecurityConstants.adminRoleGroups, Vocabulary.s_i_admin_role_groups_role),
+
+
+    @Individual(iri = Vocabulary.s_i_admin_action_history_role)
+    adminActionHistory(SecurityConstants.adminActionHistory, Vocabulary.s_i_admin_action_history_role);
 
     private final String iri;
 
