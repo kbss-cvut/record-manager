@@ -1,4 +1,4 @@
-FROM maven:3-eclipse-temurin-17 as build
+FROM maven:3-eclipse-temurin-17 AS build
 
 WORKDIR /record-manager
 
@@ -10,7 +10,7 @@ COPY src src
 
 RUN mvn package -B -DskipTests=true
 
-FROM eclipse-temurin:17-jdk-alpine as runtime
+FROM eclipse-temurin:17-jdk-alpine AS runtime
 COPY --from=build  /record-manager/target/record-manager.jar record-manager.jar
 
 EXPOSE 8080
