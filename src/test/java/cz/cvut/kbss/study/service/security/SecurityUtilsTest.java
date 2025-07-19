@@ -92,7 +92,6 @@ public class SecurityUtilsTest {
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")
-                             .claim("roles", List.of(SecurityConstants.ROLE_USER))
                              .issuer("http://localhost:8080/termit")
                              .subject(USERNAME)
                              .claim("preferred_username", USERNAME)

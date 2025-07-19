@@ -10,9 +10,6 @@ public enum Role {
     // TODO deprecated -- should be removed.
     @Individual(iri = Vocabulary.s_i_RM_ADMIN)
     administrator(SecurityConstants.ROLE_ADMIN, Vocabulary.s_i_RM_ADMIN),
-    // TODO deprecated -- should be removed.
-    @Individual(iri = Vocabulary.s_i_RM_USER)
-    user(SecurityConstants.ROLE_USER, Vocabulary.s_i_RM_USER),
 
     @Individual(iri = Vocabulary.s_i_read_all_records_role)
     readAllRecords(SecurityConstants.readAllRecords, Vocabulary.s_i_read_all_records_role),

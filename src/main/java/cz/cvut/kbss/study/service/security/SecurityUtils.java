@@ -91,6 +91,7 @@ public class SecurityUtils {
         }
     }
 
+
     private User resolveAccountFromOAuthPrincipal(Jwt principal) {
         final OidcUserInfo userInfo = new OidcUserInfo(principal.getClaims());
         final List<String> roles = new OidcGrantedAuthoritiesExtractor(config).extractRoles(principal);
@@ -99,14 +100,25 @@ public class SecurityUtils {
             throw new NotFoundException(
                     "User with username '" + userInfo.getPreferredUsername() + "' not found in repository.");
         }
-        RoleGroup roleGroup = new RoleGroup();
+
+        RoleGroup roleGroup = createRoleGroupFromPrincipal(principal);
         user.setRoleGroup(roleGroup);
-        roles.stream()
-                .map(Role::fromIriOrName)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(roleGroup::addRole);
+
         return user;
+    }
+
+    private RoleGroup createRoleGroupFromPrincipal(Jwt principal) {
+        RoleGroup roleGroup = new RoleGroup();
+        List<String> roles = new OidcGrantedAuthoritiesExtractor(config).extractRoles(principal);
+
+        if (roles != null) {
+            roles.stream()
+                    .map(Role::fromIriOrName)
+                    .flatMap(Optional::stream)
+                    .forEach(roleGroup::addRole);
+        }
+
+        return roleGroup;
     }
 
     /**

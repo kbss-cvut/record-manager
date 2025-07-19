@@ -56,7 +56,7 @@ class RepositoryPatientRecordServiceTest {
     @BeforeEach
     void setUp() {
         this.roleGroupAdmin =  Generator.generateRoleGroupWithRoles(Role.administrator);
-        this.roleGroupUser = Generator.generateRoleGroupWithRoles(Role.user);
+        this.roleGroupUser = Generator.generateRoleGroupWithRoles();
         this.user = Generator.generateUser(Generator.generateInstitution(), roleGroupUser);
         Environment.setCurrentUser(user);
         when(securityUtils.getCurrentUser()).thenReturn(user);

@@ -32,7 +32,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @BeforeEach
     public void setUp() {
         this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        this.roleGroupUser = Generator.generateRoleGroupWithRoles(Role.user);
+        this.roleGroupUser = Generator.generateRoleGroupWithRoles();
        transactional(() -> {
             roleGroupDao.persist(this.roleGroupAdmin);
             roleGroupDao.persist(this.roleGroupUser);

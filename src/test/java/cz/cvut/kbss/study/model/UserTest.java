@@ -21,12 +21,6 @@ public class UserTest {
         this.user = new User();
     }
 
-    @Disabled
-    @Test
-    public void newInstanceHasAgentInTypes() {
-        assertTrue(user.getRoleGroup().getRoles().contains(Role.user));
-    }
-
     @Test
     public void encodePasswordThrowsIllegalStateForNullPassword() {
         final IllegalStateException ex = assertThrows(IllegalStateException.class, () -> user.encodePassword(new BCryptPasswordEncoder()));
@@ -103,10 +97,4 @@ public class UserTest {
         assertTrue(user.getUri().toString().contains("Brave"));
     }
 
-    @Disabled
-    @Test
-    public void newUserHasRoleDoctor() {
-        User user = new User();
-        assertTrue(user.getRoleGroup().getRoles().contains(Role.user));
-    }
 }

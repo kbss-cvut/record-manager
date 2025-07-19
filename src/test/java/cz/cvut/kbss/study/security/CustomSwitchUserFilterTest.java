@@ -41,7 +41,7 @@ class CustomSwitchUserFilterTest {
         source.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
         Environment.setCurrentUser(source);
         final User target = Generator.generateUser(null, null);
-        target.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.user));
+        target.setRoleGroup(Generator.generateRoleGroupWithRoles());
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("username", target.getUsername());

@@ -36,11 +36,10 @@ public class UserDetails implements org.springframework.security.core.userdetail
     }
 
     private void resolveRoles() {
-        authorities.addAll(
+        this.authorities.addAll(
                 user.getRoleGroup().getRoles().stream()
                     .map(r -> new SimpleGrantedAuthority(r.getRoleName()))
                     .toList());
-        authorities.add(new SimpleGrantedAuthority(Role.user.getRoleName()));
     }
 
     public void eraseCredentials() {

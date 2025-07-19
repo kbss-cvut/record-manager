@@ -30,7 +30,7 @@ class OidcGrantedAuthoritiesExtractorTest {
     @Test
     void convertMapsTopLevelClaimWithRolesToGrantedAuthorities() {
         when(config.getConfig(ConfigParam.OIDC_ROLE_CLAIM)).thenReturn("roles");
-        final List<String> roles = List.of(SecurityConstants.ROLE_ADMIN, SecurityConstants.ROLE_USER);
+        final List<String> roles = List.of(SecurityConstants.ROLE_ADMIN);
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")
@@ -51,7 +51,7 @@ class OidcGrantedAuthoritiesExtractorTest {
     @Test
     void convertSupportsNestedRolesClaim() {
         when(config.getConfig(ConfigParam.OIDC_ROLE_CLAIM)).thenReturn("realm_access.roles");
-        final List<String> roles = List.of(SecurityConstants.ROLE_ADMIN, SecurityConstants.ROLE_USER);
+        final List<String> roles = List.of(SecurityConstants.ROLE_ADMIN);
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")
@@ -91,7 +91,7 @@ class OidcGrantedAuthoritiesExtractorTest {
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")
-                             .claim("realm_access", Map.of("roles", Map.of("notlist", SecurityConstants.ROLE_USER)))
+                             .claim("realm_access", Map.of("roles", Map.of("notlist", SecurityConstants.readAllRecords)))
                              .issuer("http://localhost:8080/termit")
                              .subject("termit")
                              .expiresAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(300))
