@@ -42,7 +42,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 @RestController
-@PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_USER + "')")
 @RequestMapping("/records")
 public class PatientRecordController extends BaseController {
 
@@ -70,7 +69,8 @@ public class PatientRecordController extends BaseController {
         this.publishRecordsService = publishRecordsService;
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') or #institutionKey==null or @securityUtils.isMemberOfInstitution(#institutionKey)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllRecords + "') or #institutionKey==null or" +
+            " hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PatientRecordDto> getRecords(
             @RequestParam(value = "institution", required = false) String institutionKey,
@@ -91,7 +91,8 @@ public class PatientRecordController extends BaseController {
         return result.getContent();
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllRecords + "')  or" +
+            " hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(value="used-record-phases", produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<RecordPhase> getUsedRecordPhases(@RequestParam(value = "institution", required = false) String institutionKey){
         return recordService.findUsedRecordPhases();
@@ -99,7 +100,8 @@ public class PatientRecordController extends BaseController {
 
 
     @PreAuthorize(
-            "hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
+            "hasAuthority('" + SecurityConstants.readAllRecords + "') or" +
+                    " hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
     @GetMapping(value = "/export", produces = {MediaType.APPLICATION_JSON_VALUE, Constants.MEDIA_TYPE_EXCEL})
     public ResponseEntity<?> exportRecords(
             @RequestParam(name = "institution", required = false) String institutionKey,
@@ -158,7 +160,8 @@ public class PatientRecordController extends BaseController {
                 .body(new InputStreamResource(stream));
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isRecordInUsersInstitution(#key)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllRecords + "') or " +
+            " hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isRecordInUsersInstitution(#key)")
     @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PatientRecord getRecord(@PathVariable("key") String key) {
         return findInternal(key);
@@ -190,7 +193,7 @@ public class PatientRecordController extends BaseController {
     }
 
     @PreAuthorize(
-        "hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
+        "hasAuthority('" + SecurityConstants.publishRecords + "') or @securityUtils.isMemberOfInstitution(#institutionKey)")
     @PostMapping(value = "/publish", produces = {MediaType.APPLICATION_JSON_VALUE})
     public RecordImportResult publishRecords(
         @RequestParam(name = "institution", required = false) String institutionKey,
