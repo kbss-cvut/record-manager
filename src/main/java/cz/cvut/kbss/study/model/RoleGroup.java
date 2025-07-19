@@ -27,6 +27,11 @@ public class RoleGroup implements Serializable, HasUri {
         roles.add(role);
     }
 
+    public void addRoles(Role ... roles) {
+        if (roles != null) {
+            this.roles.addAll(Set.of(roles));
+        }
+    }
 
     public URI getUri() {
         return uri;
