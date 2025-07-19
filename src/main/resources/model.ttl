@@ -229,52 +229,73 @@ rm:RM_ADMIN rdf:type owl:NamedIndividual, rm:role ;
 rm:RM_USER rdf:type owl:NamedIndividual, rm:role ;
         rdfs:label "user"@en .
 
+###  http://onto.fel.cvut.cz/ontologies/record-manager/read-all-records-role
+rm:read-all-records-role rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "read all records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/write-all-records-role
+rm:write-all-records-role rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "write all records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/read-organization-records-role
+rm:read-organization-records-role rdf:type owl:NamedIndividual, rm:role ;
+        rdfs:label "read organization records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/write-organization-records-role
+rm:write-organization-records-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "write organization records role"@en .
+
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/complete-records-role
 rm:complete-records-role rdf:type owl:NamedIndividual, rm:role ;
         rdfs:label "complete records role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/delete-all-records-role
-rm:delete-all-records-role rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "delete all records role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/edit-all-records-role
-rm:edit-all-records-role rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "edit all records role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/view-all-records-role
-rm:view-all-records-role rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "view all records role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/delete-organization-records-role
-rm:delete-organization-records-role rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "delete organization records role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/edit-organization-records-role
-rm:edit-organization-records-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "edit organization records role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/view-organization-records-role
-rm:view-organization-records-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "view organization records role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/edit-users-role
-rm:edit-users-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "edit users role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/import-codelists-role
-rm:import-codelists-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "import codelists role"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/publish-records-role
-rm:publish-records-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "publish records role"@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/reject-records-role
 rm:reject-records-role rdf:type owl:NamedIndividual, rm:role;
         rdfs:label "reject records role"@en .
 
+###  http://onto.fel.cvut.cz/ontologies/record-manager/publish-records-role
+rm:publish-records-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "publish records role"@en .
+
+###  http://onto.fel.cvut.cz/ontologies/record-manager/import-codelists-role
+rm:import-codelists-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "import codelists role"@en .
+
+rm:comment-record-questions-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "comment record questions role"@en .
+
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/impersonate-role
 rm:impersonate-role rdf:type owl:NamedIndividual, rm:role;
         rdfs:label "impersonate role"@en .
+
+rm:read-all-users-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "read all users role"@en .
+
+rm:write-all-users-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "write all users role"@en .
+
+rm:read-organization-users-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "read organization users role"@en .
+
+rm:write-organization-users-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "write organization users role"@en .
+
+rm:read-organization-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "read organization role"@en .
+
+rm:write-organization-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "write organization role"@en .
+
+rm:read-all-organizations-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "read all organizations role"@en .
+
+rm:write-all-organizations-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "write all organizations role"@en .
+
+rm:read-action-history-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "read action history"@en .
+
+rm:read-statistics-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "read statistics"@en .
 
 ###  Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi

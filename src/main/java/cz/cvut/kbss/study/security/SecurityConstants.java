@@ -31,28 +31,44 @@ public class SecurityConstants {
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-    public static final String impersonate = "rm-impersonate";
+    public static final String readAllRecords = "readAllRecords";
 
-    public static final String deleteAllRecords = "rm-delete-all-records";
+    public static final String writeAllRecords = "writeAllRecords";
 
-    public static final String viewAllRecords = "rm-view-all-records";
+    public static final String readOrganizationRecords = "readOrganizationRecords";
 
-    public static final String editAllRecords = "rm-edit-all-records";
+    public static final String writeOrganizationRecords = "writeOrganizationRecords";
 
-    public static final String deleteOrganizationRecords = "rm-delete-organization-records";
+    public static final String completeRecords = "completeRecords";
 
-    public static final String viewOrganizationRecords = "rm-view-organization-records";
+    public static final String rejectRecords = "rejectRecords";
 
-    public static final String editOrganizationRecords = "rm-edit-organization-records";
+    public static final String publishRecords = "publishRecords";
 
-    public static final String editUsers = "rm-edit-users";
+    public static final String importCodelists = "importCodelists";
 
-    public static final String completeRecords = "rm-complete-records";
+    public static final String commentRecordQuestions = "commentRecordQuestions";
 
-    public static final String rejectRecords = "rm-reject-records";
+    public static final String impersonate = "impersonate";
 
-    public static final String publishRecords = "rm-publish-records";
+    public static final String readAllUsers = "readAllUsers";
 
-    public static final String importCodelists = "rm-import-codelists";
+    public static final String writeAllUsers = "writeAllUsers";
+
+    public static final String readOrganizationUsers = "readOrganizationUsers";
+
+    public static final String writeOrganizationUsers = "writeOrganizationUsers";
+
+    public static final String readOrganization = "readOrganization";
+
+    public static final String writeOrganization = "writeOrganization";
+
+    public static final String readAllOrganizations = "readAllOrganizations";
+
+    public static final String writeAllOrganizations = "writeAllOrganizations";
+
+    public static final String readActionHistory = "readActionHistory";
+
+    public static final String readStatistics = "readStatistics";
 
 }
