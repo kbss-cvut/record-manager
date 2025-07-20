@@ -106,6 +106,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         return result;
     }
 
+    // TODO reconsider the logic for new roles
     private void setImportedRecordProvenance(User currentUser, Date now, Optional<RecordPhase> targetPhase,
                                              PatientRecord record) {
         if (!currentUser.isAdmin()) {

@@ -213,4 +213,14 @@ public class SecurityUtils {
             throw new SecurityException("Error exchanging token", e);
         }
     }
+
+    public boolean hasRole(Role role) {
+        final User user = getCurrentUser();
+
+        if(user.getRoleGroup().getRoles() != null){
+            return user.getRoleGroup().getRoles().contains(role);
+        }
+
+        return false;
+    }
 }

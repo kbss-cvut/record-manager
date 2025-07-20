@@ -78,10 +78,10 @@ public class PatientRecordController extends BaseController {
             UriComponentsBuilder uriBuilder, HttpServletResponse response) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean hasAdminRole = authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals(SecurityConstants.ROLE_ADMIN));
+        boolean hasReadAllRecords = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals(SecurityConstants.readAllRecords));
 
-        if (!hasAdminRole && institutionKey == null) {
+        if (!hasReadAllRecords && institutionKey == null) {
             throw new ValidationException("record.save-error.user-not-assigned-to-institution",
                     "User is not assigned to any institution.");
         }

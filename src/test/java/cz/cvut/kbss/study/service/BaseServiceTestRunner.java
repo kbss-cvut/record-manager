@@ -15,7 +15,6 @@ import cz.cvut.kbss.study.persistence.dao.UserDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -42,7 +41,7 @@ public abstract class BaseServiceTestRunner extends TransactionalTestRunner {
     @Autowired
     private RoleGroupDao roleGroupDao;
 
-    protected RoleGroup roleGroupAdmin;
+    protected RoleGroup adminRoleGroup;
 
     public static final String USERNAME = "halsey";
     public static final String PASSWORD = "john117";
@@ -51,10 +50,10 @@ public abstract class BaseServiceTestRunner extends TransactionalTestRunner {
     @BeforeEach
     public void setUp() throws Exception {
         Institution institution = Generator.generateInstitution();
-        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        user = Generator.getUser(USERNAME, PASSWORD, "John", "Grant", EMAIL, institution, this.roleGroupAdmin);
+        this.adminRoleGroup = Generator.generateAdminRoleGroup();
+        user = Generator.getUser(USERNAME, PASSWORD, "John", "Grant", EMAIL, institution, this.adminRoleGroup);
         transactional(() -> {
-            roleGroupDao.persist(this.roleGroupAdmin);
+            roleGroupDao.persist(this.adminRoleGroup);
             institutionDao.persist(institution);
             if (userDao.findByUsername(user.getUsername()) == null) {
                 user.encodePassword(passwordEncoder);

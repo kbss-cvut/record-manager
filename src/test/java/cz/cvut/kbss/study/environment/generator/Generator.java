@@ -142,7 +142,7 @@ public class Generator {
         person.setLastName("RandomLastName" + randomInt());
         person.setEmailAddress("RandomEmail" + randomInt() + "@random.rand");
         person.setInstitution(institution);
-        person.setRoleGroup(generateRoleGroupWithRoles(Role.administrator));
+        person.setRoleGroup(generateAdminRoleGroup());
         person.setUri(generateUri());
         return person;
     }
@@ -160,14 +160,9 @@ public class Generator {
         return person;
     }
 
-    public static RoleGroup generateRoleGroup() {
-        final RoleGroup roleGroup = new RoleGroup();
-        roleGroup.setName("RandomRoleGroup" + randomInt());
-        roleGroup.setUri(generateUri());
-        roleGroup.addRole(Role.administrator);
-        return roleGroup;
+    public static RoleGroup generateAdminRoleGroup() {
+       return generateRoleGroupWithRoles(Role.values());
     }
-
 
     public static RoleGroup generateRoleGroupWithRoles(Role ... roles) {
         final RoleGroup roleGroup = new RoleGroup();

@@ -34,19 +34,19 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     private static final String LOAD_ERROR = "LOAD_ERROR";
     private static final String LOAD_PENDING = "LOAD_PENDING";
 
-    private RoleGroup roleGroupAdmin;
+    private RoleGroup adminRoleGroup;
 
     @BeforeEach
     public void setUp() {
-        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        transactional(() -> roleGroupDao.persist(this.roleGroupAdmin));
+        this.adminRoleGroup = Generator.generateAdminRoleGroup();
+        transactional(() -> roleGroupDao.persist(this.adminRoleGroup));
     }
 
     @Test
     public void findByKeyReturnsActionWithPayload() {
         Institution institution = Generator.generateInstitution();
 
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         ActionHistory action = Generator.generateActionHistory(user);
 
         transactional(() -> {
@@ -64,8 +64,8 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     @Test
     public void findAllWithParamsWithoutParamsReturnsAllActions() {
         Institution institution = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution, this.adminRoleGroup);
         ActionHistory action1 = Generator.generateActionHistory(user1);
         ActionHistory action2 = Generator.generateActionHistory(user1);
         ActionHistory action3 = Generator.generateActionHistory(user2);
@@ -84,9 +84,9 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     @Test
     public void findAllWithParamsWithAuthorReturnsAuthorsActions() {
         Institution institution = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user3 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user3 = Generator.generateUser(institution, this.adminRoleGroup);
         ActionHistory action1 = Generator.generateActionHistory(user1);
         ActionHistory action2 = Generator.generateActionHistory(user1);
         ActionHistory action3 = Generator.generateActionHistory(user2);
@@ -109,7 +109,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     @Test
     public void findAllWithParamsWithTypeReturnsActionsWithExactType() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         ActionHistory action1 = Generator.generateActionHistory(user);
         action1.setType(LOAD_SUCCESS);
         ActionHistory action2 = Generator.generateActionHistory(user);
@@ -135,7 +135,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     @Test
     public void findAllWithParamsWithTypeReturnsActionsWithTypeContained() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         ActionHistory action1 = Generator.generateActionHistory(user);
         action1.setType(LOAD_SUCCESS);
         ActionHistory action2 = Generator.generateActionHistory(user);
@@ -156,8 +156,8 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     @Test
     public void findAllWithParamsReturnsMatchingActions() {
         Institution institution = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution, this.adminRoleGroup);
         ActionHistory action1 = Generator.generateActionHistory(user1);
         action1.setType(LOAD_SUCCESS);
         ActionHistory action2 = Generator.generateActionHistory(user1);
@@ -185,7 +185,7 @@ public class ActionHistoryDaoTest extends BaseDaoTestRunner {
     @Test
     void findAllReturnsActionsOnMatchingPage() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         final List<ActionHistory> allActions = IntStream.range(0, 10).mapToObj(i -> Generator.generateActionHistory(user)).toList();
         transactional(() -> {
             institutionDao.persist(institution);

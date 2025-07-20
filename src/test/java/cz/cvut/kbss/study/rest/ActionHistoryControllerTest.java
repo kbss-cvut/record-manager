@@ -55,14 +55,14 @@ public class ActionHistoryControllerTest extends BaseControllerTestRunner {
 
     private User user;
 
-    private RoleGroup roleGroupAdmin;
+    private RoleGroup adminRoleGroup;
 
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
-        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
+        this.adminRoleGroup = Generator.generateAdminRoleGroup();
         Institution institution = Generator.generateInstitution();
-        this.user = Generator.generateUser(institution, roleGroupAdmin);
+        this.user = Generator.generateUser(institution, adminRoleGroup);
         Environment.setCurrentUser(user);
     }
 

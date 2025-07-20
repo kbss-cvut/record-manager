@@ -80,7 +80,7 @@ public class SecurityConfig {
         LOG.debug("Using internal security mechanisms.");
         final AuthenticationManager authManager = buildAuthenticationManager(http);
         http.authorizeHttpRequests(
-                    (auth) -> auth.requestMatchers("/rest/users/impersonate").hasAuthority(Role.administrator.getRoleName())
+                    (auth) -> auth.requestMatchers("/rest/users/impersonate").hasAuthority(Role.impersonate.getRoleName())
                                   .anyRequest().permitAll())
             .cors((auth) -> auth.configurationSource(corsConfigurationSource(config)))
             .csrf(AbstractHttpConfigurer::disable)

@@ -78,17 +78,16 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
 
     private User user;
 
-    private RoleGroup roleGroupAdmin;
+    private RoleGroup adminRoleGroup;
 
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
-        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        this.user = Generator.generateUser(institution, roleGroupAdmin);
+        this.adminRoleGroup = Generator.generateAdminRoleGroup();
+        this.user = Generator.generateUser(institution, adminRoleGroup);
         Environment.setCurrentUser(user);
-
     }
 
     @Test
@@ -147,8 +146,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     public void getRecordsReturnsAllRecords() throws Exception {
         Institution institution = Generator.generateInstitution();
 
-        User user1 = Generator.generateUser(institution, roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, adminRoleGroup);
+        User user2 = Generator.generateUser(institution, adminRoleGroup);
 
         List<PatientRecordDto> records =
                 List.of(Generator.generatePatientRecordDto(user1), Generator.generatePatientRecordDto(user1),
@@ -175,8 +174,8 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         Institution institution = Generator.generateInstitution();
         institution.setKey(key);
 
-        User user1 = Generator.generateUser(institution, roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, adminRoleGroup);
+        User user2 = Generator.generateUser(institution, adminRoleGroup);
 
         PatientRecordDto record1 = Generator.generatePatientRecordDto(user1);
         PatientRecordDto record2 = Generator.generatePatientRecordDto(user2);

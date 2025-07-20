@@ -47,14 +47,14 @@ public class UserControllerTest extends BaseControllerTestRunner {
     @InjectMocks
     private UserController controller;
 
-    private RoleGroup roleGroupAdmin;
+    private RoleGroup adminRoleGroup;
 
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
-        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        this.adminRoleGroup = Generator.generateAdminRoleGroup();
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setUsername("tom");
         Environment.setCurrentUser(user);
     }
@@ -105,9 +105,9 @@ public class UserControllerTest extends BaseControllerTestRunner {
     public void getUsersReturnsAllUsers() throws Exception {
         Institution institution = Generator.generateInstitution();
 
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user3 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user3 = Generator.generateUser(institution, this.adminRoleGroup);
 
         List<User> users = new ArrayList<>();
         users.add(user1);
@@ -132,9 +132,9 @@ public class UserControllerTest extends BaseControllerTestRunner {
         Institution institution = Generator.generateInstitution();
         institution.setKey(key);
 
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user3 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user3 = Generator.generateUser(institution, this.adminRoleGroup);
 
         List<User> users = new ArrayList<>();
         users.add(user1);
@@ -297,7 +297,7 @@ public class UserControllerTest extends BaseControllerTestRunner {
     public void sendInvitationReturnsResponseStatusBadRequest() throws Exception {
         final String username = "tom";
         final Institution institution = Generator.generateInstitution();
-        final User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        final User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setIsInvited(true);
 
         when(userServiceMock.findByUsername(username)).thenReturn(user);
@@ -312,7 +312,7 @@ public class UserControllerTest extends BaseControllerTestRunner {
     public void sendInvitationReturnsResponseStatusNoContent() throws Exception {
         final String username = "tom";
         final Institution institution = Generator.generateInstitution();
-        final User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        final User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setIsInvited(false);
 
         when(userServiceMock.findByUsername(username)).thenReturn(user);
@@ -327,7 +327,7 @@ public class UserControllerTest extends BaseControllerTestRunner {
     public void sendInvitationDeleteReturnsResponseStatusNoContent() throws Exception {
         final String username = "tom";
         final Institution institution = Generator.generateInstitution();
-        final User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        final User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setIsInvited(false);
 
         when(userServiceMock.findByUsername(username)).thenReturn(user);

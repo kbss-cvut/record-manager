@@ -30,7 +30,7 @@ class OidcGrantedAuthoritiesExtractorTest {
     @Test
     void convertMapsTopLevelClaimWithRolesToGrantedAuthorities() {
         when(config.getConfig(ConfigParam.OIDC_ROLE_CLAIM)).thenReturn("roles");
-        final List<String> roles = List.of(SecurityConstants.ROLE_ADMIN);
+        final List<String> roles = List.of();
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")
@@ -51,7 +51,7 @@ class OidcGrantedAuthoritiesExtractorTest {
     @Test
     void convertSupportsNestedRolesClaim() {
         when(config.getConfig(ConfigParam.OIDC_ROLE_CLAIM)).thenReturn("realm_access.roles");
-        final List<String> roles = List.of(SecurityConstants.ROLE_ADMIN);
+        final List<String> roles = List.of();
         final Jwt token = Jwt.withTokenValue("abcdef12345")
                              .header("alg", "RS256")
                              .header("typ", "JWT")

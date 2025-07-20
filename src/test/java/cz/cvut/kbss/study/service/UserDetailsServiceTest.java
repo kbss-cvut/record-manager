@@ -2,10 +2,7 @@ package cz.cvut.kbss.study.service;
 
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.Role;
-import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.persistence.dao.RoleGroupDao;
 import cz.cvut.kbss.study.service.security.UserDetailsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +30,7 @@ public class UserDetailsServiceTest extends BaseServiceTestRunner {
     public void loadUserByUsername() {
         Institution institution = Generator.generateInstitution();
         institutionService.persist(institution);
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         userService.persist(user);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());

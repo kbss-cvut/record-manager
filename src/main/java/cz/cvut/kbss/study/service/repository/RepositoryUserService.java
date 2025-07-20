@@ -4,10 +4,12 @@ import cz.cvut.kbss.study.exception.EntityExistsException;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
+import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.service.UserService;
@@ -208,11 +210,18 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void preUpdate(User instance) {
         final User currentUser = securityUtils.getCurrentUser();
-        if (!currentUser.isAdmin()
-            && (!instance.getRoleGroup().getRoles().equals(currentUser.getRoleGroup().getRoles()) || (instance.getInstitution() != null
-            && !instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey())))) {
+
+
+        boolean hasWriteAllUsers = securityUtils.hasRole(Role.writeAllUsers);
+        boolean sameRoleGroup = instance.getRoleGroup().getRoles().equals(currentUser.getRoleGroup().getRoles());
+        boolean sameInstitution = instance.getInstitution() == null
+                || instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey());
+        boolean sameUser = Objects.equals(instance.getUsername(), currentUser.getUsername());
+
+        if (!sameUser && !hasWriteAllUsers && !(sameInstitution && !sameRoleGroup && securityUtils.hasRole(Role.writeOrganizationUsers))) {
             throw new UnauthorizedException("Cannot update user.");
         }
+
         try {
             Validator.validateEmail(instance.getEmailAddress());
         } catch (IllegalStateException e) {
