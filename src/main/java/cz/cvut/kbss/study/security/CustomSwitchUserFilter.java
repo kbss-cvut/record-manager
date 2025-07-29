@@ -31,12 +31,12 @@ public class CustomSwitchUserFilter extends SwitchUserFilter {
     private boolean hasHigherPrivileges(Authentication a1, Authentication a2) {
         Set<String> a1Authorities = a1.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .filter(auth -> !auth.equals(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR) && !auth.equals(Role.impersonate.name()))
+                .filter(auth -> !auth.equals(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR))
                 .collect(Collectors.toSet());
 
         Set<String> a2Authorities = a2.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .filter(auth -> !auth.equals(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR) && !auth.equals(Role.impersonate.name()))
+                .filter(auth -> !auth.equals(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR))
                 .collect(Collectors.toSet());
 
         return a1Authorities.containsAll(a2Authorities) && a1Authorities.size() > a2Authorities.size();

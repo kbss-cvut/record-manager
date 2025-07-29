@@ -83,10 +83,8 @@ public class SecurityUtils {
         } else {
             final String username = context.getAuthentication().getName();
             final User user = userDao.findByUsername(username).copy();
-            if (context.getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(
-                    SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR))) {
-                user.getRoleGroup().addRole(cz.cvut.kbss.study.model.Role.impersonate);
-            }
+            user.setImpersonated(context.getAuthentication().getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR)));
             return user;
         }
     }

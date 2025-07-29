@@ -200,7 +200,7 @@ public class SecurityUtilsTest {
         when(userDao.findByUsername(user.getUsername())).thenReturn(user);
         final User result = sut.getCurrentUser();
         assertEquals(user, result);
-        assertThat(result.getRoleGroup().getRoles(), hasItem(Role.impersonate));
+        assertTrue(result.isImpersonated());
     }
 
     @Test

@@ -38,9 +38,6 @@ public enum Role {
     @Individual(iri = Vocabulary.s_i_comment_record_questions_role)
     commentRecordQuestions(SecurityConstants.commentRecordQuestions, Vocabulary.s_i_comment_record_questions_role),
 
-    @Individual(iri = Vocabulary.s_i_impersonate_role)
-    impersonate(SecurityConstants.impersonate, Vocabulary.s_i_impersonate_role),
-
     @Individual(iri = Vocabulary.s_i_read_all_users_role)
     readAllUsers(SecurityConstants.readAllUsers, Vocabulary.s_i_read_all_users_role),
 

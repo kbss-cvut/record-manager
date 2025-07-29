@@ -264,10 +264,6 @@ rm:import-codelists-role rdf:type owl:NamedIndividual, rm:role;
 rm:comment-record-questions-role rdf:type owl:NamedIndividual, rm:role;
         rdfs:label "comment record questions role"@en .
 
-###  http://onto.fel.cvut.cz/ontologies/record-manager/impersonate-role
-rm:impersonate-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "impersonate role"@en .
-
 rm:read-all-users-role rdf:type owl:NamedIndividual, rm:role;
         rdfs:label "read all users role"@en .
 
