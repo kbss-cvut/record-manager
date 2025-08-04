@@ -219,16 +219,6 @@ rm:role-group rdf:type owl:Class;
 #   Roles
 #################################################################
 
-###  http://onto.fel.cvut.cz/ontologies/record-manager/administrator
-### TODO deprecated
-rm:RM_ADMIN rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "administrator"@en .
-
-###  http://onto.fel.cvut.cz/ontologies/record-manager/user
-### TODO deprecated
-rm:RM_USER rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "user"@en .
-
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/read-all-records-role
 rm:read-all-records-role rdf:type owl:NamedIndividual, rm:role ;
         rdfs:label "read all records role"@en .

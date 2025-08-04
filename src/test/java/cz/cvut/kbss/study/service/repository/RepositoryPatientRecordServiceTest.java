@@ -56,7 +56,7 @@ class RepositoryPatientRecordServiceTest {
     @BeforeEach
     void setUp() {
         this.adminRoleGroup =  Generator.generateAdminRoleGroup();
-        this.userRoleGroup = Generator.generateRoleGroupWithRoles();
+        this.userRoleGroup = Generator.generateRoleGroupWithRoles(Role.readAllUsers, Role.readAllOrganizations, Role.completeRecords, Role.rejectRecords);
         this.user = Generator.generateUser(Generator.generateInstitution(), userRoleGroup);
         Environment.setCurrentUser(user);
         when(securityUtils.getCurrentUser()).thenReturn(user);
@@ -100,7 +100,6 @@ class RepositoryPatientRecordServiceTest {
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.adminRoleGroup);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         Environment.setCurrentUser(user);
-        user.getRoleGroup().addRole(Role.administrator);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
         when(recordDao.exists(any())).thenReturn(false);
 

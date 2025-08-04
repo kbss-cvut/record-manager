@@ -146,17 +146,6 @@ public class User implements HasDerivableUri, Serializable {
         isImpersonated = impersonated;
     }
 
-    /**
-     * Returns true if this user is an admin.
-     * <p>
-     * That is, it has an admin type.
-     *
-     * @return {@code true} if this is admin, {@code false} otherwise
-     */
-    public boolean isAdmin() {
-        return roleGroup != null && roleGroup.getRoles().contains(Role.administrator);
-    }
-
     public String getToken() {
         return token;
     }

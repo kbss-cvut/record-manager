@@ -7,10 +7,6 @@ import java.util.Optional;
 
 public enum Role {
 
-    // TODO deprecated -- should be removed.
-    @Individual(iri = Vocabulary.s_i_RM_ADMIN)
-    administrator(SecurityConstants.ROLE_ADMIN, Vocabulary.s_i_RM_ADMIN),
-
     @Individual(iri = Vocabulary.s_i_read_all_records_role)
     readAllRecords(SecurityConstants.readAllRecords, Vocabulary.s_i_read_all_records_role),
 
