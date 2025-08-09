@@ -25,15 +25,12 @@ public class UserDaoTest extends BaseDaoTestRunner {
     private RoleGroupDao roleGroupDao;
 
     private RoleGroup adminRoleGroup;
-    private RoleGroup userRoleGroup;
 
     @BeforeEach
     public void setUp() {
         this.adminRoleGroup = Generator.generateAdminRoleGroup();
-        this.userRoleGroup = Generator.generateRoleGroupWithRoles();
        transactional(() -> {
             roleGroupDao.persist(this.adminRoleGroup);
-            roleGroupDao.persist(this.userRoleGroup);
         });
     }
 
@@ -131,8 +128,17 @@ public class UserDaoTest extends BaseDaoTestRunner {
     public void getNumberOfInvestigators() {
         Institution institution = Generator.generateInstitution();
         User user1 = Generator.generateUser(institution, this.adminRoleGroup);
-        User user2 = Generator.generateUser(institution, this.userRoleGroup);
-        User user3 = Generator.generateUser(institution, this.userRoleGroup);
+
+        RoleGroup writeAllRecordsRoleGroup = Generator.generateRoleGroupWithRoles(Role.writeAllRecords);
+        RoleGroup writeOrganizationRecords =  Generator.generateRoleGroupWithRoles(Role.writeOrganizationRecords);
+
+        transactional(() -> {
+            roleGroupDao.persist(writeAllRecordsRoleGroup);
+            roleGroupDao.persist(writeOrganizationRecords);
+        });
+
+        User user2 = Generator.generateUser(institution, writeAllRecordsRoleGroup);
+        User user3 = Generator.generateUser(institution, writeOrganizationRecords);
 
 
         transactional(() -> {
