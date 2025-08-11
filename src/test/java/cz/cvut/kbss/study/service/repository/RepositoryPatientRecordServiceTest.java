@@ -49,6 +49,7 @@ class RepositoryPatientRecordServiceTest {
     private RepositoryPatientRecordService sut;
 
     private User user;
+    private User admin;
 
     private RoleGroup adminRoleGroup;
     private RoleGroup userRoleGroup;
@@ -56,8 +57,9 @@ class RepositoryPatientRecordServiceTest {
     @BeforeEach
     void setUp() {
         this.adminRoleGroup =  Generator.generateAdminRoleGroup();
-        this.userRoleGroup = Generator.generateRoleGroupWithRoles(Role.readAllUsers, Role.readAllOrganizations, Role.completeRecords, Role.rejectRecords);
+        this.userRoleGroup = Generator.generateRoleGroupWithRoles();
         this.user = Generator.generateUser(Generator.generateInstitution(), userRoleGroup);
+        this.admin = Generator.generateUser(Generator.generateInstitution(), adminRoleGroup);
         Environment.setCurrentUser(user);
         when(securityUtils.getCurrentUser()).thenReturn(user);
     }
@@ -99,7 +101,8 @@ class RepositoryPatientRecordServiceTest {
     void importRecordsRetainsRecordProvenanceDataWhenCurrentUserIsAdmin() {
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.adminRoleGroup);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
-        Environment.setCurrentUser(user);
+        Environment.setCurrentUser(this.admin);
+        when(securityUtils.getCurrentUser()).thenReturn(admin);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
         when(recordDao.exists(any())).thenReturn(false);
 
