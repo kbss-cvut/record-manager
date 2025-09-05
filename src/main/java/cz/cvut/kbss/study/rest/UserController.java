@@ -47,8 +47,9 @@ public class UserController extends BaseController {
         this.institutionService = institutionService;
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllUsers + "') or #username == authentication.name or" +
-            " hasAuthority('" + SecurityConstants.readOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllUsers + "') " +
+            "or (hasAuthority('" + SecurityConstants.readOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username))" +
+            "or #username == authentication.name ")
     @GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getByUsername(@PathVariable("username") String username) {
         final User user = userService.findByUsername(username);
@@ -75,9 +76,8 @@ public class UserController extends BaseController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @PreAuthorize(
-            "hasAuthority('" + SecurityConstants.readAllUsers + "') " +
-                    "or hasAuthority('" + SecurityConstants.readOrganizationUsers + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllUsers + "') " +
+                    "or (hasAuthority('" + SecurityConstants.readOrganizationUsers + "') and @securityUtils.isMemberOfInstitution(#institutionKey))")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> getUsers(@RequestParam(value = "institution", required = false) String institutionKey) {
         return institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
@@ -100,8 +100,9 @@ public class UserController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') or #username == authentication.name or" +
-            " hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') " +
+            "or (hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username))" +
+            "or #username == authentication.name ")
     @PutMapping(value = "/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUser(@PathVariable("username") String username, @RequestBody User user,
@@ -117,8 +118,9 @@ public class UserController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') or #username == authentication.name" +
-            " or hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') " +
+            "or (hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username))" +
+            "or #username == authentication.name ")
     @PutMapping(value = "/{username}/password-change", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePassword(@PathVariable("username") String username, @RequestBody Map<String, String> password,
@@ -173,7 +175,8 @@ public class UserController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') or hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.isMemberOfInstitution(#username)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') " +
+            "or (hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.isMemberOfInstitution(#username))")
     @PutMapping(value = "/send-invitation/{username}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void sendInvitation(@PathVariable(value = "username") String username) {
@@ -188,7 +191,8 @@ public class UserController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') or hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.isMemberOfInstitution(#username)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') " +
+            "or (hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.isMemberOfInstitution(#username))")
     @PostMapping(value = "/send-invitation/delete", consumes = MediaType.TEXT_PLAIN_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteInvitationOption(@RequestBody String username) {

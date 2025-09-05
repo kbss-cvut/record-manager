@@ -43,8 +43,9 @@ public class OidcUserController extends BaseController {
         return userService.getCurrentUser();
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllUsers + "') or #username == authentication.name or " +
-            "hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.areFromSameInstitution(#username)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllUsers + "') " +
+            "or (hasAuthority('" + SecurityConstants.readOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username))" +
+            "or #username == authentication.name ")
     @GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getByUsername(@PathVariable("username") String username) {
         final User user = userService.findByUsername(username);
@@ -54,16 +55,16 @@ public class OidcUserController extends BaseController {
         return user;
     }
 
-    @PreAuthorize(
-            "hasAuthority('" + SecurityConstants.readAllUsers + "') " +
-                    "or hasAuthority('" + SecurityConstants.readOrganizationUsers + "') and @securityUtils.isMemberOfInstitution(#institutionKey)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllUsers + "') " +
+            "or (hasAuthority('" + SecurityConstants.readOrganizationUsers + "') and @securityUtils.isMemberOfInstitution(#institutionKey))")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> getUsers(@RequestParam(value = "institution", required = false) String institutionKey) {
         return institutionKey != null ? getByInstitution(institutionKey) : userService.findAll();
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') or #username == authentication.name or" +
-            " hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username)")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllUsers + "') " +
+            "or (hasAuthority('" + SecurityConstants.writeOrganizationUsers + "') and @securityUtils.areFromSameInstitution(#username))" +
+            "or #username == authentication.name ")
     @PutMapping(value = "/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUser(@PathVariable("username") String username, @RequestBody User user,
