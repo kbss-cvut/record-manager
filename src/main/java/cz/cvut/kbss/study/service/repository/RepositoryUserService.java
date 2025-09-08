@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.service.repository;
 
+import cz.cvut.kbss.jopa.exceptions.EntityNotFoundException;
 import cz.cvut.kbss.study.exception.EntityExistsException;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
@@ -210,15 +211,20 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void preUpdate(User instance) {
         final User currentUser = securityUtils.getCurrentUser();
+        final User original = userDao.findByUsername(instance.getUsername());
 
+        if(original == null) {
+            throw new EntityNotFoundException("User with specified username does not exist.");
+        }
 
         boolean hasWriteAllUsers = securityUtils.hasRole(Role.writeAllUsers);
-        boolean sameRoleGroup = instance.getRoleGroup().getRoles().equals(currentUser.getRoleGroup().getRoles());
+        boolean hasHigherPrivileges = securityUtils.hasHigherPrivileges(currentUser, original);
+
         boolean sameInstitution = instance.getInstitution() == null
                 || instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey());
         boolean sameUser = Objects.equals(instance.getUsername(), currentUser.getUsername());
 
-        if (!sameUser && !hasWriteAllUsers && !(sameInstitution && !sameRoleGroup && securityUtils.hasRole(Role.writeOrganizationUsers))) {
+        if ((!sameUser && !hasWriteAllUsers && !(sameInstitution && securityUtils.hasRole(Role.writeOrganizationUsers))) && !hasHigherPrivileges) {
             throw new UnauthorizedException("Cannot update user.");
         }
 

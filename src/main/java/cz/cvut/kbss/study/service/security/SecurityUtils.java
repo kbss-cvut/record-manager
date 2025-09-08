@@ -221,4 +221,14 @@ public class SecurityUtils {
 
         return false;
     }
+
+    public boolean hasHigherPrivileges(User u1,  User u2) {
+        if(u1.getRoleGroup() == null){
+            return false;
+        }else if(u2.getRoleGroup() == null){
+            return true;
+        }else{
+            return u1.getRoleGroup().getRoles().containsAll(u2.getRoleGroup().getRoles()) && u1.getRoleGroup().getRoles().size() > u2.getRoleGroup().getRoles().size();
+        }
+    }
 }

@@ -110,8 +110,7 @@ public class UserController extends BaseController {
         if (!username.equals(user.getUsername())) {
             throw new BadRequestException("The passed user's username is different from the specified one.");
         }
-        final User original = getByUsername(username);
-        assert original != null;
+
         userService.update(user, sendEmail, "profileUpdate");
         if (LOG.isTraceEnabled()) {
             LOG.trace("User {} successfully updated.", user);

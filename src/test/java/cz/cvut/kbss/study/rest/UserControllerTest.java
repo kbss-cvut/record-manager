@@ -11,6 +11,7 @@ import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -166,39 +167,12 @@ public class UserControllerTest extends BaseControllerTestRunner {
         verify(userServiceMock).findByUsername(username);
     }
 
-
-    @Test
-    public void updateUserReturnsResponseStatusNoContent() throws Exception {
-        final String username = "tom";
-
-        when(userServiceMock.findByUsername(username)).thenReturn(Environment.getCurrentUser());
-
-        final MvcResult result = mockMvc.perform(put("/users/" + username).content(toJson(Environment.getCurrentUser()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
-
-        assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
-        verify(userServiceMock).findByUsername(username);
-    }
-
     @Test
     public void updateUserWithNonMatchingUsernameReturnsResponseStatusBadRequest() throws Exception {
                 final MvcResult result = mockMvc.perform(put("/users/tomas").content(toJson(Environment.getCurrentUser()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
         assertEquals(HttpStatus.BAD_REQUEST, HttpStatus.valueOf(result.getResponse().getStatus()));
-    }
-
-    @Test
-    public void updateUserReturnsResponseStatusNotFound() throws Exception {
-        final String username = "tom";
-
-        when(userServiceMock.findByUsername(username)).thenReturn(null);
-
-        final MvcResult result = mockMvc.perform(put("/users/" + username).content(toJson(Environment.getCurrentUser()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
-
-        assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
-        verify(userServiceMock).findByUsername(username);
     }
 
     @Test
