@@ -5,22 +5,19 @@ import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.Role;
-import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.security.model.UserDetails;
+import cz.cvut.kbss.study.service.BaseServiceTestRunner;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,8 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-public class SecurityUtilsTest {
+
+public class SecurityUtilsTest extends BaseServiceTestRunner {
 
     @Mock
     private UserDao userDao;
@@ -57,22 +54,6 @@ public class SecurityUtilsTest {
     @InjectMocks
     private SecurityUtils sut;
 
-    private User user;
-
-    private RoleGroup adminRoleGroup;
-
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "pass" + Generator.randomInt(0, 1000);
-
-    @BeforeEach
-    public void setUp() {
-        Institution institution = Generator.generateInstitution();
-        institution.setKey(IdentificationUtils.generateKey());
-        this.adminRoleGroup = Generator.generateAdminRoleGroup();
-        this.user = Generator.getUser(USERNAME, PASSWORD, "John", "Johnie", "Johnie@gmail.com", institution, this.adminRoleGroup);
-        user.generateUri();
-    }
-
     @AfterEach
     public void tearDown() {
         SecurityContextHolder.clearContext();
@@ -80,10 +61,10 @@ public class SecurityUtilsTest {
 
     @Test
     public void getCurrentUserReturnsCurrentlyLoggedInUser() {
-        Environment.setCurrentUser(user);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        Environment.setCurrentUser(admin);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
         final User result = sut.getCurrentUser();
-        assertEquals(user, result);
+        assertEquals(admin, result);
     }
 
     @Test
@@ -93,63 +74,63 @@ public class SecurityUtilsTest {
                              .header("alg", "RS256")
                              .header("typ", "JWT")
                              .issuer("http://localhost:8080/termit")
-                             .subject(USERNAME)
-                             .claim("preferred_username", USERNAME)
+                             .subject(admin.getUsername())
+                             .claim("preferred_username", admin.getUsername())
                              .expiresAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(300))
                              .build();
         SecurityContext context = new SecurityContextImpl();
         context.setAuthentication(new JwtAuthenticationToken(token));
         SecurityContextHolder.setContext(context);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
 
         final User result = sut.getCurrentUser();
-        assertEquals(user, result);
+        assertEquals(admin, result);
     }
 
     @Test
     public void isMemberOfInstitutionReturnsTrueForUserFromSpecifiedInstitution() {
-        Environment.setCurrentUser(user);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
-        assertTrue(sut.isMemberOfInstitution(user.getInstitution().getKey()));
+        Environment.setCurrentUser(admin);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
+        assertTrue(sut.isMemberOfInstitution(admin.getInstitution().getKey()));
     }
 
     @Test
     public void isMemberOfInstitutionReturnsFalseForDifferentInstitutionKey() {
-        Environment.setCurrentUser(user);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        Environment.setCurrentUser(admin);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
         assertFalse(sut.isMemberOfInstitution("nonExistingInstitutionKey"));
     }
 
     @Test
     public void areFromSameInstitutionReturnsTrueForUserFromSameInstitution() {
-        Environment.setCurrentUser(user);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        Environment.setCurrentUser(admin);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
 
-        User userFromSameInstitution = Generator.generateUser(user.getInstitution(), this.adminRoleGroup);
-        when(userDao.findByInstitution(user.getInstitution())).thenReturn(List.of(user, userFromSameInstitution));
+        User userFromSameInstitution = Generator.generateUser(admin.getInstitution(), this.adminRoleGroup);
+        when(userDao.findByInstitution(admin.getInstitution())).thenReturn(List.of(admin, userFromSameInstitution));
 
         assertTrue(sut.areFromSameInstitution(userFromSameInstitution.getUsername()));
     }
 
     @Test
     public void areFromSameInstitutionReturnsFalseForUserFromDifferentInstitution() {
-        Environment.setCurrentUser(user);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        Environment.setCurrentUser(admin);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
 
         Institution institutionAnother = Generator.generateInstitution();
 
         User userFromAnotherInstitution = Generator.generateUser(institutionAnother, this.adminRoleGroup);
-        when(userDao.findByInstitution(user.getInstitution())).thenReturn(List.of(user));
+        when(userDao.findByInstitution(admin.getInstitution())).thenReturn(List.of(admin));
 
         assertFalse(sut.areFromSameInstitution(userFromAnotherInstitution.getUsername()));
     }
 
     @Test
     public void isRecordInUsersInstitutionReturnsTrueWhenRecordBelongsToCurrentUsersInstitution() {
-        Environment.setCurrentUser(user);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        Environment.setCurrentUser(admin);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
 
-        PatientRecord record = Generator.generatePatientRecord(user);
+        PatientRecord record = Generator.generatePatientRecord(admin);
         record.setKey(IdentificationUtils.generateKey());
         when(patientRecordDao.findByKey(record.getKey())).thenReturn(record);
 
@@ -158,8 +139,8 @@ public class SecurityUtilsTest {
 
     @Test
     public void isRecordInUsersInstitutionReturnsFalseWhenRecordBelongsToInstitutionDifferentFromCurrentUsers() {
-        Environment.setCurrentUser(user);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        Environment.setCurrentUser(admin);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
         Institution institutionAnother = Generator.generateInstitution();
         institutionAnother.setKey(IdentificationUtils.generateKey());
         User userFromAnotherInstitution = Generator.generateUser(institutionAnother, this.adminRoleGroup);
@@ -179,14 +160,14 @@ public class SecurityUtilsTest {
                              .header("typ", "JWT")
                              .claim("roles", List.of(SecurityConstants.writeAllUsers))
                              .issuer("http://localhost:8080/termit")
-                             .subject(USERNAME)
-                             .claim("preferred_username", USERNAME)
+                             .subject(admin.getUsername())
+                             .claim("preferred_username", admin.getUsername())
                              .expiresAt(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(300))
                              .build();
         SecurityContext context = new SecurityContextImpl();
         context.setAuthentication(new JwtAuthenticationToken(token));
         SecurityContextHolder.setContext(context);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
 
         final User result = sut.getCurrentUser();
         assertThat(result.getRoleGroup().getRoles(), hasItem(Role.writeAllUsers));
@@ -195,23 +176,23 @@ public class SecurityUtilsTest {
     @Test
     void getCurrentUserEnhancesRetrievedUserWithImpersonatorTypeWhenItHasSwitchAuthorityRole() {
         final UserDetails userDetails =
-                new UserDetails(user, Set.of(new SimpleGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)));
+                new UserDetails(admin, Set.of(new SimpleGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)));
         SecurityUtils.setCurrentUser(userDetails);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
         final User result = sut.getCurrentUser();
-        assertEquals(user, result);
+        assertEquals(admin, result);
         assertTrue(result.isImpersonated());
     }
 
     @Test
     void getCurrentUserReturnsCopyOfInstanceRetrievedFromRepository() {
         final UserDetails userDetails =
-                new UserDetails(user, Set.of(new SimpleGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)));
+                new UserDetails(admin, Set.of(new SimpleGrantedAuthority(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR)));
         SecurityUtils.setCurrentUser(userDetails);
-        when(userDao.findByUsername(user.getUsername())).thenReturn(user);
+        when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
         final User result = sut.getCurrentUser();
 
-        assertNotSame(user, result);
-        assertEquals(user, result);
+        assertNotSame(admin, result);
+        assertEquals(admin, result);
     }
 }

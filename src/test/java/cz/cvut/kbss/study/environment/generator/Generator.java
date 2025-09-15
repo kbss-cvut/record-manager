@@ -4,6 +4,7 @@ import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.model.*;
 import cz.cvut.kbss.study.model.qam.Answer;
 import cz.cvut.kbss.study.model.qam.Question;
+import cz.cvut.kbss.study.util.IdentificationUtils;
 
 import java.net.URI;
 import java.util.*;
@@ -181,6 +182,7 @@ public class Generator {
         final Institution org = new Institution();
         org.setName("RandomInstitution" + randomInt());
         org.setUri(generateUri());
+        org.setKey(IdentificationUtils.generateKey());
         return org;
     }
 

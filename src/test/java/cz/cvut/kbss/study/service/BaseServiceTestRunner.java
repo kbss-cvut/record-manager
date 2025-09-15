@@ -5,17 +5,11 @@ import cz.cvut.kbss.study.environment.config.TestPersistenceConfig;
 import cz.cvut.kbss.study.environment.config.TestServiceConfig;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.ConfigDataApplicationContextInitializer;
-import cz.cvut.kbss.study.persistence.dao.InstitutionDao;
-import cz.cvut.kbss.study.persistence.dao.RoleGroupDao;
-import cz.cvut.kbss.study.persistence.dao.UserDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,38 +21,22 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("test")
 public abstract class BaseServiceTestRunner extends TransactionalTestRunner {
 
-    @Autowired
-    private UserDao userDao;
-
-    @Autowired
-    private InstitutionDao institutionDao;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    protected User admin;
 
     protected User user;
 
-    @Autowired
-    private RoleGroupDao roleGroupDao;
-
     protected RoleGroup adminRoleGroup;
 
-    public static final String USERNAME = "halsey";
-    public static final String PASSWORD = "john117";
-    public static final String EMAIL = "john117@gmail.com";
+    protected RoleGroup userRoleGroup;
+
+    protected Institution institution;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        Institution institution = Generator.generateInstitution();
+    public void setUp() {
+        this.institution = Generator.generateInstitution();
         this.adminRoleGroup = Generator.generateAdminRoleGroup();
-        user = Generator.getUser(USERNAME, PASSWORD, "John", "Grant", EMAIL, institution, this.adminRoleGroup);
-        transactional(() -> {
-            roleGroupDao.persist(this.adminRoleGroup);
-            institutionDao.persist(institution);
-            if (userDao.findByUsername(user.getUsername()) == null) {
-                user.encodePassword(passwordEncoder);
-                userDao.persist(user);
-            }
-        });
+        this.userRoleGroup = Generator.generateRoleGroupWithRoles();
+        this.admin = Generator.generateUser(institution, adminRoleGroup);
+        this.user = Generator.generateUser(institution, this.userRoleGroup);
     }
 }
