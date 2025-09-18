@@ -33,6 +33,14 @@ public class RoleGroup implements Serializable, HasUri {
         }
     }
 
+    public boolean hasRole(Role role){
+        return roles.contains(role);
+    }
+
+    public boolean hasRoles(Set<Role> roles){
+        return roles.stream().anyMatch(roles::contains);
+    }
+
     public URI getUri() {
         return uri;
     }

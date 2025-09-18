@@ -52,7 +52,7 @@ public class PatientRecordController extends BaseController {
     private final RestTemplate restTemplate;
     private final ConfigReader configReader;
     private final PublishRecordsService publishRecordsService;
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     private final UserService userService;
 
     public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher,
@@ -77,15 +77,6 @@ public class PatientRecordController extends BaseController {
             @RequestParam(value = "institution", required = false) String institutionKey,
             @RequestParam MultiValueMap<String, String> params,
             UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean hasReadAllRecords = authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals(SecurityConstants.readAllRecords));
-
-        if (!hasReadAllRecords && institutionKey == null) {
-            throw new ValidationException("record.save-error.user-not-assigned-to-institution",
-                    "User is not assigned to any institution.");
-        }
         final Page<PatientRecordDto> result = recordService.findAll(RecordFilterMapper.constructRecordFilter(params),
                                                                     RestUtils.resolvePaging(params));
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));

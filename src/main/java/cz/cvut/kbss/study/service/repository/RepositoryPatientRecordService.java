@@ -11,6 +11,7 @@ import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
+import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
@@ -54,6 +55,13 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Transactional(readOnly = true)
     @Override
     public Page<PatientRecordDto> findAll(RecordFilterParams filters, Pageable pageSpec) {
+        User currentUser = securityUtils.getCurrentUser();
+        boolean hasReadAllRecords = currentUser.getRoleGroup().hasRole(Role.valueOf(SecurityConstants.readAllRecords));
+
+        if(currentUser.getInstitution() == null && !hasReadAllRecords) {
+            filters.setAuthor(currentUser.getUsername());
+        }
+
         return recordDao.findAllRecords(filters, pageSpec);
     }
 
