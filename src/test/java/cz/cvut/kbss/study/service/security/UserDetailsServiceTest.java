@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 public class UserDetailsServiceTest extends BaseServiceTestRunner {
 
     @InjectMocks
-    private UserDetailsService userDetailsService;
+    private UserDetailsService sut;
 
     @Mock
     private UserDao userDao;
@@ -24,7 +24,7 @@ public class UserDetailsServiceTest extends BaseServiceTestRunner {
     @Test
     void loadUserByUsernameReturnsUserDetailsWhenUserExists() {
         when(userDao.findByUsername(this.admin.getUsername())).thenReturn(this.admin);
-        UserDetails result = userDetailsService.loadUserByUsername(this.admin.getUsername());
+        UserDetails result = sut.loadUserByUsername(this.admin.getUsername());
         assertNotNull(result);
         assertEquals(admin.getUsername(), result.getUsername());
         assertEquals(admin.getPassword(), result.getPassword());
@@ -36,7 +36,7 @@ public class UserDetailsServiceTest extends BaseServiceTestRunner {
     void loadUserByUsername_ThrowsUsernameNotFoundException_WhenUserDoesNotExist() {
         when(userDao.findByUsername("nonexistent")).thenReturn(null);
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () ->
-                userDetailsService.loadUserByUsername("nonexistent"));
+                sut.loadUserByUsername("nonexistent"));
         assertEquals("User with username 'nonexistent' does not exist.", exception.getMessage());
         verify(userDao).findByUsername("nonexistent");
     }

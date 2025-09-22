@@ -11,11 +11,9 @@ import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
 import java.util.Date;
@@ -37,7 +35,7 @@ import static org.mockito.Mockito.when;
 class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
 
     @InjectMocks
-    private RepositoryPatientRecordService repositoryPatientRecordService;
+    private RepositoryPatientRecordService sut;
 
     @Mock
     private PatientRecordDao recordDao;
@@ -57,7 +55,7 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         when(recordDao.exists(any())).thenReturn(false);
 
-        final RecordImportResult result = repositoryPatientRecordService.importRecords(toImport);
+        final RecordImportResult result = sut.importRecords(toImport);
         assertEquals(toImport.size(), result.getTotalCount());
         assertEquals(toImport.size(), result.getImportedCount());
         assertThat(result.getErrors(), anyOf(nullValue(), empty()));
@@ -93,7 +91,7 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
         when(recordDao.exists(any())).thenReturn(false);
 
-        repositoryPatientRecordService.importRecords(toImport);
+        sut.importRecords(toImport);
         final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
         verify(recordDao, times(toImport.size())).persist(captor.capture());
         final List<PatientRecord> imported = captor.getAllValues();
@@ -114,7 +112,7 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.adminRoleGroup);
         final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
         when(userService.exists(originalAuthor.getUri())).thenReturn(false);
-        assertThrows(RecordAuthorNotFoundException.class, () -> repositoryPatientRecordService.importRecords(toImport));
+        assertThrows(RecordAuthorNotFoundException.class, () -> sut.importRecords(toImport));
     }
 
     @Test
@@ -129,7 +127,7 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         when(recordDao.exists(existing.getUri())).thenReturn(true);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
 
-        final RecordImportResult result = repositoryPatientRecordService.importRecords(toImport);
+        final RecordImportResult result = sut.importRecords(toImport);
         assertEquals(toImport.size(), result.getTotalCount());
         assertEquals(toImport.size() - 1, result.getImportedCount());
         assertEquals(1, result.getErrors().size());
@@ -147,7 +145,7 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         when(recordDao.exists(any())).thenReturn(false);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
 
-        repositoryPatientRecordService.importRecords(toImport, targetPhase);
+        sut.importRecords(toImport, targetPhase);
         final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
         verify(recordDao, times(toImport.size())).persist(captor.capture());
         captor.getAllValues().forEach(r -> assertEquals(targetPhase, r.getPhase()));
@@ -162,7 +160,7 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         when(recordDao.exists(any())).thenReturn(false);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
 
-        repositoryPatientRecordService.importRecords(toImport);
+        sut.importRecords(toImport);
         final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
         verify(recordDao, times(toImport.size())).persist(captor.capture());
         captor.getAllValues().forEach(r -> assertEquals(RecordPhase.open, r.getPhase()));

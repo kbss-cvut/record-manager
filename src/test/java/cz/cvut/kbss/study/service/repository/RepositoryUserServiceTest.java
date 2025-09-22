@@ -1,15 +1,12 @@
 package cz.cvut.kbss.study.service.repository;
 
-import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.exception.NotFoundException;
-import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.BaseServiceTestRunner;
 import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,7 +22,7 @@ import static org.mockito.Mockito.when;
 public class RepositoryUserServiceTest extends BaseServiceTestRunner {
 
     @InjectMocks
-    private RepositoryUserService userService;
+    private RepositoryUserService sut;
 
     @Mock
     private UserDao userDao;;
@@ -39,7 +36,7 @@ public class RepositoryUserServiceTest extends BaseServiceTestRunner {
     @Test
     void findByUsernameReturnsUserWhenUserExists() {
         when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
-        User result = userService.findByUsername(admin.getUsername());
+        User result = sut.findByUsername(admin.getUsername());
         assertEquals(admin, result);
         verify(userDao).findByUsername(admin.getUsername());
     }
@@ -47,7 +44,7 @@ public class RepositoryUserServiceTest extends BaseServiceTestRunner {
     @Test
     void findByUsernameReturnsNullWhenUserDoesNotExist() {
         when(userDao.findByUsername(anyString())).thenReturn(null);
-        User result = userService.findByUsername("nonexistent");
+        User result = sut.findByUsername("nonexistent");
         assertNull(result);
         verify(userDao).findByUsername("nonexistent");
     }
@@ -56,7 +53,7 @@ public class RepositoryUserServiceTest extends BaseServiceTestRunner {
     void getCurrentUserReturnsUserFromSecurityUtils() {
         Environment.setCurrentUser(admin);
         when(securityUtils.getCurrentUser()).thenReturn(admin);
-        User result = userService.getCurrentUser();
+        User result = sut.getCurrentUser();
         assertEquals(admin, result);
         verify(securityUtils).getCurrentUser();
     }
@@ -65,7 +62,7 @@ public class RepositoryUserServiceTest extends BaseServiceTestRunner {
     void findByInstitutionReturnsUsersForInstitution() {
         List<User> users = List.of(admin, user);
         when(userDao.findByInstitution(institution)).thenReturn(users);
-        List<User> result = userService.findByInstitution(institution);
+        List<User> result = sut.findByInstitution(institution);
         assertEquals(users, result);
         verify(userDao).findByInstitution(institution);
     }
@@ -73,7 +70,7 @@ public class RepositoryUserServiceTest extends BaseServiceTestRunner {
     @Test
     void findByEmailReturnsUserWhenEmailExists() {
         when(userDao.findByEmail(admin.getEmailAddress())).thenReturn(admin);
-        User result = userService.findByEmail(admin.getEmailAddress());
+        User result = sut.findByEmail(admin.getEmailAddress());
         assertEquals(admin, result);
         verify(userDao).findByEmail(admin.getEmailAddress());
     }
@@ -82,7 +79,7 @@ public class RepositoryUserServiceTest extends BaseServiceTestRunner {
     void findByEmailThrowsNotFoundExceptionWhenEmailDoesNotExist() {
         when(userDao.findByEmail(anyString())).thenReturn(null);
         NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> userService.findByEmail("nonexistent@example.com"));
+                () -> sut.findByEmail("nonexistent@example.com"));
         assertEquals("Could not find user by email 'nonexistent@example.com'.", exception.getMessage());
         verify(userDao).findByEmail("nonexistent@example.com");
     }
@@ -90,7 +87,7 @@ public class RepositoryUserServiceTest extends BaseServiceTestRunner {
     @Test
     void findByTokenReturnsUserWhenTokenExists() {
         when(userDao.findByToken("token123")).thenReturn(admin);
-        User result = userService.findByToken("token123");
+        User result = sut.findByToken("token123");
         assertEquals(admin, result);
         verify(userDao).findByToken("token123");
     }
