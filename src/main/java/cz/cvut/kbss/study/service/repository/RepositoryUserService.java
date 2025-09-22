@@ -217,15 +217,30 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
             throw new EntityNotFoundException("User with specified username does not exist.");
         }
 
+        boolean differentUser = !Objects.equals(instance.getUsername(), currentUser.getUsername());
+
         boolean hasWriteAllUsers = securityUtils.hasRole(Role.writeAllUsers);
-        boolean hasHigherPrivileges = securityUtils.hasHigherPrivileges(currentUser, original);
+        boolean lacksPrivilegeOfUpdatedUser = !securityUtils.hasHigherPrivileges(currentUser, original);
 
         boolean sameInstitution = instance.getInstitution() == null
                 || instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey());
-        boolean sameUser = Objects.equals(instance.getUsername(), currentUser.getUsername());
+        boolean hasWriteOrganizationUsers = securityUtils.hasRole(Role.writeOrganizationUsers) && sameInstitution;
 
-        if ((!sameUser && !hasWriteAllUsers && !(sameInstitution && securityUtils.hasRole(Role.writeOrganizationUsers))) && !hasHigherPrivileges) {
-            throw new UnauthorizedException("Cannot update user.");
+        boolean noWriteToUpdatedUser = !(hasWriteAllUsers || hasWriteOrganizationUsers);
+
+        if (differentUser) {
+            if (noWriteToUpdatedUser) {
+                throw new UnauthorizedException(String.format("Cannot update user %s as current user %s does not have write permission to update it.",
+                        original.getUsername(),
+                        currentUser.getUsername()));
+            }
+            if (lacksPrivilegeOfUpdatedUser) {
+                throw new UnauthorizedException(String.format(
+                        "Cannot update user with privileges %s as they are no subset of privileges %s belonging to the current user %s.",
+                        original.getRoleGroup().getRoles().toString(),
+                        currentUser.getRoleGroup().getRoles().toString(),
+                        currentUser.getUsername()));
+            }
         }
 
         try {
