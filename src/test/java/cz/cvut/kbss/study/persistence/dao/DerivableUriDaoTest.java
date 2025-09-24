@@ -25,11 +25,11 @@ public class DerivableUriDaoTest extends BaseDaoTestRunner {
     @Test
     public void persistedInstanceHasGeneratedUri(){
         final Institution institution = Generator.generateInstitution();
-        final RoleGroup roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        final User user = Generator.generateUser(institution, roleGroupAdmin);
+        final RoleGroup adminRoleGroup = Generator.generateAdminRoleGroup();
+        final User user = Generator.generateUser(institution, adminRoleGroup);
 
         transactional(() -> {
-            roleGroupDao.persist(roleGroupAdmin);
+            roleGroupDao.persist(adminRoleGroup);
             institutionDao.persist(institution);
             userDao.persist(user);
         });

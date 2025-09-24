@@ -1,12 +1,7 @@
 package cz.cvut.kbss.study.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cz.cvut.kbss.jopa.model.annotations.FetchType;
-import cz.cvut.kbss.jopa.model.annotations.Id;
-import cz.cvut.kbss.jopa.model.annotations.OWLClass;
-import cz.cvut.kbss.jopa.model.annotations.OWLDataProperty;
-import cz.cvut.kbss.jopa.model.annotations.OWLObjectProperty;
-import cz.cvut.kbss.jopa.model.annotations.ParticipationConstraints;
+import cz.cvut.kbss.jopa.model.annotations.*;
 import cz.cvut.kbss.study.model.util.HasDerivableUri;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
@@ -59,6 +54,9 @@ public class User implements HasDerivableUri, Serializable {
 
     @OWLObjectProperty(iri = Vocabulary.s_p_has_role_group, fetch = FetchType.EAGER)
     private RoleGroup roleGroup;
+
+    @Transient
+    private boolean isImpersonated = false;
 
     public User() {
 
@@ -140,15 +138,12 @@ public class User implements HasDerivableUri, Serializable {
         this.roleGroup = roleGroup;
     }
 
-    /**
-     * Returns true if this user is an admin.
-     * <p>
-     * That is, it has an admin type.
-     *
-     * @return {@code true} if this is admin, {@code false} otherwise
-     */
-    public boolean isAdmin() {
-        return roleGroup != null && roleGroup.getRoles().contains(Role.administrator);
+    public boolean isImpersonated() {
+        return isImpersonated;
+    }
+
+    public void setImpersonated(boolean impersonated) {
+        isImpersonated = impersonated;
     }
 
     public String getToken() {
@@ -206,6 +201,7 @@ public class User implements HasDerivableUri, Serializable {
         copy.setIsInvited(isInvited);
         copy.setToken(token);
         copy.setRoleGroup(roleGroup);
+        copy.setImpersonated(isImpersonated);
         return copy;
     }
 

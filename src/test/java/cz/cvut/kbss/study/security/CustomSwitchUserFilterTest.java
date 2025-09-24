@@ -38,10 +38,10 @@ class CustomSwitchUserFilterTest {
     @Test
     void attemptSwitchUserSwitchesCurrentUserToTarget() {
         final User source = Generator.generateUser(null, null);
-        source.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
+        source.setRoleGroup(Generator.generateAdminRoleGroup());
         Environment.setCurrentUser(source);
         final User target = Generator.generateUser(null, null);
-        target.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.user));
+        target.setRoleGroup(Generator.generateRoleGroupWithRoles());
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("username", target.getUsername());
@@ -51,12 +51,12 @@ class CustomSwitchUserFilterTest {
 
     @Test
     void attemptSwitchUserThrowsBadRequestExceptionWhenTargetUserIsAdmin() {
-        RoleGroup roleGroup = Generator.generateRoleGroupWithRoles(Role.administrator);
+        RoleGroup roleGroup = Generator.generateAdminRoleGroup();
         final User source = Generator.generateUser(null, roleGroup);
-        source.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
+        source.setRoleGroup(Generator.generateAdminRoleGroup());
         Environment.setCurrentUser(source);
         final User target = Generator.generateUser(null, roleGroup);
-        target.setRoleGroup(Generator.generateRoleGroupWithRoles(Role.administrator));
+        target.setRoleGroup(Generator.generateAdminRoleGroup());
         when(userDetailsService.loadUserByUsername(target.getUsername())).thenReturn(new UserDetails(target));
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("username", target.getUsername());

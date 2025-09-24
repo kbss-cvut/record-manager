@@ -26,9 +26,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SecurityUtils {
@@ -83,13 +81,12 @@ public class SecurityUtils {
         } else {
             final String username = context.getAuthentication().getName();
             final User user = userDao.findByUsername(username).copy();
-            if (context.getAuthentication().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(
-                    SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR))) {
-                user.getRoleGroup().addRole(cz.cvut.kbss.study.model.Role.impersonate);
-            }
+            user.setImpersonated(context.getAuthentication().getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR)));
             return user;
         }
     }
+
 
     private User resolveAccountFromOAuthPrincipal(Jwt principal) {
         final OidcUserInfo userInfo = new OidcUserInfo(principal.getClaims());
@@ -99,14 +96,25 @@ public class SecurityUtils {
             throw new NotFoundException(
                     "User with username '" + userInfo.getPreferredUsername() + "' not found in repository.");
         }
-        RoleGroup roleGroup = new RoleGroup();
+
+        RoleGroup roleGroup = createRoleGroupFromPrincipal(principal);
         user.setRoleGroup(roleGroup);
-        roles.stream()
-                .map(Role::fromIriOrName)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(roleGroup::addRole);
+
         return user;
+    }
+
+    private RoleGroup createRoleGroupFromPrincipal(Jwt principal) {
+        RoleGroup roleGroup = new RoleGroup();
+        List<String> roles = new OidcGrantedAuthoritiesExtractor(config).extractRoles(principal);
+
+        if (roles != null) {
+            roles.stream()
+                    .map(Role::fromIriOrName)
+                    .flatMap(Optional::stream)
+                    .forEach(roleGroup::addRole);
+        }
+
+        return roleGroup;
     }
 
     /**
@@ -200,5 +208,27 @@ public class SecurityUtils {
         } catch (Exception e) {
             throw new SecurityException("Error exchanging token", e);
         }
+    }
+
+    public boolean hasRole(Role role) {
+        final User user = getCurrentUser();
+
+        if(user.getRoleGroup().getRoles() != null){
+            return user.getRoleGroup().getRoles().contains(role);
+        }
+
+        return false;
+    }
+
+    public boolean hasSupersetOfRoles(User u1, User u2) {
+        Set<Role> u1Roles = Optional.ofNullable(u1.getRoleGroup())
+                .map(RoleGroup::getRoles)
+                .orElse(Collections.emptySet());
+
+        Set<Role> u2Roles = Optional.ofNullable(u2.getRoleGroup())
+                .map(RoleGroup::getRoles)
+                .orElse(Collections.emptySet());
+
+        return u1Roles.containsAll(u2Roles);
     }
 }

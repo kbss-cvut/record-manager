@@ -58,20 +58,20 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Autowired
     private RoleGroupDao roleGroupDao;
 
-    RoleGroup roleGroupAdmin;
+    RoleGroup adminRoleGroup;
 
     @BeforeEach
     public void setUp() {
-        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        transactional(() -> roleGroupDao.persist(roleGroupAdmin));
+        this.adminRoleGroup = Generator.generateAdminRoleGroup();
+        transactional(() -> roleGroupDao.persist(adminRoleGroup));
     }
 
     @Test
     public void findByInstitutionReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
         Institution institutionOther = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institutionOther, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institutionOther, this.adminRoleGroup);
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord recordOther = Generator.generatePatientRecord(user2);
@@ -97,8 +97,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     public void findAllRecordsReturnAllRecords() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution1, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution2, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution1, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution2, this.adminRoleGroup);
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord record3 = Generator.generatePatientRecord(user2);
@@ -121,7 +121,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     public void getNumberOfProcessedRecords() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         PatientRecord record1 = Generator.generatePatientRecord(user);
         PatientRecord record2 = Generator.generatePatientRecord(user);
         transactional(() -> {
@@ -139,8 +139,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     public void findByAuthorReturnsMatchingRecords() {
         Institution institution = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution, this.adminRoleGroup);
         PatientRecord record1 = Generator.generatePatientRecord(user1);
         PatientRecord record2 = Generator.generatePatientRecord(user1);
         PatientRecord record3 = Generator.generatePatientRecord(user2);
@@ -165,7 +165,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     void persistGeneratesIdentifierBeforeSavingRecord() {
         final Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
-        final User author = Generator.generateUser(institution, this.roleGroupAdmin);
+        final User author = Generator.generateUser(institution, this.adminRoleGroup);
         author.generateUri();
         transactional(() -> {
             em.persist(author);
@@ -184,7 +184,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     private User generateAuthorWithInstitution() {
         final Institution institution = Generator.generateInstitution();
         institution.setKey(IdentificationUtils.generateKey());
-        final User author = Generator.generateUser(institution, this.roleGroupAdmin);
+        final User author = Generator.generateUser(institution, this.adminRoleGroup);
         author.generateUri();
         transactional(() -> {
             em.persist(author);
@@ -286,7 +286,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         }).toList();
 
         final Page<PatientRecord> result =
-                sut.findAllRecordsFull(new RecordFilterParams(null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
+                sut.findAllRecordsFull(new RecordFilterParams(null, null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        Pageable.unpaged());
         assertFalse(result.isEmpty());
         assertThat(result.getContent(), containsSameEntities(expected));
@@ -325,7 +325,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         }).toList();
 
         final Page<PatientRecord> result =
-                sut.findAllRecordsFull(new RecordFilterParams(institution.getKey(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
+                sut.findAllRecordsFull(new RecordFilterParams(null, institution.getKey(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        Pageable.unpaged());
         assertFalse(result.isEmpty());
         assertThat(result.getContent(), containsSameEntities(expected));
@@ -439,7 +439,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         final int pageSize = 3;
 
         final Page<PatientRecordDto> result =
-                sut.findAllRecords(new RecordFilterParams(null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
+                sut.findAllRecords(new RecordFilterParams(null,null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        PageRequest.of(0, pageSize, Sort.Direction.ASC, RecordSort.SORT_DATE_PROPERTY));
         assertEquals(Math.min(pageSize, allMatching.size()), result.getNumberOfElements());
         assertEquals(allMatching.size(), result.getTotalElements());

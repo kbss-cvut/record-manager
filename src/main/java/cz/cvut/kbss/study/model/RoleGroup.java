@@ -27,6 +27,19 @@ public class RoleGroup implements Serializable, HasUri {
         roles.add(role);
     }
 
+    public void addRoles(Role ... roles) {
+        if (roles != null) {
+            this.roles.addAll(Set.of(roles));
+        }
+    }
+
+    public boolean hasRole(Role role){
+        return roles.contains(role);
+    }
+
+    public boolean hasRoles(Set<Role> roles){
+        return roles.stream().anyMatch(roles::contains);
+    }
 
     public URI getUri() {
         return uri;

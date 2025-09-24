@@ -1,9 +1,11 @@
 package cz.cvut.kbss.study.service.repository;
 
+import cz.cvut.kbss.jopa.exceptions.EntityNotFoundException;
 import cz.cvut.kbss.study.exception.EntityExistsException;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
@@ -208,11 +210,38 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     @Override
     protected void preUpdate(User instance) {
         final User currentUser = securityUtils.getCurrentUser();
-        if (!currentUser.isAdmin()
-            && (!instance.getRoleGroup().getRoles().equals(currentUser.getRoleGroup().getRoles()) || (instance.getInstitution() != null
-            && !instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey())))) {
-            throw new UnauthorizedException("Cannot update user.");
+        final User original = userDao.findByUsername(instance.getUsername());
+
+        if(original == null) {
+            throw new EntityNotFoundException("User with specified username does not exist.");
         }
+
+        boolean differentUser = !Objects.equals(instance.getUsername(), currentUser.getUsername());
+
+        boolean hasWriteAllUsers = securityUtils.hasRole(Role.writeAllUsers);
+        boolean lacksPrivilegeOfUpdatedUser = !securityUtils.hasSupersetOfRoles(currentUser, original);
+
+        boolean sameInstitution = instance.getInstitution() == null
+                || instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey());
+        boolean hasWriteOrganizationUsers = securityUtils.hasRole(Role.writeOrganizationUsers) && sameInstitution;
+
+        boolean noWriteToUpdatedUser = !(hasWriteAllUsers || hasWriteOrganizationUsers);
+
+        if (differentUser) {
+            if (noWriteToUpdatedUser) {
+                throw new UnauthorizedException(String.format("Cannot update user %s as current user %s does not have write permission to update it.",
+                        original.getUsername(),
+                        currentUser.getUsername()));
+            }
+            if (lacksPrivilegeOfUpdatedUser) {
+                throw new UnauthorizedException(String.format(
+                        "Cannot update user with privileges %s as they are no subset of privileges %s belonging to the current user %s.",
+                        original.getRoleGroup().getRoles().toString(),
+                        currentUser.getRoleGroup().getRoles().toString(),
+                        currentUser.getUsername()));
+            }
+        }
+
         try {
             Validator.validateEmail(instance.getEmailAddress());
         } catch (IllegalStateException e) {

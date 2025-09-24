@@ -5,11 +5,13 @@ import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
 import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.RecordPhase;
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
+import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.PatientRecordService;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
@@ -53,6 +55,13 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Transactional(readOnly = true)
     @Override
     public Page<PatientRecordDto> findAll(RecordFilterParams filters, Pageable pageSpec) {
+        User currentUser = securityUtils.getCurrentUser();
+        boolean hasReadAllRecords = currentUser.getRoleGroup().hasRole(Role.valueOf(SecurityConstants.readAllRecords));
+
+        if(currentUser.getInstitution() == null && !hasReadAllRecords) {
+            filters.setAuthor(currentUser.getUsername());
+        }
+
         return recordDao.findAllRecords(filters, pageSpec);
     }
 
@@ -106,19 +115,21 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
         return result;
     }
 
+    // TODO reconsider the logic for new roles
     private void setImportedRecordProvenance(User currentUser, Date now, Optional<RecordPhase> targetPhase,
                                              PatientRecord record) {
-        if (!currentUser.isAdmin()) {
+
+        if(currentUser.getRoleGroup().getRoles().containsAll(List.of(Role.readAllOrganizations, Role.readAllUsers, Role.rejectRecords, Role.completeRecords))){
+            targetPhase.ifPresent(record::setPhase);
+            if (!userService.exists(record.getAuthor().getUri())) {
+                throw new RecordAuthorNotFoundException("Author of record " + record + " not found during import.");
+            }
+        }else{
             record.setAuthor(currentUser);
             record.setLastModifiedBy(currentUser);
             record.setInstitution(currentUser.getInstitution());
             record.setDateCreated(now);
             targetPhase.ifPresentOrElse(record::setPhase, () -> record.setPhase(RecordPhase.open));
-        } else {
-            targetPhase.ifPresent(record::setPhase);
-            if (!userService.exists(record.getAuthor().getUri())) {
-                throw new RecordAuthorNotFoundException("Author of record " + record + " not found during import.");
-            }
         }
     }
 

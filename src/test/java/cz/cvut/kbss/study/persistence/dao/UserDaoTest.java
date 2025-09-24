@@ -7,9 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,16 +24,13 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @Autowired
     private RoleGroupDao roleGroupDao;
 
-    private RoleGroup roleGroupAdmin;
-    private RoleGroup roleGroupUser;
+    private RoleGroup adminRoleGroup;
 
     @BeforeEach
     public void setUp() {
-        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        this.roleGroupUser = Generator.generateRoleGroupWithRoles(Role.user);
+        this.adminRoleGroup = Generator.generateAdminRoleGroup();
        transactional(() -> {
-            roleGroupDao.persist(this.roleGroupAdmin);
-            roleGroupDao.persist(this.roleGroupUser);
+            roleGroupDao.persist(this.adminRoleGroup);
         });
     }
 
@@ -88,7 +83,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @Test
     public void getUsersByToken() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setToken("Token");
 
         transactional(() -> {
@@ -107,8 +102,8 @@ public class UserDaoTest extends BaseDaoTestRunner {
     public void getUsersByInstitution() {
         Institution institution1 = Generator.generateInstitution();
         Institution institution2 = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution1, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution1, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution1, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution1, this.adminRoleGroup);
 
         transactional(() -> {
             institutionDao.persist(institution1);
@@ -132,9 +127,18 @@ public class UserDaoTest extends BaseDaoTestRunner {
     @Test
     public void getNumberOfInvestigators() {
         Institution institution = Generator.generateInstitution();
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupUser);
-        User user3 = Generator.generateUser(institution, this.roleGroupUser);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+
+        RoleGroup writeAllRecordsRoleGroup = Generator.generateRoleGroupWithRoles(Role.writeAllRecords);
+        RoleGroup writeOrganizationRecords =  Generator.generateRoleGroupWithRoles(Role.writeOrganizationRecords);
+
+        transactional(() -> {
+            roleGroupDao.persist(writeAllRecordsRoleGroup);
+            roleGroupDao.persist(writeOrganizationRecords);
+        });
+
+        User user2 = Generator.generateUser(institution, writeAllRecordsRoleGroup);
+        User user3 = Generator.generateUser(institution, writeOrganizationRecords);
 
 
         transactional(() -> {
@@ -150,7 +154,7 @@ public class UserDaoTest extends BaseDaoTestRunner {
 
     private User getPersistedUser() {
         Institution institution = Generator.generateInstitution();
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         transactional(() -> {
             institutionDao.persist(institution);
             userDao.persist(user);

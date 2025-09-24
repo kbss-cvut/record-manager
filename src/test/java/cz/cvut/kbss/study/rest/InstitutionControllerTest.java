@@ -53,8 +53,8 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
     public void setUp() {
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
-        RoleGroup roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        User user = Generator.generateUser(institution, roleGroupAdmin);
+        RoleGroup adminRoleGroup = Generator.generateAdminRoleGroup();
+        User user = Generator.generateUser(institution, adminRoleGroup);
         Environment.setCurrentUser(user);
     }
 

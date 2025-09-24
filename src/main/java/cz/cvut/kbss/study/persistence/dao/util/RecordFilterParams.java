@@ -11,6 +11,8 @@ import java.util.Set;
  */
 public class RecordFilterParams {
 
+    private String author;
+
     private String institutionKey;
 
     private LocalDate minModifiedDate = LocalDate.EPOCH;
@@ -28,15 +30,20 @@ public class RecordFilterParams {
         this.institutionKey = institutionKey;
     }
 
-    // This one mainly is for test data setup
-    public RecordFilterParams(String institutionKey, LocalDate minModifiedDate, LocalDate maxModifiedDate,
+
+    public RecordFilterParams(String author, String institutionKey, LocalDate minModifiedDate, LocalDate maxModifiedDate,
                               Set<String> phaseIds, Set<String> formTemplateIds) {
+        this.author = author;
         this.institutionKey = institutionKey;
         this.minModifiedDate = minModifiedDate;
         this.maxModifiedDate = maxModifiedDate;
         this.phaseIds = phaseIds;
         this.formTemplateIds = formTemplateIds;
     }
+
+    public Optional<String> getAuthor() { return Optional.ofNullable(author); }
+
+    public void setAuthor(String author) { this.author = author; }
 
     public Optional<String> getInstitutionKey() {
         return Optional.ofNullable(institutionKey);
@@ -86,7 +93,8 @@ public class RecordFilterParams {
         if (!(o instanceof RecordFilterParams that)) {
             return false;
         }
-        return Objects.equals(institutionKey, that.institutionKey)
+        return  Objects.equals(this.author, that.author)
+                && Objects.equals(institutionKey, that.institutionKey)
                 && Objects.equals(minModifiedDate, that.minModifiedDate)
                 && Objects.equals(maxModifiedDate, that.maxModifiedDate)
                 && Objects.equals(formTemplateIds, that.formTemplateIds)
@@ -95,13 +103,14 @@ public class RecordFilterParams {
 
     @Override
     public int hashCode() {
-        return Objects.hash(institutionKey, minModifiedDate, maxModifiedDate, formTemplateIds, phaseIds);
+        return Objects.hash(author, institutionKey, minModifiedDate, maxModifiedDate, formTemplateIds, phaseIds);
     }
 
     @Override
     public String toString() {
         return "RecordFilter{" +
-                "institutionKey='" + institutionKey + '\'' +
+                "author='" + author + '\'' +
+                ", institutionKey='" + institutionKey + '\'' +
                 ", minModifiedDate=" + minModifiedDate +
                 ", maxModifiedDate=" + maxModifiedDate +
                 ", formTemplateIds=" + formTemplateIds +

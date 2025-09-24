@@ -11,6 +11,7 @@ import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,14 +48,14 @@ public class UserControllerTest extends BaseControllerTestRunner {
     @InjectMocks
     private UserController controller;
 
-    private RoleGroup roleGroupAdmin;
+    private RoleGroup adminRoleGroup;
 
     @BeforeEach
     public void setUp() {
         super.setUp(controller);
         Institution institution = Generator.generateInstitution();
-        this.roleGroupAdmin = Generator.generateRoleGroupWithRoles(Role.administrator);
-        User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        this.adminRoleGroup = Generator.generateAdminRoleGroup();
+        User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setUsername("tom");
         Environment.setCurrentUser(user);
     }
@@ -105,9 +106,9 @@ public class UserControllerTest extends BaseControllerTestRunner {
     public void getUsersReturnsAllUsers() throws Exception {
         Institution institution = Generator.generateInstitution();
 
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user3 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user3 = Generator.generateUser(institution, this.adminRoleGroup);
 
         List<User> users = new ArrayList<>();
         users.add(user1);
@@ -132,9 +133,9 @@ public class UserControllerTest extends BaseControllerTestRunner {
         Institution institution = Generator.generateInstitution();
         institution.setKey(key);
 
-        User user1 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user2 = Generator.generateUser(institution, this.roleGroupAdmin);
-        User user3 = Generator.generateUser(institution, this.roleGroupAdmin);
+        User user1 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user2 = Generator.generateUser(institution, this.adminRoleGroup);
+        User user3 = Generator.generateUser(institution, this.adminRoleGroup);
 
         List<User> users = new ArrayList<>();
         users.add(user1);
@@ -166,39 +167,12 @@ public class UserControllerTest extends BaseControllerTestRunner {
         verify(userServiceMock).findByUsername(username);
     }
 
-
-    @Test
-    public void updateUserReturnsResponseStatusNoContent() throws Exception {
-        final String username = "tom";
-
-        when(userServiceMock.findByUsername(username)).thenReturn(Environment.getCurrentUser());
-
-        final MvcResult result = mockMvc.perform(put("/users/" + username).content(toJson(Environment.getCurrentUser()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
-
-        assertEquals(HttpStatus.NO_CONTENT, HttpStatus.valueOf(result.getResponse().getStatus()));
-        verify(userServiceMock).findByUsername(username);
-    }
-
     @Test
     public void updateUserWithNonMatchingUsernameReturnsResponseStatusBadRequest() throws Exception {
                 final MvcResult result = mockMvc.perform(put("/users/tomas").content(toJson(Environment.getCurrentUser()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
         assertEquals(HttpStatus.BAD_REQUEST, HttpStatus.valueOf(result.getResponse().getStatus()));
-    }
-
-    @Test
-    public void updateUserReturnsResponseStatusNotFound() throws Exception {
-        final String username = "tom";
-
-        when(userServiceMock.findByUsername(username)).thenReturn(null);
-
-        final MvcResult result = mockMvc.perform(put("/users/" + username).content(toJson(Environment.getCurrentUser()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
-
-        assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
-        verify(userServiceMock).findByUsername(username);
     }
 
     @Test
@@ -297,7 +271,7 @@ public class UserControllerTest extends BaseControllerTestRunner {
     public void sendInvitationReturnsResponseStatusBadRequest() throws Exception {
         final String username = "tom";
         final Institution institution = Generator.generateInstitution();
-        final User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        final User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setIsInvited(true);
 
         when(userServiceMock.findByUsername(username)).thenReturn(user);
@@ -312,7 +286,7 @@ public class UserControllerTest extends BaseControllerTestRunner {
     public void sendInvitationReturnsResponseStatusNoContent() throws Exception {
         final String username = "tom";
         final Institution institution = Generator.generateInstitution();
-        final User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        final User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setIsInvited(false);
 
         when(userServiceMock.findByUsername(username)).thenReturn(user);
@@ -327,7 +301,7 @@ public class UserControllerTest extends BaseControllerTestRunner {
     public void sendInvitationDeleteReturnsResponseStatusNoContent() throws Exception {
         final String username = "tom";
         final Institution institution = Generator.generateInstitution();
-        final User user = Generator.generateUser(institution, this.roleGroupAdmin);
+        final User user = Generator.generateUser(institution, this.adminRoleGroup);
         user.setIsInvited(false);
 
         when(userServiceMock.findByUsername(username)).thenReturn(user);

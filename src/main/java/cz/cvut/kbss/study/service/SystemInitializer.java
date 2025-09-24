@@ -4,13 +4,13 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.model.Vocabulary;
-import cz.cvut.kbss.study.util.Constants;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @ConditionalOnProperty(prefix = "security", name = "provider", havingValue = "internal", matchIfMissing = true)
 @Service
@@ -47,7 +47,7 @@ public class SystemInitializer {
 
     private boolean noAdminExists() {
         return userService.findAll().stream()
-                .noneMatch(user -> user.getRoleGroup() != null && user.getRoleGroup().getRoles().contains(Role.administrator));
+                .noneMatch(user -> user.getRoleGroup() != null && user.getRoleGroup().getRoles().containsAll(Set.of(Role.values())));
     }
 
 
@@ -79,7 +79,7 @@ public class SystemInitializer {
         if (roleGroupService.findByName(ADMIN_ROLE_GROUP_NAME) == null) {
             final RoleGroup roleGroup = new RoleGroup();
             roleGroup.setName(ADMIN_ROLE_GROUP_NAME);
-            roleGroup.addRole(Role.administrator);
+            roleGroup.addRoles(Role.values());
             roleGroup.generateUri();
             roleGroupService.persist(roleGroup);
         }

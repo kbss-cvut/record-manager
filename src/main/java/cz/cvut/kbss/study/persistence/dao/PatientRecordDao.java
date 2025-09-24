@@ -289,14 +289,16 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     }
 
     private void setQueryParameters(Query query, Map<String, Object> queryParams) {
-        query.setParameter("type", typeUri)
-             .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
-            .setParameter("hasFormTemplate", URI.create(Vocabulary.s_p_has_form_template))
-             .setParameter("hasInstitution",
-                           URI.create(Vocabulary.s_p_was_treated_at))
-             .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
-             .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
-             .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified));
+        query
+                .setParameter("type", typeUri)
+                .setParameter("hasAuthor", URI.create(Vocabulary.s_p_has_author))
+                .setParameter("hasUsername", URI.create(Vocabulary.s_p_accountName))
+                .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
+                .setParameter("hasFormTemplate", URI.create(Vocabulary.s_p_has_form_template))
+                .setParameter("hasInstitution", URI.create(Vocabulary.s_p_was_treated_at))
+                .setParameter("hasKey", URI.create(Vocabulary.s_p_key))
+                .setParameter("hasCreatedDate", URI.create(Vocabulary.s_p_created))
+                .setParameter("hasLastModified", URI.create(Vocabulary.s_p_modified));
         queryParams.forEach(query::setParameter);
     }
 
@@ -304,9 +306,11 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         // Could not use Criteria API because it does not support OPTIONAL
         String whereClause = "{" +
                 "?r a ?type ; " +
+                "?hasAuthor ?author ; " +
                 "?hasCreatedDate ?created ; " +
                 "?hasInstitution ?institution . " +
                 "?institution ?hasKey ?institutionKey ." +
+                "?author ?hasUsername ?username ." +
                 "OPTIONAL { ?r ?hasPhase ?phase . } " +
                 "OPTIONAL { ?r ?hasFormTemplate ?formTemplate . } " +
                 "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
@@ -339,6 +343,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
 
     private static String mapParamsToQuery(RecordFilterParams filterParams, Map<String, Object> queryParams) {
         final List<String> filters = new ArrayList<>();
+        filterParams.getAuthor().ifPresent(author -> queryParams.put("username",  new LangString(author, Constants.PU_LANGUAGE)));
         filterParams.getInstitutionKey()
                     .ifPresent(key -> queryParams.put("institutionKey", new LangString(key, Constants.PU_LANGUAGE)));
         filterParams.getMinModifiedDate().ifPresent(date -> {
