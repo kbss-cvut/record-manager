@@ -26,9 +26,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SecurityUtils {
@@ -222,13 +220,15 @@ public class SecurityUtils {
         return false;
     }
 
-    public boolean hasSupersetOfPrivileges(User u1, User u2) {
-        if(u1.getRoleGroup() == null){
-            return false;
-        }else if(u2.getRoleGroup() == null){
-            return true;
-        }else{
-            return u1.getRoleGroup().getRoles().containsAll(u2.getRoleGroup().getRoles());
-        }
+    public boolean hasSupersetOfRoles(User u1, User u2) {
+        Set<Role> u1Roles = Optional.ofNullable(u1.getRoleGroup())
+                .map(RoleGroup::getRoles)
+                .orElse(Collections.emptySet());
+
+        Set<Role> u2Roles = Optional.ofNullable(u2.getRoleGroup())
+                .map(RoleGroup::getRoles)
+                .orElse(Collections.emptySet());
+
+        return u1Roles.containsAll(u2Roles);
     }
 }

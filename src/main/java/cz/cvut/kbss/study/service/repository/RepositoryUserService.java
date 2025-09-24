@@ -219,7 +219,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         boolean differentUser = !Objects.equals(instance.getUsername(), currentUser.getUsername());
 
         boolean hasWriteAllUsers = securityUtils.hasRole(Role.writeAllUsers);
-        boolean lacksPrivilegeOfUpdatedUser = !securityUtils.hasSupersetOfPrivileges(currentUser, original);
+        boolean lacksPrivilegeOfUpdatedUser = !securityUtils.hasSupersetOfRoles(currentUser, original);
 
         boolean sameInstitution = instance.getInstitution() == null
                 || instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey());
