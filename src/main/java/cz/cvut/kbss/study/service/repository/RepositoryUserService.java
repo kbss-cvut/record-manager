@@ -10,7 +10,6 @@ import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
-import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.service.UserService;
@@ -220,7 +219,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         boolean differentUser = !Objects.equals(instance.getUsername(), currentUser.getUsername());
 
         boolean hasWriteAllUsers = securityUtils.hasRole(Role.writeAllUsers);
-        boolean lacksPrivilegeOfUpdatedUser = !securityUtils.hasHigherPrivileges(currentUser, original);
+        boolean lacksPrivilegeOfUpdatedUser = !securityUtils.hasSupersetOfPrivileges(currentUser, original);
 
         boolean sameInstitution = instance.getInstitution() == null
                 || instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey());
