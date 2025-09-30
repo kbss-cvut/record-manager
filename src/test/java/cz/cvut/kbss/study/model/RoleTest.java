@@ -36,4 +36,10 @@ class RoleTest {
         assertEquals(Role.readAllRecords, Role.fromIriOrName(SecurityConstants.readAllRecords.toLowerCase()).get());
     }
 
+    @Test
+    void fromNameHandlesKebabCaseWithSuffix() {
+        String kebabName = "read-all-records-role";
+        assertEquals(Role.readAllRecords, Role.fromName(kebabName).get());
+    }
+
 }

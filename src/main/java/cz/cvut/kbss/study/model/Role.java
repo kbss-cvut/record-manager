@@ -5,6 +5,8 @@ import cz.cvut.kbss.jopa.model.annotations.Individual;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import java.util.Optional;
 
+import static cz.cvut.kbss.study.util.Utils.kebabToCamel;
+
 public enum Role {
 
     @Individual(iri = Vocabulary.s_i_read_all_records_role)
@@ -103,20 +105,25 @@ public enum Role {
     }
 
     /**
-     * Retrieves a role based on its role name.
+     * Retrieves a role based on its name.
      *
-     * <p>This method iterates over all available roles and checks if any role's
-     * name matches the provided name string (case-insensitive). If a match is found,
-     * the corresponding role is returned as an Optional. If no match is found,
-     * an empty Optional is returned.</p>
+     * <p>This method normalizes the provided name by removing a possible "-role"
+     * suffix and converting from kebab-case (e.g., "publish-records-role") to camelCase
+     * (e.g., "publishRecords") before comparison. It then iterates over all available
+     * roles and checks if any role's name matches the normalized name (case-insensitive).
+     * If a match is found, the corresponding role is returned as an Optional.
+     * If no match is found, an empty Optional is returned.</p>
      *
-     * @param name the name of the role to retrieve
+     * @param name the name of the role to retrieve (may include "-role" suffix)
      * @return an Optional containing the corresponding Role if found,
      *         or an empty Optional if no matching role exists
      */
     public static Optional<Role> fromName(String name) {
+        String normalizedInput = name.replaceAll("-role$", "");
+        String camelCaseInput = kebabToCamel(normalizedInput);
+
         for (Role r : values()) {
-            if (r.roleName.equalsIgnoreCase(name)) {
+            if (r.roleName.equalsIgnoreCase(camelCaseInput)) {
                 return Optional.of(r);
             }
         }

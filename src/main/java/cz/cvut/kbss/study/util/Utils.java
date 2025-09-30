@@ -57,4 +57,18 @@ public class Utils {
     public static String uriToString(URI uri) {
         return "<" + uri + ">";
     }
+
+    public static String kebabToCamel(String str) {
+        StringBuilder result = new StringBuilder();
+        boolean upperNext = false;
+        for (char c : str.toCharArray()) {
+            if (c == '-') {
+                upperNext = true;
+            } else {
+                result.append(upperNext ? Character.toUpperCase(c) : c);
+                upperNext = false;
+            }
+        }
+        return result.toString();
+    }
 }
