@@ -211,7 +211,7 @@ public class Generator {
     public static PatientRecordDto generatePatientRecordDto(User author) {
         final PatientRecordDto rec = new PatientRecordDto();
         rec.setLocalName("RandomRecordDto" + randomInt());
-        rec.setAuthor(author.getUri());
+        rec.setAuthor(author);
         rec.setUri(generateUri());
         rec.setInstitution(author.getInstitution());
         return rec;
