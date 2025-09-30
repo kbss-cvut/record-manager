@@ -1,5 +1,6 @@
 package cz.cvut.kbss.study.util.oidc;
 
+import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.util.ConfigParam;
 import org.springframework.core.convert.converter.Converter;
@@ -7,10 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.ClaimAccessor;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OidcGrantedAuthoritiesExtractor implements Converter<Jwt, Collection<SimpleGrantedAuthority>> {
 
@@ -22,7 +20,12 @@ public class OidcGrantedAuthoritiesExtractor implements Converter<Jwt, Collectio
 
     @Override
     public Collection<SimpleGrantedAuthority> convert(Jwt source) {
-        return extractRoles(source).stream().map(SimpleGrantedAuthority::new).toList();
+        return extractRoles(source).stream()
+                .map(Role::fromName)                        
+                .flatMap(Optional::stream)
+                .map(Role::getRoleName)
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     public List<String> extractRoles(ClaimAccessor source) {
