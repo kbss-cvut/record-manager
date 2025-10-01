@@ -22,7 +22,7 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
     private String localName;
 
     @ParticipationConstraints(nonEmpty = true)
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_author)
+    @OWLObjectProperty(iri = Vocabulary.s_p_record_manager_has_author)
     private URI author;
 
     @OWLDataProperty(iri = Vocabulary.s_p_created)
