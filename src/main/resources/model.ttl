@@ -107,6 +107,11 @@ rm:has-role  rdf:type owl:ObjectProperty ;
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/action_type
 rm:action_type rdf:type owl:DatatypeProperty .
 
+
+###  http://onto.fel.cvut.cz/ontologies/form/has-author
+form:has-author rdf:type owl:DatatypeProperty ;
+                       rdfs:subPropertyOf rm:relates-to .
+
 ###  http://onto.fel.cvut.cz/ontologies/form/has-comment-value
 form:has-comment-value rdf:type owl:DatatypeProperty ;
                        rdfs:subPropertyOf rm:relates-to .
