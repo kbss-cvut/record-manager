@@ -33,7 +33,7 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
     private String localName;
 
     @ParticipationConstraints(nonEmpty = true)
-    @OWLObjectProperty(iri = Vocabulary.s_p_has_author, fetch = FetchType.EAGER)
+    @OWLObjectProperty(iri = Vocabulary.s_p_record_manager_has_author, fetch = FetchType.EAGER)
     private User author;
 
     @OWLDataProperty(iri = Vocabulary.s_p_created)
