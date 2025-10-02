@@ -194,7 +194,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
                                                                    new TypeReference<>() {
                                                                    });
         assertEquals(2, body.size());
-        verify(patientRecordServiceMock).findAll(new RecordFilterParams(institution.getKey()), Pageable.unpaged());
+        verify(patientRecordServiceMock).findAll(new RecordFilterParams(Set.of(institution.getKey())), Pageable.unpaged());
     }
 
     @Test
@@ -305,7 +305,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(null,null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()), Pageable.unpaged());
+                new RecordFilterParams(null,Set.of(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()), Pageable.unpaged());
     }
 
     @Test
@@ -340,7 +340,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(null, user.getInstitution().getKey(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
+                new RecordFilterParams(null, Set.of(user.getInstitution().getKey()), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                 Pageable.unpaged());
     }
 
@@ -437,7 +437,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(null,null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
+                new RecordFilterParams(null,Set.of(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                 PageRequest.of(page, pageSize, Sort.Direction.DESC, RecordSort.SORT_DATE_PROPERTY));
     }
 
@@ -485,7 +485,7 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
         });
         assertThat(result, containsSameEntities(records));
         verify(patientRecordServiceMock).findAllFull(
-                new RecordFilterParams(null,null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()), PageRequest.of(0, 50));
+                new RecordFilterParams(null,Set.of(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()), PageRequest.of(0, 50));
         final ArgumentCaptor<PaginatedResultRetrievedEvent> captor =
                 ArgumentCaptor.forClass(PaginatedResultRetrievedEvent.class);
         verify(eventPublisherMock).publishEvent(captor.capture());

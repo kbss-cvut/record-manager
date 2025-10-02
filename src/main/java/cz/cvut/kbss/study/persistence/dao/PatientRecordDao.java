@@ -344,8 +344,10 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     private static String mapParamsToQuery(RecordFilterParams filterParams, Map<String, Object> queryParams) {
         final List<String> filters = new ArrayList<>();
         filterParams.getAuthor().ifPresent(author -> queryParams.put("username",  new LangString(author, Constants.PU_LANGUAGE)));
-        filterParams.getInstitutionKey()
-                    .ifPresent(key -> queryParams.put("institutionKey", new LangString(key, Constants.PU_LANGUAGE)));
+        if(!filterParams.getInstitutionKeys().isEmpty()) {
+            filters.add("FILTER (?institutionKey in (?institutionKeys))");
+            queryParams.put("institutionKeys", filterParams.getInstitutionKeys().stream().map(key -> new LangString(key, Constants.PU_LANGUAGE)).collect(Collectors.toList()));
+        }
         filterParams.getMinModifiedDate().ifPresent(date -> {
             filters.add("FILTER (?date >= ?minDate)");
             queryParams.put("minDate", date.atStartOfDay(ZoneOffset.UTC).toInstant());

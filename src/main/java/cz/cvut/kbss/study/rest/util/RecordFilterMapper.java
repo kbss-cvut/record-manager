@@ -71,7 +71,8 @@ public class RecordFilterMapper {
                 throw new BadRequestException("Value '" + s + "' is not a date in the ISO format.");
             }
         });
-        getSingleValue(INSTITUTION_KEY_PARAM, params).ifPresent(result::setInstitutionKey);
+
+        result.setInstitutionKeys(new HashSet<>(params.getOrDefault(INSTITUTION_KEY_PARAM, Collections.emptyList())));
         result.setPhaseIds(params.getOrDefault(PHASE_ID_PARAM, Collections.emptyList()).stream()
                                  .map(s -> RecordPhase.fromIriOrName(s).getIri()).collect(Collectors.toSet()));
 

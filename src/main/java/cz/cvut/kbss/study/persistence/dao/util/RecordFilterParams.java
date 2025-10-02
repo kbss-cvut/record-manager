@@ -13,7 +13,7 @@ public class RecordFilterParams {
 
     private String author;
 
-    private String institutionKey;
+    private Set<String> institutionKeys = Collections.emptySet();
 
     private LocalDate minModifiedDate = LocalDate.EPOCH;
 
@@ -26,15 +26,15 @@ public class RecordFilterParams {
     public RecordFilterParams() {
     }
 
-    public RecordFilterParams(String institutionKey) {
-        this.institutionKey = institutionKey;
+    public RecordFilterParams(Set<String> institutionKeys) {
+        this.institutionKeys = institutionKeys;
     }
 
 
-    public RecordFilterParams(String author, String institutionKey, LocalDate minModifiedDate, LocalDate maxModifiedDate,
+    public RecordFilterParams(String author, Set<String> institutionKeys, LocalDate minModifiedDate, LocalDate maxModifiedDate,
                               Set<String> phaseIds, Set<String> formTemplateIds) {
         this.author = author;
-        this.institutionKey = institutionKey;
+        this.institutionKeys = institutionKeys;
         this.minModifiedDate = minModifiedDate;
         this.maxModifiedDate = maxModifiedDate;
         this.phaseIds = phaseIds;
@@ -45,12 +45,12 @@ public class RecordFilterParams {
 
     public void setAuthor(String author) { this.author = author; }
 
-    public Optional<String> getInstitutionKey() {
-        return Optional.ofNullable(institutionKey);
+    public Set<String> getInstitutionKeys() {
+        return institutionKeys;
     }
 
-    public void setInstitutionKey(String institutionKey) {
-        this.institutionKey = institutionKey;
+    public void setInstitutionKeys(Set<String> institutionKeys) {
+        this.institutionKeys = institutionKeys;
     }
 
     public Optional<LocalDate> getMinModifiedDate() {
@@ -94,7 +94,7 @@ public class RecordFilterParams {
             return false;
         }
         return  Objects.equals(this.author, that.author)
-                && Objects.equals(institutionKey, that.institutionKey)
+                && Objects.equals(institutionKeys, that.institutionKeys)
                 && Objects.equals(minModifiedDate, that.minModifiedDate)
                 && Objects.equals(maxModifiedDate, that.maxModifiedDate)
                 && Objects.equals(formTemplateIds, that.formTemplateIds)
@@ -103,14 +103,14 @@ public class RecordFilterParams {
 
     @Override
     public int hashCode() {
-        return Objects.hash(author, institutionKey, minModifiedDate, maxModifiedDate, formTemplateIds, phaseIds);
+        return Objects.hash(author, institutionKeys, minModifiedDate, maxModifiedDate, formTemplateIds, phaseIds);
     }
 
     @Override
     public String toString() {
         return "RecordFilter{" +
                 "author='" + author + '\'' +
-                ", institutionKey='" + institutionKey + '\'' +
+                ", institutionKeys='" + institutionKeys + '\'' +
                 ", minModifiedDate=" + minModifiedDate +
                 ", maxModifiedDate=" + maxModifiedDate +
                 ", formTemplateIds=" + formTemplateIds +

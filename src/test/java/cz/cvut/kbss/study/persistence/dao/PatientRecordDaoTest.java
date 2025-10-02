@@ -286,7 +286,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         }).toList();
 
         final Page<PatientRecord> result =
-                sut.findAllRecordsFull(new RecordFilterParams(null, null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
+                sut.findAllRecordsFull(new RecordFilterParams(null, Set.of(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        Pageable.unpaged());
         assertFalse(result.isEmpty());
         assertThat(result.getContent(), containsSameEntities(expected));
@@ -325,7 +325,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         }).toList();
 
         final Page<PatientRecord> result =
-                sut.findAllRecordsFull(new RecordFilterParams(null, institution.getKey(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
+                sut.findAllRecordsFull(new RecordFilterParams(null, Set.of(institution.getKey()), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        Pageable.unpaged());
         assertFalse(result.isEmpty());
         assertThat(result.getContent(), containsSameEntities(expected));
@@ -439,7 +439,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         final int pageSize = 3;
 
         final Page<PatientRecordDto> result =
-                sut.findAllRecords(new RecordFilterParams(null,null, minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
+                sut.findAllRecords(new RecordFilterParams(null,Set.of(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        PageRequest.of(0, pageSize, Sort.Direction.ASC, RecordSort.SORT_DATE_PROPERTY));
         assertEquals(Math.min(pageSize, allMatching.size()), result.getNumberOfElements());
         assertEquals(allMatching.size(), result.getTotalElements());
