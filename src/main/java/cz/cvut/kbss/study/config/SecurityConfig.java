@@ -85,6 +85,7 @@ public class SecurityConfig {
                                     "/login",
                                     "/register"
                             ).permitAll()
+                            .requestMatchers("/rest/users/impersonate").hasAuthority(Role.impersonate.getRoleName())
                             .anyRequest().authenticated())
             .cors((auth) -> auth.configurationSource(corsConfigurationSource(config)))
             .csrf(AbstractHttpConfigurer::disable)
