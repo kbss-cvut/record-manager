@@ -91,7 +91,7 @@ public class SecurityUtils {
     private User resolveAccountFromOAuthPrincipal(Jwt principal) {
         final OidcUserInfo userInfo = new OidcUserInfo(principal.getClaims());
         final List<String> roles = new OidcGrantedAuthoritiesExtractor(config).extractRoles(principal);
-        final User user = userDao.findByUsername(userInfo.getPreferredUsername());
+        final User user = userDao.findByUsername(userInfo.getPreferredUsername()).copy();
         if (user == null) {
             throw new NotFoundException(
                     "User with username '" + userInfo.getPreferredUsername() + "' not found in repository.");
