@@ -221,67 +221,86 @@ rm:role-group rdf:type owl:Class;
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/read-all-records-role
 rm:read-all-records-role rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "read all records role"@en .
+        rdfs:label "read all records role"@en ;
+        rdfs:comment "Allows user to read all records in the system, regardless of the organization they belong to."@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/write-all-records-role
 rm:write-all-records-role rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "write all records role"@en .
+        rdfs:label "write all records role"@en ;
+        rdfs:comment "Allows user to create, update, or delete any record in the system, regardless of organization."@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/read-organization-records-role
 rm:read-organization-records-role rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "read organization records role"@en .
+        rdfs:label "read organization records role"@en ;
+        rdfs:comment "Allows user to read records belonging to their own organization only."@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/write-organization-records-role
 rm:write-organization-records-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "write organization records role"@en .
+        rdfs:label "write organization records role"@en ;
+        rdfs:comment "Allows user to create, update, or delete records within their own organization only."@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/complete-records-role
 rm:complete-records-role rdf:type owl:NamedIndividual, rm:role ;
-        rdfs:label "complete records role"@en .
+        rdfs:label "complete records role"@en ;
+        rdfs:comment "Allow user to transition records to the 'Complete' phase."@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/reject-records-role
 rm:reject-records-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "reject records role"@en .
+        rdfs:label "reject records role"@en ;
+        rdfs:comment "Allow user to transition records to the 'Rejected' phase."@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/publish-records-role
 rm:publish-records-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "publish records role"@en .
+        rdfs:label "publish records role"@en ;
+        rdfs:comment "Allow user to transition records to the 'Published' phase."@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/import-codelists-role
 rm:import-codelists-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "import codelists role"@en .
+        rdfs:label "import codelists role"@en ;
+        rdfs:comment "Allows user to import codelists into the system."@en .
 
 rm:comment-record-questions-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "comment record questions role"@en .
+        rdfs:label "comment record questions role"@en ;
+        rdfs:comment "Allows user to add comments to questions in records."@en .
 
 rm:read-all-users-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "read all users role"@en .
+        rdfs:label "read all users role"@en ;
+        rdfs:comment "Allows user to view the details of all users in the system, regardless of their organization."@en .
 
 rm:write-all-users-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "write all users role"@en .
+        rdfs:label "write all users role"@en ;
+        rdfs:comment "Allows user to create, update, or delete any user account in the system, including modifying user attributes."@en .
 
 rm:read-organization-users-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "read organization users role"@en .
+        rdfs:label "read organization users role"@en ;
+        rdfs:comment "Allows user to view the details of users within their own organization only."@en .
 
 rm:write-organization-users-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "write organization users role"@en .
+        rdfs:label "write organization users role"@en ;
+        rdfs:comment "Allows user to create, update, or delete user accounts within their own organization only."@en .
 
 rm:read-organization-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "read organization role"@en .
+        rdfs:label "read organization role"@en ;
+        rdfs:comment "Allows user to view details about the user’s own organization, such as its name or email."@en .
 
 rm:write-organization-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "write organization role"@en .
+        rdfs:label "write organization role"@en ;
+        rdfs:comment "Allows user to modify their own organization’s details, such as updating its name or email."@en .
 
 rm:read-all-organizations-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "read all organizations role"@en .
+        rdfs:label "read all organizations role"@en ;
+        rdfs:comment "Allows user to view details of all organizations in the system."@en .
 
 rm:write-all-organizations-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "write all organizations role"@en .
+        rdfs:label "write all organizations role"@en ;
+        rdfs:comment "Allows user to create, update, or delete any organization in the system."@en .
 
 rm:read-action-history-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "read action history"@en .
+        rdfs:label "read action history"@en ;
+        rdfs:comment "Allows user to view the history of operations performed in the system."@en .
 
 rm:read-statistics-role rdf:type owl:NamedIndividual, rm:role;
-        rdfs:label "read statistics"@en .
+        rdfs:label "read statistics"@en ;
+        rdfs:comment "Allows user to view statistical reports about the system’s data."@en .
 
 ###  Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi
