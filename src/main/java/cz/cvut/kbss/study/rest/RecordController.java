@@ -168,7 +168,7 @@ public class RecordController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> createRecord(@RequestBody Record record) {
 
-        if(userService.getCurrentUser().getInstitution() == null)
+        if(configReader.getConfig(ConfigParam.RECORDS_ALLOWED_CREATION_WITHOUT_INSTITUTION).equals("false") && userService.getCurrentUser().getInstitution() == null)
             throw new ValidationException("record.save-error.user-not-assigned-to-institution",
                     "User is not assigned to any institution.");
 

@@ -54,3 +54,4 @@ email:
 
 records:
   allowedRejectReason: true
+  allowedCreationWithoutInstitution: true

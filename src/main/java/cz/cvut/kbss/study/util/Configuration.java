@@ -422,12 +422,25 @@ public class Configuration {
          */
         boolean allowedRejectReason;
 
+        /**
+         *  it indicates functionality allowing users to create records without being assigned to any institution.
+         */
+        boolean allowedCreationWithoutInstitution;
+
         public boolean isAllowedRejectReason() {
             return allowedRejectReason;
         }
 
+        public boolean isAllowedCreationWithoutInstitution() {
+            return allowedCreationWithoutInstitution;
+        }
+
         public void setAllowedRejectReason(boolean allowedRejectReason) {
             this.allowedRejectReason = allowedRejectReason;
+        }
+
+        public void setAllowedCreationWithoutInstitution(boolean allowedCreationWithoutInstitution) {
+            this.allowedCreationWithoutInstitution = allowedCreationWithoutInstitution;
         }
     }
 }
