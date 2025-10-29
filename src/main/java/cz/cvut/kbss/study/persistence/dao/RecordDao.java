@@ -178,6 +178,12 @@ public class RecordDao extends OwlKeySupportingDao<Record> {
             throw new ValidationException("error.record.localNameOfRecordIsEmpty",
                                           "Local name of record is empty for entity " + entity);
         }
+
+        if(entity.getInstitution() == null){
+            em.clear();
+            return;
+        }
+
         boolean unique = findByInstitution(entity.getInstitution()).stream()
                                                                    .filter(pr -> (entity.getFormTemplate() != null) && entity.getFormTemplate()
                                                                                                                              .equals(pr.getFormTemplate()))
@@ -305,13 +311,16 @@ public class RecordDao extends OwlKeySupportingDao<Record> {
 
     private static String constructWhereClause(RecordFilterParams filters, Map<String, Object> queryParams) {
         // Could not use Criteria API because it does not support OPTIONAL
+
         String whereClause = "{" +
                 "?r a ?type ; " +
                 "?hasAuthor ?author ; " +
-                "?hasCreatedDate ?created ; " +
-                "?hasInstitution ?institution . " +
-                "?institution ?hasKey ?institutionKey ." +
-                "?author ?hasUsername ?username ." +
+                "?hasCreatedDate ?created . " +
+                "?author ?hasUsername ?username . " +
+                "OPTIONAL { " +
+                "?r ?hasInstitution ?institution . " +
+                "?institution ?hasKey ?institutionKey . " +
+                "} " +
                 "OPTIONAL { ?r ?hasPhase ?phase . } " +
                 "OPTIONAL { ?r ?hasFormTemplate ?formTemplate . } " +
                 "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
