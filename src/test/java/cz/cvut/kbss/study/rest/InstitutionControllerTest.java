@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -148,7 +149,7 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
                                                                    });
         assertEquals(2, body.size());
         verify(institutionServiceMock).findByKey(key);
-        verify(patientRecordServiceMock).findAll(new RecordFilterParams(key), Pageable.unpaged());
+        verify(patientRecordServiceMock).findAll(new RecordFilterParams(Set.of(key)), Pageable.unpaged());
     }
 
     @Test
