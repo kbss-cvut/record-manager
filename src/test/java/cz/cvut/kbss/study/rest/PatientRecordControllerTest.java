@@ -198,9 +198,12 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    public void createRecordReturnsResponseStatusCreated() throws Exception {
+    public void createRecordWithInstitutionReturnsResponseStatusCreated() throws Exception {
         PatientRecord record = Generator.generatePatientRecord(user);
         when(userService.getCurrentUser()).thenReturn(user);
+
+        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_CREATION_WITHOUT_INSTITUTION))
+                .thenReturn("false");
 
         final MvcResult result = mockMvc.perform(post("/records").content(toJson(record))
                                                                  .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -210,18 +213,36 @@ public class PatientRecordControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    public void createRecordWithoutInstitutionReturnsResponseStatusBadRequest() throws Exception {
+    public void createRecordWithoutInstitutionIfItIsNotAllowedReturnsResponseStatusBadRequest() throws Exception {
         user.setInstitution(null);
 
         PatientRecord record = Generator.generatePatientRecord(user);
 
         when(userService.getCurrentUser()).thenReturn(user);
+        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_CREATION_WITHOUT_INSTITUTION))
+                .thenReturn("false");
 
         final MvcResult result = mockMvc.perform(post("/records").content(toJson(record))
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
         assertEquals(HttpStatus.CONFLICT, HttpStatus.valueOf(result.getResponse().getStatus()));
+    }
+
+    @Test
+    public void createRecordWithoutInstitutionIfItIsAllowedReturnsResponseStatusBadRequest() throws Exception {
+        user.setInstitution(null);
+
+        PatientRecord record = Generator.generatePatientRecord(user);
+
+        when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_CREATION_WITHOUT_INSTITUTION))
+                .thenReturn("true");
+
+        final MvcResult result = mockMvc.perform(post("/records").content(toJson(record))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn();
+
+        assertEquals(HttpStatus.CREATED, HttpStatus.valueOf(result.getResponse().getStatus()));
     }
 
 
