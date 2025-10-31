@@ -268,6 +268,14 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
     }
 
+    void changePatientRecordsInstitution(User original, Institution newInstitution) {
+        List<PatientRecord> recordsToUpdate = patientRecordDao.findByAuthor(original);
+        for (PatientRecord record : recordsToUpdate) {
+            record.setInstitution(newInstitution);
+            patientRecordDao.update(record);
+        }
+    }
+
     @Override
     protected void preUpdate(User instance) {
         final User currentUser = securityUtils.getCurrentUser();
@@ -281,6 +289,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
         if (instance.getInstitution() != original.getInstitution()) {
             validateRecordsAgainstCollisions(instance, original);
+            changePatientRecordsInstitution(original, instance.getInstitution());
         }
 
         try {
