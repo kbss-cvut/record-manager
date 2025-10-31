@@ -206,7 +206,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
     }
 
-    private void validatePermissionToUpdate(User currentUser, User toUpdate, User original) {
+    protected void validatePermissionToUpdate(User currentUser, User toUpdate, User original) {
         boolean differentUser = !Objects.equals(toUpdate.getUsername(), currentUser.getUsername());
 
         boolean hasWriteAllUsers = securityUtils.hasRole(Role.writeAllUsers);
@@ -236,7 +236,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
     }
 
-    private void validateRecordsAgainstCollisions(User toUpdate, User original) {
+    protected void validateRecordsAgainstCollisions(User toUpdate, User original) {
 
         if (toUpdate.getInstitution() == null) return;
 
@@ -268,7 +268,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
     }
 
-    void changePatientRecordsInstitution(User original, Institution newInstitution) {
+    protected void changePatientRecordsInstitution(User original, Institution newInstitution) {
         List<PatientRecord> recordsToUpdate = patientRecordDao.findByAuthor(original);
         for (PatientRecord record : recordsToUpdate) {
             record.setInstitution(newInstitution);
