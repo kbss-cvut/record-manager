@@ -58,6 +58,9 @@ form:has-origin-path-id rdf:type owl:DatatypeProperty .
 doc:answer rdf:type owl:Class ;
            rdfs:label "Answer"@en .
 
+### http://onto.fel.cvut.cz/ontologies/form/comment
+form:comment rdf:type owl:Class ;
+             rdfs:label "Comment"@en .
 
 ###  http://onto.fel.cvut.cz/ontologies/documentation/question
 doc:question rdf:type owl:Class ;

@@ -154,7 +154,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         Objects.requireNonNull(author);
         return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?createdBy ?author . }", PatientRecord.class)
                  .setParameter("type", typeUri)
-                 .setParameter("createdBy", URI.create(Vocabulary.s_p_has_author))
+                 .setParameter("createdBy", URI.create(Vocabulary.s_p_record_manager_has_author))
                  .setParameter("author", author.getUri()).getResultList();
     }
 
@@ -291,7 +291,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     private void setQueryParameters(Query query, Map<String, Object> queryParams) {
         query
                 .setParameter("type", typeUri)
-                .setParameter("hasAuthor", URI.create(Vocabulary.s_p_has_author))
+                .setParameter("hasAuthor", URI.create(Vocabulary.s_p_record_manager_has_author))
                 .setParameter("hasUsername", URI.create(Vocabulary.s_p_accountName))
                 .setParameter("hasPhase", URI.create(Vocabulary.s_p_has_phase))
                 .setParameter("hasFormTemplate", URI.create(Vocabulary.s_p_has_form_template))

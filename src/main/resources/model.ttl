@@ -21,6 +21,9 @@
 doc:has_answer rdf:type owl:ObjectProperty ;
                rdfs:subPropertyOf rm:relates-to .
 
+###  http://onto.fel.cvut.cz/ontologies/form/has-comment
+form:has-comment rdf:type owl:ObjectProperty ;
+               rdfs:subPropertyOf rm:relates-to .
 
 ###  http://onto.fel.cvut.cz/ontologies/documentation/has_related_question
 doc:has_related_question rdf:type owl:ObjectProperty ;
@@ -105,6 +108,15 @@ rm:has-role  rdf:type owl:ObjectProperty ;
 rm:action_type rdf:type owl:DatatypeProperty .
 
 
+###  http://onto.fel.cvut.cz/ontologies/form/has-author
+form:has-author rdf:type owl:DatatypeProperty ;
+                       rdfs:subPropertyOf rm:relates-to .
+
+###  http://onto.fel.cvut.cz/ontologies/form/has-comment-value
+form:has-comment-value rdf:type owl:DatatypeProperty ;
+                       rdfs:subPropertyOf rm:relates-to .
+
+
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/isInvited
 rm:isInvited rdf:type owl:DatatypeProperty .
 
@@ -118,6 +130,10 @@ rm:has-form-template-version rdf:type owl:DatatypeProperty ;
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/key
 rm:key rdf:type owl:DatatypeProperty .
+
+
+form:has-timestamp rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf rm:relates-to .
 
 
 ###  http://onto.fel.cvut.cz/ontologies/record-manager/password
