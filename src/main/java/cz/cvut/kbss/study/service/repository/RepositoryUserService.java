@@ -30,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RepositoryUserService extends BaseRepositoryService<User> implements UserService {
@@ -240,28 +241,36 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
         if (toUpdate.getInstitution() == null) return;
 
-        List<PatientRecordDto> newInstitutionRecords = patientRecordDao.findByInstitution(toUpdate.getInstitution());
-        List<PatientRecord> originalUserRecords = patientRecordDao.findByAuthor(original);
+        Map<String, PatientRecordDto> existingInstitutionRecords = patientRecordDao.findByInstitution(toUpdate.getInstitution()).stream().collect(
+                Collectors.toMap(PatientRecordDto::getLocalName, r -> r)
+        );
+        Map<String, PatientRecord> newInstitutionRecords = patientRecordDao.findByAuthor(original).stream().collect(
+                Collectors.toMap(PatientRecord::getLocalName, r -> r)
+        );
 
-        Set<PatientRecord> conflictingRecords = new HashSet<>();
+        Map<String, List<String>> conflictingRecords = newInstitutionRecords.keySet().stream()
+                .filter(existingInstitutionRecords::containsKey)
+                .collect(Collectors.toMap(
+                        key -> key,
+                        key -> Arrays.asList(existingInstitutionRecords.get(key).getKey(), newInstitutionRecords.get(key).getKey())
+                ));
 
-        originalUserRecords.forEach(originalUserRecord -> {
-            for (PatientRecordDto newInstitutionRecord : newInstitutionRecords) {
-                if (newInstitutionRecord.getLocalName().equals(originalUserRecord.getLocalName())) {
-                    conflictingRecords.add(originalUserRecord);
-                }
-            }
-        });
 
         if (!conflictingRecords.isEmpty()) {
-            List<String> localRecordsNames = conflictingRecords.stream()
-                    .map(PatientRecord::getLocalName)
-                    .toList();
+
+            String conflictsFormatted = conflictingRecords.entrySet().stream()
+                    .map(e -> String.format(
+                            "• %s (existing record ID: %s, new record ID: %s)",
+                            e.getKey(),
+                            e.getValue().get(0),
+                            e.getValue().get(1)
+                    ))
+                    .collect(Collectors.joining("\n"));
 
             String message = String.format(
-                    "User cannot be moved to %s institution because of the following conflicting patient records: %s.",
+                    "User cannot be moved to institution '%s' because there are conflicting records with the same name:\n%s.",
                     toUpdate.getInstitution().getName(),
-                    String.join(", ", localRecordsNames)
+                    conflictsFormatted
             );
 
             throw new ValidationException(message);
