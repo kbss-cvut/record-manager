@@ -15,11 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.security.web.server.authentication.SwitchUserWebFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,6 +29,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SecurityUtils {
@@ -220,7 +223,7 @@ public class SecurityUtils {
         return false;
     }
 
-    public boolean hasSupersetOfRoles(User u1, User u2) {
+    static public boolean hasSupersetOfRoles(User u1, User u2) {
         Set<Role> u1Roles = Optional.ofNullable(u1.getRoleGroup())
                 .map(RoleGroup::getRoles)
                 .orElse(Collections.emptySet());
@@ -231,4 +234,19 @@ public class SecurityUtils {
 
         return u1Roles.containsAll(u2Roles);
     }
+
+    static public boolean hasSupersetOfRoles(Authentication a1, Authentication a2) {
+        Set<String> a1Authorities = a1.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(auth -> !auth.equals(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR))
+                .collect(Collectors.toSet());
+
+        Set<String> a2Authorities = a2.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(auth -> !auth.equals(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR))
+                .collect(Collectors.toSet());
+
+        return a1Authorities.containsAll(a2Authorities);
+    }
+
 }
