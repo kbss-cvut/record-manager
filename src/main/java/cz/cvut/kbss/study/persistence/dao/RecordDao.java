@@ -8,10 +8,11 @@ import cz.cvut.kbss.jopa.model.metamodel.EntityType;
 import cz.cvut.kbss.jopa.model.query.Query;
 import cz.cvut.kbss.jopa.model.query.TypedQuery;
 import cz.cvut.kbss.ontodriver.model.LangString;
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.exception.PersistenceException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.*;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
@@ -32,30 +33,30 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
+public class RecordDao extends OwlKeySupportingDao<Record> {
 
-    public static final String FIND_ALL_RAW_PATIENT_RECORDS = "find-raw-records.sparql";
+    public static final String FIND_ALL_RAW_RECORDS = "find-raw-records.sparql";
     public static final String RECORDS_CLAUSE_TEMPLATE_VAR = "###RECORD_CLAUSE###";
 
-    public PatientRecordDao(EntityManager em) {
-        super(PatientRecord.class, em);
+    public RecordDao(EntityManager em) {
+        super(Record.class, em);
     }
 
     @Override
-    public PatientRecord find(URI uri) {
+    public Record find(URI uri) {
         Objects.requireNonNull(uri);
         try {
-            return em.find(PatientRecord.class, uri, getDescriptor(uri));
+            return em.find(Record.class, uri, getDescriptor(uri));
         } catch (RuntimeException e) {
             throw new PersistenceException(e);
         }
     }
 
     @Override
-    public PatientRecord findByKey(String key) {
+    public Record findByKey(String key) {
         Objects.requireNonNull(key);
         try {
-            return em.createQuery("SELECT r FROM " + PatientRecord.class.getSimpleName() + " r WHERE r.key = :key",
+            return em.createQuery("SELECT r FROM " + Record.class.getSimpleName() + " r WHERE r.key = :key",
                                   type)
                      .setParameter("key", key, Constants.PU_LANGUAGE)
                      .setDescriptor(getDescriptor(key)).getSingleResult();
@@ -65,7 +66,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     }
 
     @Override
-    public void persist(PatientRecord entity) {
+    public void persist(Record entity) {
         Objects.requireNonNull(entity);
         if (entity.getKey() == null) {
             entity.setKey(IdentificationUtils.generateKey());
@@ -89,7 +90,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
 
     private Descriptor getDescriptor(URI ctx) {
         final EntityDescriptor descriptor = new EntityDescriptor(ctx);
-        final EntityType<PatientRecord> et = em.getMetamodel().entity(PatientRecord.class);
+        final EntityType<Record> et = em.getMetamodel().entity(Record.class);
         descriptor.addAttributeContext(et.getAttribute("author"), null);
         descriptor.addAttributeContext(et.getAttribute("lastModifiedBy"), null);
         descriptor.addAttributeContext(et.getAttribute("institution"), null);
@@ -97,47 +98,47 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     }
 
     public static URI generateRecordUriFromKey(String recordKey) {
-        return URI.create(Vocabulary.s_c_patient_record + "/" + Objects.requireNonNull(recordKey));
+        return URI.create(Vocabulary.s_c_record + "/" + Objects.requireNonNull(recordKey));
     }
 
     @Override
-    public void update(PatientRecord entity) {
+    public void update(Record entity) {
         Objects.requireNonNull(entity);
         final Descriptor descriptor = getDescriptor(entity.getUri());
-        final PatientRecord orig = em.find(PatientRecord.class, entity.getUri(), descriptor);
+        final Record orig = em.find(Record.class, entity.getUri(), descriptor);
         assert orig != null;
         orig.setQuestion(null);
         em.merge(entity, descriptor);
         // Evict cached instances loaded from the default context
-        em.getEntityManagerFactory().getCache().evict(PatientRecord.class, entity.getUri(), null);
-        em.getEntityManagerFactory().getCache().evict(PatientRecordDto.class, entity.getUri(), null);
+        em.getEntityManagerFactory().getCache().evict(Record.class, entity.getUri(), null);
+        em.getEntityManagerFactory().getCache().evict(RecordDto.class, entity.getUri(), null);
     }
 
     public void updateStatus(URI entityUri, RecordPhase targetPhase){
-        PatientRecord entity = find(entityUri);
+        Record entity = find(entityUri);
         if(entity == null)
              return;
         entity.setPhase(targetPhase);
-        em.getEntityManagerFactory().getCache().evict(PatientRecord.class, entity.getUri(), null);
-        em.getEntityManagerFactory().getCache().evict(PatientRecordDto.class, entity.getUri(), null);
+        em.getEntityManagerFactory().getCache().evict(Record.class, entity.getUri(), null);
+        em.getEntityManagerFactory().getCache().evict(RecordDto.class, entity.getUri(), null);
     }
 
-    public List<PatientRecordDto> findAllRecords() {
-        return em.createNativeQuery("SELECT ?x WHERE { ?x a ?type . }", PatientRecordDto.class)
+    public List<RecordDto> findAllRecords() {
+        return em.createNativeQuery("SELECT ?x WHERE { ?x a ?type . }", RecordDto.class)
                  .setParameter("type", typeUri)
                  .getResultList();
     }
 
     /**
-     * Gets records of patients treated at the specified institution.
+     * Gets records of the specified institution.
      *
      * @param institution The institution to filter by
-     * @return Records of matching patients
+     * @return Records
      */
-    public List<PatientRecordDto> findByInstitution(Institution institution) {
+    public List<RecordDto> findByInstitution(Institution institution) {
         Objects.requireNonNull(institution);
         return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?treatedAt ?institution . }",
-                                    PatientRecordDto.class)
+                                    RecordDto.class)
                  .setParameter("type", typeUri)
                  .setParameter("treatedAt", URI.create(Vocabulary.s_p_was_treated_at))
                  .setParameter("institution", institution.getUri())
@@ -145,14 +146,14 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     }
 
     /**
-     * Gets records of patients created by specified author.
+     * Gets records created by specified author.
      *
      * @param author The author to filter by
-     * @return Records of matching patients
+     * @return Records
      */
-    public List<PatientRecord> findByAuthor(User author) {
+    public List<Record> findByAuthor(User author) {
         Objects.requireNonNull(author);
-        return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?createdBy ?author . }", PatientRecord.class)
+        return em.createNativeQuery("SELECT ?r WHERE { ?r a ?type ; ?createdBy ?author . }", Record.class)
                  .setParameter("type", typeUri)
                  .setParameter("createdBy", URI.create(Vocabulary.s_p_has_author))
                  .setParameter("author", author.getUri()).getResultList();
@@ -160,8 +161,8 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
 
     public int getNumberOfProcessedRecords() {
         return ((BigInteger) em.createNativeQuery(
-                                       "SELECT (count(?p) as ?patientRecordsCount) WHERE { ?p a ?record . }")
-                               .setParameter("record", URI.create(Vocabulary.s_c_patient_record))
+                                       "SELECT (count(?p) as ?recordsCount) WHERE { ?p a ?record . }")
+                               .setParameter("record", URI.create(Vocabulary.s_c_record))
                                .getSingleResult()
         ).intValue();
     }
@@ -171,7 +172,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
      *
      * @param entity The local name to be checked for uniqueness
      */
-    public void requireUniqueNonEmptyLocalName(PatientRecord entity) {
+    public void requireUniqueNonEmptyLocalName(Record entity) {
         Objects.requireNonNull(entity.getInstitution());
         if (entity.getLocalName() == null || entity.getLocalName().isEmpty()) {
             throw new ValidationException("error.record.localNameOfRecordIsEmpty",
@@ -203,10 +204,10 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
      * @return Page with matching records
      * @see #findAllRecordsFull(RecordFilterParams, Pageable)
      */
-    public Page<PatientRecordDto> findAllRecords(RecordFilterParams filters, Pageable pageSpec) {
+    public Page<RecordDto> findAllRecords(RecordFilterParams filters, Pageable pageSpec) {
         Objects.requireNonNull(filters);
         Objects.requireNonNull(pageSpec);
-        return findRecords(filters, pageSpec, PatientRecordDto.class);
+        return findRecords(filters, pageSpec, RecordDto.class);
     }
 
     /**
@@ -222,10 +223,10 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
      * @return Page with matching records
      * @see #findAllRecords(RecordFilterParams, Pageable)
      */
-    public Page<PatientRecord> findAllRecordsFull(RecordFilterParams filters, Pageable pageSpec) {
+    public Page<Record> findAllRecordsFull(RecordFilterParams filters, Pageable pageSpec) {
         Objects.requireNonNull(filters);
         Objects.requireNonNull(pageSpec);
-        return findRecords(filters, pageSpec, PatientRecord.class);
+        return findRecords(filters, pageSpec, Record.class);
     }
 
     private <T> Page<T> findRecords(RecordFilterParams filters, Pageable pageSpec, Class<T> resultClass) {
@@ -259,7 +260,7 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
         final Map<String, Object> queryParams = new HashMap<>();
         final String whereClause = constructWhereClauseWithGraphs(filters, queryParams);
 
-        final String queryStringNoPaging = Utils.loadQuery(FIND_ALL_RAW_PATIENT_RECORDS)
+        final String queryStringNoPaging = Utils.loadQuery(FIND_ALL_RAW_RECORDS)
                 .replaceFirst(RECORDS_CLAUSE_TEMPLATE_VAR, whereClause);
         final String queryString = queryStringNoPaging + (pageSpec.isPaged()
                 ? resolveOrderBy(pageSpec.getSortOr(RecordSort.defaultSort()))

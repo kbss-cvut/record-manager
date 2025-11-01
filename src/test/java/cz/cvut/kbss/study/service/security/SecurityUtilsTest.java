@@ -3,10 +3,10 @@ package cz.cvut.kbss.study.service.security;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.persistence.dao.RecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.security.model.UserDetails;
@@ -46,7 +46,7 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
     private UserDao userDao;
 
     @Mock
-    private PatientRecordDao patientRecordDao;
+    private RecordDao recordDao;
 
     @Mock
     private ConfigReader config;
@@ -130,9 +130,9 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
         Environment.setCurrentUser(admin);
         when(userDao.findByUsername(admin.getUsername())).thenReturn(admin);
 
-        PatientRecord record = Generator.generatePatientRecord(admin);
+        Record record = Generator.generateRecord(admin);
         record.setKey(IdentificationUtils.generateKey());
-        when(patientRecordDao.findByKey(record.getKey())).thenReturn(record);
+        when(recordDao.findByKey(record.getKey())).thenReturn(record);
 
         assertTrue(sut.isRecordInUsersInstitution(record.getKey()));
     }
@@ -145,9 +145,9 @@ public class SecurityUtilsTest extends BaseServiceTestRunner {
         institutionAnother.setKey(IdentificationUtils.generateKey());
         User userFromAnotherInstitution = Generator.generateUser(institutionAnother, this.adminRoleGroup);
 
-        PatientRecord record = Generator.generatePatientRecord(userFromAnotherInstitution);
+        Record record = Generator.generateRecord(userFromAnotherInstitution);
         record.setKey(IdentificationUtils.generateKey());
-        when(patientRecordDao.findByKey(record.getKey())).thenReturn(record);
+        when(recordDao.findByKey(record.getKey())).thenReturn(record);
 
         assertFalse(sut.isRecordInUsersInstitution(record.getKey()));
     }

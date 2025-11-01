@@ -5,7 +5,8 @@ import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
 import cz.cvut.kbss.study.model.*;
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.model.Record;
+import cz.cvut.kbss.study.persistence.dao.RecordDao;
 import cz.cvut.kbss.study.service.BaseServiceTestRunner;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
@@ -32,13 +33,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
+class RepositoryRecordServiceTest extends BaseServiceTestRunner {
 
     @InjectMocks
-    private RepositoryPatientRecordService sut;
+    private RepositoryRecordService sut;
 
     @Mock
-    private PatientRecordDao recordDao;
+    private RecordDao recordDao;
 
     @Mock
     private SecurityUtils securityUtils;
@@ -52,16 +53,16 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         Environment.setCurrentUser(user);
         when(securityUtils.getCurrentUser()).thenReturn(user);
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.userRoleGroup);
-        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
+        final List<Record> toImport = generateRecordsToImport(originalAuthor);
         when(recordDao.exists(any())).thenReturn(false);
 
         final RecordImportResult result = sut.importRecords(toImport);
         assertEquals(toImport.size(), result.getTotalCount());
         assertEquals(toImport.size(), result.getImportedCount());
         assertThat(result.getErrors(), anyOf(nullValue(), empty()));
-        final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
+        final ArgumentCaptor<Record> captor = ArgumentCaptor.forClass(Record.class);
         verify(recordDao, times(toImport.size())).persist(captor.capture());
-        final List<PatientRecord> imported = captor.getAllValues();
+        final List<Record> imported = captor.getAllValues();
         assertEquals(toImport.size(), imported.size());
         for (int i = 0; i < toImport.size(); i++) {
             assertEquals(toImport.get(i).getUri(), imported.get(i).getUri());
@@ -71,9 +72,9 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         }
     }
 
-    private List<PatientRecord> generateRecordsToImport(User originalAuthor) {
-        final List<PatientRecord> toImport =
-                List.of(Generator.generatePatientRecord(originalAuthor), Generator.generatePatientRecord(originalAuthor));
+    private List<Record> generateRecordsToImport(User originalAuthor) {
+        final List<Record> toImport =
+                List.of(Generator.generateRecord(originalAuthor), Generator.generateRecord(originalAuthor));
         toImport.forEach(r -> {
             // Simulate that the records existed in another deployment from which they are imported
             r.setKey(IdentificationUtils.generateKey());
@@ -85,16 +86,16 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
     @Test
     void importRecordsRetainsRecordProvenanceDataWhenCurrentUserIsAdmin() {
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.adminRoleGroup);
-        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
+        final List<Record> toImport = generateRecordsToImport(originalAuthor);
         Environment.setCurrentUser(this.admin);
         when(securityUtils.getCurrentUser()).thenReturn(admin);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
         when(recordDao.exists(any())).thenReturn(false);
 
         sut.importRecords(toImport);
-        final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
+        final ArgumentCaptor<Record> captor = ArgumentCaptor.forClass(Record.class);
         verify(recordDao, times(toImport.size())).persist(captor.capture());
-        final List<PatientRecord> imported = captor.getAllValues();
+        final List<Record> imported = captor.getAllValues();
         assertEquals(toImport.size(), imported.size());
         for (int i = 0; i < toImport.size(); i++) {
             assertEquals(toImport.get(i).getUri(), imported.get(i).getUri());
@@ -110,7 +111,7 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         Environment.setCurrentUser(admin);
         when(securityUtils.getCurrentUser()).thenReturn(admin);
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.adminRoleGroup);
-        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
+        final List<Record> toImport = generateRecordsToImport(originalAuthor);
         when(userService.exists(originalAuthor.getUri())).thenReturn(false);
         assertThrows(RecordAuthorNotFoundException.class, () -> sut.importRecords(toImport));
     }
@@ -121,8 +122,8 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         when(securityUtils.getCurrentUser()).thenReturn(admin);
 
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.userRoleGroup);
-        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
-        final PatientRecord existing = toImport.get(Generator.randomIndex(toImport));
+        final List<Record> toImport = generateRecordsToImport(originalAuthor);
+        final Record existing = toImport.get(Generator.randomIndex(toImport));
         when(recordDao.exists(any(URI.class))).thenReturn(false);
         when(recordDao.exists(existing.getUri())).thenReturn(true);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
@@ -140,13 +141,13 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         when(securityUtils.getCurrentUser()).thenReturn(admin);
 
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.userRoleGroup);
-        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
+        final List<Record> toImport = generateRecordsToImport(originalAuthor);
         final RecordPhase targetPhase = RecordPhase.values()[Generator.randomInt(0, RecordPhase.values().length)];
         when(recordDao.exists(any())).thenReturn(false);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
 
         sut.importRecords(toImport, targetPhase);
-        final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
+        final ArgumentCaptor<Record> captor = ArgumentCaptor.forClass(Record.class);
         verify(recordDao, times(toImport.size())).persist(captor.capture());
         captor.getAllValues().forEach(r -> assertEquals(targetPhase, r.getPhase()));
     }
@@ -156,12 +157,12 @@ class RepositoryPatientRecordServiceTest extends BaseServiceTestRunner {
         Environment.setCurrentUser(user);
         when(securityUtils.getCurrentUser()).thenReturn(user);
         final User originalAuthor = Generator.generateUser(Generator.generateInstitution(), this.userRoleGroup);
-        final List<PatientRecord> toImport = generateRecordsToImport(originalAuthor);
+        final List<Record> toImport = generateRecordsToImport(originalAuthor);
         when(recordDao.exists(any())).thenReturn(false);
         when(userService.exists(originalAuthor.getUri())).thenReturn(true);
 
         sut.importRecords(toImport);
-        final ArgumentCaptor<PatientRecord> captor = ArgumentCaptor.forClass(PatientRecord.class);
+        final ArgumentCaptor<Record> captor = ArgumentCaptor.forClass(Record.class);
         verify(recordDao, times(toImport.size())).persist(captor.capture());
         captor.getAllValues().forEach(r -> assertEquals(RecordPhase.open, r.getPhase()));
     }

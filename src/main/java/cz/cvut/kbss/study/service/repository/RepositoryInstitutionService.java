@@ -4,7 +4,7 @@ import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.persistence.dao.InstitutionDao;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.persistence.dao.RecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.InstitutionService;
 import cz.cvut.kbss.study.util.Validator;
@@ -18,14 +18,14 @@ public class RepositoryInstitutionService extends KeySupportingRepositoryService
 
     private final UserDao userDao;
 
-    private final PatientRecordDao patientRecordDao;
+    private final RecordDao recordDao;
 
     public RepositoryInstitutionService(InstitutionDao institutionDao,
                                         UserDao userDao,
-                                        PatientRecordDao patientRecordDao) {
+                                        RecordDao recordDao) {
         this.institutionDao = institutionDao;
         this.userDao = userDao;
-        this.patientRecordDao = patientRecordDao;
+        this.recordDao = recordDao;
     }
 
     @Override
@@ -41,10 +41,10 @@ public class RepositoryInstitutionService extends KeySupportingRepositoryService
 
     @Override
     protected void preRemove(Institution instance) {
-        if (!userDao.findByInstitution(instance).isEmpty() || !patientRecordDao.findByInstitution(instance).isEmpty()) {
+        if (!userDao.findByInstitution(instance).isEmpty() || !recordDao.findByInstitution(instance).isEmpty()) {
             throw new ValidationException(
-                    "error.institution.remove.institutionWithMembersOrPatientRecordsCannotBeDeleted",
-                    "Institution with members or patient records cannot be deleted.");
+                    "error.institution.remove.institutionWithMembersOrRecordsCannotBeDeleted",
+                    "Institution with members or records cannot be deleted.");
         }
     }
 

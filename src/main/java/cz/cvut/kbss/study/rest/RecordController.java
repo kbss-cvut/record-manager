@@ -2,11 +2,11 @@ package cz.cvut.kbss.study.rest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
-import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
@@ -26,8 +26,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +41,9 @@ import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/records")
-public class PatientRecordController extends BaseController {
+public class RecordController extends BaseController {
 
-    private final PatientRecordService recordService;
+    private final RecordService recordService;
 
     private final ApplicationEventPublisher eventPublisher;
     private final ExcelRecordConverter excelRecordConverter;
@@ -55,10 +53,10 @@ public class PatientRecordController extends BaseController {
     private final ObjectMapper objectMapper;
     private final UserService userService;
 
-    public PatientRecordController(PatientRecordService recordService, ApplicationEventPublisher eventPublisher,
-                                   ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate,
-                                   ConfigReader configReader, ObjectMapper objectMapper,
-                                   UserService userService, PublishRecordsService publishRecordsService)  {
+    public RecordController(RecordService recordService, ApplicationEventPublisher eventPublisher,
+                            ExcelRecordConverter excelRecordConverter, RestTemplate restTemplate,
+                            ConfigReader configReader, ObjectMapper objectMapper,
+                            UserService userService, PublishRecordsService publishRecordsService)  {
         this.recordService = recordService;
         this.eventPublisher = eventPublisher;
         this.excelRecordConverter = excelRecordConverter;
@@ -73,11 +71,11 @@ public class PatientRecordController extends BaseController {
             "or (hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isMemberOfInstitution(#institutionKey))" +
             "or #institutionKey==null ")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PatientRecordDto> getRecords(
+    public List<RecordDto> getRecords(
             @RequestParam(value = "institution", required = false) String institutionKey,
             @RequestParam MultiValueMap<String, String> params,
             UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-        final Page<PatientRecordDto> result = recordService.findAll(RecordFilterMapper.constructRecordFilter(params),
+        final Page<RecordDto> result = recordService.findAll(RecordFilterMapper.constructRecordFilter(params),
                                                                     RestUtils.resolvePaging(params));
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
         return result.getContent();
@@ -122,10 +120,10 @@ public class PatientRecordController extends BaseController {
         };
     }
 
-    protected ResponseEntity<List<PatientRecord>> exportRecordsAsJson(
+    protected ResponseEntity<List<Record>> exportRecordsAsJson(
             MultiValueMap<String, String> params,
             UriComponentsBuilder uriBuilder, HttpServletResponse response){
-        final Page<PatientRecord> result = recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
+        final Page<Record> result = recordService.findAllFull(RecordFilterMapper.constructRecordFilter(params),
                 RestUtils.resolvePaging(params));
         eventPublisher.publishEvent(new PaginatedResultRetrievedEvent(this, uriBuilder, response, result));
         return ResponseEntity.ok()
@@ -154,21 +152,21 @@ public class PatientRecordController extends BaseController {
     @PreAuthorize("hasAuthority('" + SecurityConstants.readAllRecords + "') " +
             "or (hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isRecordInUsersInstitution(#key))")
     @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PatientRecord getRecord(@PathVariable("key") String key) {
+    public Record getRecord(@PathVariable("key") String key) {
         return findInternal(key);
     }
 
-    private PatientRecord findInternal(String key) {
-        final PatientRecord record = recordService.findByKey(key);
+    private Record findInternal(String key) {
+        final Record record = recordService.findByKey(key);
         if (record == null) {
-            throw NotFoundException.create("PatientRecord", key);
+            throw NotFoundException.create("Record", key);
         }
         return record;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> createRecord(@RequestBody PatientRecord record) {
+    public ResponseEntity<String> createRecord(@RequestBody Record record) {
 
         if(userService.getCurrentUser().getInstitution() == null)
             throw new ValidationException("record.save-error.user-not-assigned-to-institution",
@@ -176,7 +174,7 @@ public class PatientRecordController extends BaseController {
 
         recordService.persist(record);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Patient record {} successfully created.", record);
+            LOG.trace("Record {} successfully created.", record);
         }
         final String key = record.getKey();
         final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/{key}", key);
@@ -200,12 +198,12 @@ public class PatientRecordController extends BaseController {
     public RecordImportResult importRecordsJson(@RequestPart("file") MultipartFile file,
                                             @RequestParam(name = "phase", required = false) String phase) {
 
-        List<PatientRecord> records;
+        List<Record> records;
 
         if(file.isEmpty())
             throw new IllegalArgumentException("Cannot import records, missing input file");
         try {
-            records =  objectMapper.readValue(file.getBytes(), new TypeReference<List<PatientRecord>>(){});
+            records =  objectMapper.readValue(file.getBytes(), new TypeReference<List<Record>>(){});
         } catch (IOException e) {
             throw new RuntimeException("Failed to parse JSON content", e);
         }
@@ -217,7 +215,7 @@ public class PatientRecordController extends BaseController {
         @RequestPart("file") MultipartFile file,
         @RequestParam(name = "phase", required = false) String phase) {
 
-        List<PatientRecord> records;
+        List<Record> records;
 
         if(file.isEmpty())
             throw new IllegalArgumentException("Cannot import records, missing input file");
@@ -239,11 +237,11 @@ public class PatientRecordController extends BaseController {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<List<PatientRecord>> responseEntity = restTemplate.exchange(
+        ResponseEntity<List<Record>> responseEntity = restTemplate.exchange(
                 URI.create(request),
                 HttpMethod.POST,
                 requestEntity,
-                new ParameterizedTypeReference<List<PatientRecord>>() {}
+                new ParameterizedTypeReference<List<Record>>() {}
         );
         records = responseEntity.getBody();
         return importRecords(records, phase);
@@ -254,7 +252,7 @@ public class PatientRecordController extends BaseController {
         @RequestPart("file") MultipartFile file,
         @RequestParam(name = "phase", required = false) String phase) {
 
-        List<PatientRecord> records;
+        List<Record> records;
 
         if(file.isEmpty())
             throw new IllegalArgumentException("Cannot import records, missing input file");
@@ -291,7 +289,7 @@ public class PatientRecordController extends BaseController {
         return new RecordImportResult();
     }
 
-    public RecordImportResult importRecords(List<PatientRecord> records, String phase) {
+    public RecordImportResult importRecords(List<Record> records, String phase) {
         final RecordImportResult importResult;
         if (phase != null) {
             final RecordPhase targetPhase = RecordPhase.fromIriOrName(phase);
@@ -306,15 +304,15 @@ public class PatientRecordController extends BaseController {
 
     @PutMapping(value = "/{key}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateRecord(@PathVariable("key") String key, @RequestBody PatientRecord record) {
+    public void updateRecord(@PathVariable("key") String key, @RequestBody Record record) {
         if (!key.equals(record.getKey())) {
             throw new BadRequestException("The passed record's key is different from the specified one.");
         }
-        final PatientRecord original = findInternal(key);
+        final Record original = findInternal(key);
         assert original != null;
         recordService.update(record);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Patient record {} successfully updated.", record);
+            LOG.trace("Record {} successfully updated.", record);
         }
 
         onUpdateRecord(record.getUri());
@@ -341,10 +339,10 @@ public class PatientRecordController extends BaseController {
     @DeleteMapping(value = "/{key}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeRecord(@PathVariable("key") String key) {
-        final PatientRecord toRemove = findInternal(key);
+        final Record toRemove = findInternal(key);
         recordService.remove(toRemove);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Patient record {} successfully removed.", toRemove);
+            LOG.trace("Record {} successfully removed.", toRemove);
         }
     }
 

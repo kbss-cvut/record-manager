@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.model.util;
 
-import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.Vocabulary;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ public class EntityToOwlClassMapperTest {
 
     @Test
     public void getOWlClassForEntityExtractsOwlClassIriFromEntityClass() {
-        assertEquals(Vocabulary.s_c_patient_record, EntityToOwlClassMapper.getOwlClassForEntity(PatientRecord.class));
+        assertEquals(Vocabulary.s_c_record, EntityToOwlClassMapper.getOwlClassForEntity(Record.class));
     }
 
     @Test
