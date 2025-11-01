@@ -423,7 +423,7 @@ public class Configuration {
         boolean allowedRejectReason;
 
         /**
-         *  it indicates functionality allowing users to create records without being assigned to any institution.
+         *  Allow users who are not members of any institution to create records.
          */
         boolean allowedCreationWithoutInstitution;
 
