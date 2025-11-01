@@ -2,7 +2,8 @@ package cz.cvut.kbss.study.service.security;
 
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.*;
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.model.Record;
+import cz.cvut.kbss.study.persistence.dao.RecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.security.model.UserDetails;
 import cz.cvut.kbss.study.service.ConfigReader;
@@ -36,14 +37,14 @@ public class SecurityUtils {
 
     private final UserDao userDao;
 
-    private final PatientRecordDao patientRecordDao;
+    private final RecordDao recordDao;
 
     private final ConfigReader config;
     private final RestTemplate restTemplate;
 
-    public SecurityUtils(UserDao userDao, PatientRecordDao patientRecordDao, ConfigReader config, RestTemplate restTemplate) {
+    public SecurityUtils(UserDao userDao, RecordDao recordDao, ConfigReader config, RestTemplate restTemplate) {
         this.userDao = userDao;
-        this.patientRecordDao = patientRecordDao;
+        this.recordDao = recordDao;
         this.config = config;
         this.restTemplate = restTemplate;
     }
@@ -153,14 +154,14 @@ public class SecurityUtils {
     }
 
     /**
-     * Checks whether the current user is in same institution as the patient record was created.
+     * Checks whether the current user is in same institution as the record was created.
      *
-     * @param recordKey PatientRecord identifier
-     * @return Membership status of the current user and patient record
+     * @param recordKey Record identifier
+     * @return Membership status of the current user and record
      */
     public boolean isRecordInUsersInstitution(String recordKey) {
         final User user = getCurrentUser();
-        final PatientRecord record = patientRecordDao.findByKey(recordKey);
+        final Record record = recordDao.findByKey(recordKey);
         return user.getInstitution().getKey().equals(record.getInstitution().getKey());
     }
 

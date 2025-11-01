@@ -4,10 +4,8 @@ import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.jopa.model.EntityManagerFactory;
 import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
 import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
-import cz.cvut.kbss.jopa.model.metamodel.EntityType;
-import cz.cvut.kbss.study.model.PatientRecord;
-import cz.cvut.kbss.study.model.User;
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.model.Record;
+import cz.cvut.kbss.study.persistence.dao.RecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
 import cz.cvut.kbss.study.util.Constants;
 import cz.cvut.kbss.study.util.IdentificationUtils;
@@ -32,18 +30,18 @@ public class FormGenDao {
         return URI.create(Constants.FORM_GEN_CONTEXT_BASE + System.currentTimeMillis());
     }
 
-    public URI persist(PatientRecord record) {
+    public URI persist(Record record) {
         return persist(Collections.singletonList(record));
     }
 
-    public URI persist(List<PatientRecord> records) {
+    public URI persist(List<Record> records) {
         final EntityManager em = emf.createEntityManager();
 
         try {
             em.getTransaction().begin();
             final Descriptor descriptor = new EntityDescriptor(generateContextUri());
 
-            for (PatientRecord r : records) {
+            for (Record r : records) {
                 Objects.requireNonNull(r);
                 initRequiredFieldsIfNecessary(r);
                 persistRelatedFieldsIfNecessary(r, em, descriptor);
@@ -60,14 +58,14 @@ public class FormGenDao {
         }
     }
 
-    private void initRequiredFieldsIfNecessary(PatientRecord record) {
+    private void initRequiredFieldsIfNecessary(Record record) {
         if (record.getKey() == null) {  // Happens for unpersisted records
             record.setKey(IdentificationUtils.generateKey());
-            record.setUri(PatientRecordDao.generateRecordUriFromKey(record.getKey()));
+            record.setUri(RecordDao.generateRecordUriFromKey(record.getKey()));
         }
     }
 
-    private void persistRelatedFieldsIfNecessary(PatientRecord record, EntityManager em, Descriptor descriptor) {
+    private void persistRelatedFieldsIfNecessary(Record record, EntityManager em, Descriptor descriptor) {
         if(record.getAuthor().getRoleGroup() != null) {
             em.persist(record.getAuthor().getRoleGroup(), descriptor);
         }

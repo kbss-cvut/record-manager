@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.service.formgen;
 
-import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.formgen.FormGenDao;
 import cz.cvut.kbss.study.rest.dto.RawJson;
@@ -72,7 +72,7 @@ public class FormGenService {
      * @param record Record for which the form should be generated
      * @return Form template in JSON-LD
      */
-    public RawJson generateForm(PatientRecord record) {
+    public RawJson generateForm(Record record) {
         Objects.requireNonNull(record);
         final User author = userService.findCurrentUser();
         if (author.getInstitution() != null) {

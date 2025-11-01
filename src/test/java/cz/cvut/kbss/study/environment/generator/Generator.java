@@ -1,15 +1,14 @@
 package cz.cvut.kbss.study.environment.generator;
 
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.model.*;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.qam.Answer;
 import cz.cvut.kbss.study.model.qam.Question;
 import cz.cvut.kbss.study.util.IdentificationUtils;
 
 import java.net.URI;
 import java.util.*;
-
-import static org.apache.commons.lang3.BooleanUtils.forEach;
 
 public class Generator {
 
@@ -187,13 +186,13 @@ public class Generator {
     }
 
     /**
-     * Generators a (pseudo) random patient record.
+     * Generators a (pseudo) random record.
      *
-     * @param author author of patient record
-     * @return Random patient record
+     * @param author author of record
+     * @return Random record
      */
-    public static PatientRecord generatePatientRecord(User author) {
-        final PatientRecord rec = new PatientRecord();
+    public static Record generateRecord(User author) {
+        final Record rec = new Record();
         rec.setAuthor(author);
         rec.setLocalName("RandomRecord" + randomInt());
         rec.setUri(generateUri());
@@ -203,13 +202,13 @@ public class Generator {
     }
 
     /**
-     * Generators a (pseudo) random patient record dto.
+     * Generators a (pseudo) random record dto.
      *
-     * @param author author of patient record dto
-     * @return Random patient record dto
+     * @param author author of record dto
+     * @return Random record dto
      */
-    public static PatientRecordDto generatePatientRecordDto(User author) {
-        final PatientRecordDto rec = new PatientRecordDto();
+    public static RecordDto generateRecordDto(User author) {
+        final RecordDto rec = new RecordDto();
         rec.setLocalName("RandomRecordDto" + randomInt());
         rec.setAuthor(author);
         rec.setUri(generateUri());
