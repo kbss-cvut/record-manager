@@ -422,12 +422,25 @@ public class Configuration {
          */
         boolean allowedRejectReason;
 
+        /**
+         *  Allow users who are not members of any institution to create records.
+         */
+        boolean allowedCreationWithoutInstitution;
+
         public boolean isAllowedRejectReason() {
             return allowedRejectReason;
         }
 
+        public boolean isAllowedCreationWithoutInstitution() {
+            return allowedCreationWithoutInstitution;
+        }
+
         public void setAllowedRejectReason(boolean allowedRejectReason) {
             this.allowedRejectReason = allowedRejectReason;
+        }
+
+        public void setAllowedCreationWithoutInstitution(boolean allowedCreationWithoutInstitution) {
+            this.allowedCreationWithoutInstitution = allowedCreationWithoutInstitution;
         }
     }
 }

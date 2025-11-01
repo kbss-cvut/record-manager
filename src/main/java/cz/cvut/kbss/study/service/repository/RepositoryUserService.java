@@ -1,15 +1,18 @@
 package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.jopa.exceptions.EntityNotFoundException;
+import cz.cvut.kbss.study.dto.PatientRecordDto;
 import cz.cvut.kbss.study.exception.EntityExistsException;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
+import cz.cvut.kbss.study.model.PatientRecord;
 import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
 import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
+import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.EmailService;
 import cz.cvut.kbss.study.service.UserService;
@@ -26,11 +29,8 @@ import org.eclipse.rdf4j.http.protocol.UnauthorizedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RepositoryUserService extends BaseRepositoryService<User> implements UserService {
@@ -207,23 +207,15 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
     }
 
-    @Override
-    protected void preUpdate(User instance) {
-        final User currentUser = securityUtils.getCurrentUser();
-        final User original = userDao.findByUsername(instance.getUsername());
-
-        if(original == null) {
-            throw new EntityNotFoundException("User with specified username does not exist.");
-        }
-
-        boolean differentUser = !Objects.equals(instance.getUsername(), currentUser.getUsername());
+    protected void validatePermissionToUpdate(User currentUser, User toUpdate, User original) {
+        boolean differentUser = !Objects.equals(toUpdate.getUsername(), currentUser.getUsername());
 
         boolean hasWriteAllUsers = securityUtils.hasRole(Role.writeAllUsers);
         boolean lacksPrivilegeOfUpdatedUser = !securityUtils.hasSupersetOfRoles(currentUser, original);
 
-        boolean sameInstitution = instance.getInstitution() != null
+        boolean sameInstitution = toUpdate.getInstitution() != null
                 && currentUser.getInstitution() != null
-                && instance.getInstitution().getKey().equals(currentUser.getInstitution().getKey());
+                && toUpdate.getInstitution().getKey().equals(currentUser.getInstitution().getKey());
 
         boolean hasWriteOrganizationUsers = securityUtils.hasRole(Role.writeOrganizationUsers) && sameInstitution;
 
@@ -242,6 +234,71 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
                         currentUser.getRoleGroup().getRoles().toString(),
                         currentUser.getUsername()));
             }
+        }
+    }
+
+    protected void validateRecordsAgainstCollisions(User toUpdate, User original) {
+
+        if (toUpdate.getInstitution() == null) return;
+
+        Map<String, PatientRecordDto> existingInstitutionRecords = patientRecordDao.findByInstitution(toUpdate.getInstitution()).stream().collect(
+                Collectors.toMap(PatientRecordDto::getLocalName, r -> r)
+        );
+        Map<String, PatientRecord> newInstitutionRecords = patientRecordDao.findByAuthor(original).stream().collect(
+                Collectors.toMap(PatientRecord::getLocalName, r -> r)
+        );
+
+        Map<String, List<String>> conflictingRecords = newInstitutionRecords.keySet().stream()
+                .filter(existingInstitutionRecords::containsKey)
+                .collect(Collectors.toMap(
+                        key -> key,
+                        key -> Arrays.asList(existingInstitutionRecords.get(key).getKey(), newInstitutionRecords.get(key).getKey())
+                ));
+
+
+        if (!conflictingRecords.isEmpty()) {
+
+            String conflictsFormatted = conflictingRecords.entrySet().stream()
+                    .map(e -> String.format(
+                            "• %s (existing record ID: %s, new record ID: %s)",
+                            e.getKey(),
+                            e.getValue().get(0),
+                            e.getValue().get(1)
+                    ))
+                    .collect(Collectors.joining("\n"));
+
+            String message = String.format(
+                    "User cannot be moved to institution '%s' because there are conflicting records with the same name:\n%s.",
+                    toUpdate.getInstitution().getName(),
+                    conflictsFormatted
+            );
+
+            throw new ValidationException(message);
+        }
+    }
+
+    protected void changePatientRecordsInstitution(User original, Institution newInstitution) {
+        List<PatientRecord> recordsToUpdate = patientRecordDao.findByAuthor(original);
+        for (PatientRecord record : recordsToUpdate) {
+            record.setInstitution(newInstitution);
+            patientRecordDao.update(record);
+        }
+    }
+
+    @Override
+    protected void preUpdate(User instance) {
+        final User currentUser = securityUtils.getCurrentUser();
+        final User original = userDao.findByUsername(instance.getUsername());
+
+        if (original == null) {
+            throw new EntityNotFoundException("User with specified username does not exist.");
+        }
+
+        validatePermissionToUpdate(currentUser, instance, original);
+
+        if (instance.getInstitution() != original.getInstitution()) {
+            validateRecordsAgainstCollisions(instance, original);
+            changePatientRecordsInstitution(original, instance.getInstitution());
         }
 
         try {
