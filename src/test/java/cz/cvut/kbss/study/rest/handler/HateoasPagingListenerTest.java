@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.rest.handler;
 
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.rest.event.PaginatedResultRetrievedEvent;
@@ -33,7 +33,7 @@ class HateoasPagingListenerTest {
     private UriComponentsBuilder uriBuilder;
     private MockHttpServletResponse responseMock;
 
-    private List<PatientRecordDto> records;
+    private List<RecordDto> records;
 
     private HateoasPagingListener listener;
 
@@ -43,14 +43,14 @@ class HateoasPagingListenerTest {
         this.uriBuilder = UriComponentsBuilder.newInstance().scheme("http").host("localhost").path("rest/records");
         this.responseMock = new MockHttpServletResponse();
         final User author = Generator.generateUser(null, null);
-        this.records = IntStream.range(0, 10).mapToObj(i -> Generator.generatePatientRecordDto(author))
+        this.records = IntStream.range(0, 10).mapToObj(i -> Generator.generateRecordDto(author))
                                 .collect(Collectors.toList());
     }
 
     @Test
     public void generatesNextRelativeLink() {
         final int size = 5;
-        final Page<PatientRecordDto> page =
+        final Page<RecordDto> page =
                 new PageImpl<>(records.subList(0, size), PageRequest.of(0, size), records.size());
         listener.onApplicationEvent(event(page));
         final String linkHeader = responseMock.getHeader(HttpHeaders.LINK);
@@ -69,14 +69,14 @@ class HateoasPagingListenerTest {
         return Constants.PAGE_SIZE_PARAM + "=" + size;
     }
 
-    private PaginatedResultRetrievedEvent event(Page<PatientRecordDto> page) {
+    private PaginatedResultRetrievedEvent event(Page<RecordDto> page) {
         return new PaginatedResultRetrievedEvent(this, uriBuilder, responseMock, page);
     }
 
     @Test
     public void generatesLastRelativeLink() {
         final int size = 5;
-        final Page<PatientRecordDto> page =
+        final Page<RecordDto> page =
                 new PageImpl<>(records.subList(0, size), PageRequest.of(0, size), records.size());
         listener.onApplicationEvent(event(page));
         final String linkHeader = responseMock.getHeader(HttpHeaders.LINK);
@@ -90,7 +90,7 @@ class HateoasPagingListenerTest {
     @Test
     public void generatesPreviousRelativeLink() {
         final int size = 5;
-        final Page<PatientRecordDto> page =
+        final Page<RecordDto> page =
                 new PageImpl<>(records.subList(size, records.size()), PageRequest.of(1, size),
                                records.size());
         listener.onApplicationEvent(event(page));
@@ -105,7 +105,7 @@ class HateoasPagingListenerTest {
     @Test
     public void generatesFirstRelativeLink() {
         final int size = 5;
-        final Page<PatientRecordDto> page =
+        final Page<RecordDto> page =
                 new PageImpl<>(records.subList(size, records.size()), PageRequest.of(1, size),
                                records.size());
         listener.onApplicationEvent(event(page));
@@ -121,7 +121,7 @@ class HateoasPagingListenerTest {
     public void generatesAllRelativeLinks() {
         final int size = 3;
         final int pageNum = 2;
-        final Page<PatientRecordDto> page = new PageImpl<>(records.subList(pageNum * size, pageNum * size + size),
+        final Page<RecordDto> page = new PageImpl<>(records.subList(pageNum * size, pageNum * size + size),
                                                            PageRequest.of(pageNum, size), records.size());
         listener.onApplicationEvent(event(page));
         final String linkHeader = responseMock.getHeader(HttpHeaders.LINK);
@@ -144,7 +144,7 @@ class HateoasPagingListenerTest {
     @Test
     public void generatesNoLinksForEmptyPage() {
         final int size = 5;
-        final Page<PatientRecordDto> page = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, size), 0);
+        final Page<RecordDto> page = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, size), 0);
         listener.onApplicationEvent(event(page));
         final String linkHeader = responseMock.getHeader(HttpHeaders.LINK);
         assertNull(linkHeader);
@@ -154,7 +154,7 @@ class HateoasPagingListenerTest {
     public void generatesPreviousAndFirstLinkForEmptyPageAfterEnd() {
         final int size = 5;
         final int pageNum = 4;
-        final Page<PatientRecordDto> page = new PageImpl<>(Collections.emptyList(), PageRequest.of(pageNum, size),
+        final Page<RecordDto> page = new PageImpl<>(Collections.emptyList(), PageRequest.of(pageNum, size),
                                                            records.size());
         listener.onApplicationEvent(event(page));
         final String linkHeader = responseMock.getHeader(HttpHeaders.LINK);
@@ -171,7 +171,7 @@ class HateoasPagingListenerTest {
     @Test
     public void generatesFirstAndLastLinksForOnlyPage() {
         final int size = records.size();
-        final Page<PatientRecordDto> page = new PageImpl<>(records, PageRequest.of(0, size), records.size());
+        final Page<RecordDto> page = new PageImpl<>(records, PageRequest.of(0, size), records.size());
         listener.onApplicationEvent(event(page));
         final String linkHeader = responseMock.getHeader(HttpHeaders.LINK);
         assertNotNull(linkHeader);
@@ -186,7 +186,7 @@ class HateoasPagingListenerTest {
     @Test
     public void generatesTotalCountHeader() {
         final int size = records.size();
-        final Page<PatientRecordDto> page = new PageImpl<>(records, PageRequest.of(0, size / 2), records.size());
+        final Page<RecordDto> page = new PageImpl<>(records, PageRequest.of(0, size / 2), records.size());
         listener.onApplicationEvent(event(page));
         final String totalCountHeader = responseMock.getHeader(Constants.X_TOTAL_COUNT_HEADER);
         assertNotNull(totalCountHeader);

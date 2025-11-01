@@ -8,7 +8,7 @@ import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.persistence.dao.RecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.EmailService;
@@ -41,7 +41,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
     private final UserDao userDao;
 
-    private final PatientRecordDao patientRecordDao;
+    private final RecordDao recordDao;
 
     private final EmailService email;
 
@@ -50,13 +50,13 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     public RepositoryUserService(SecurityUtils securityUtils,
                                  PasswordEncoder passwordEncoder,
                                  UserDao userDao,
-                                 PatientRecordDao patientRecordDao,
+                                 RecordDao recordDao,
                                  EmailService email,
                                  ConfigReader config) {
         this.securityUtils = securityUtils;
         this.passwordEncoder = passwordEncoder;
         this.userDao = userDao;
-        this.patientRecordDao = patientRecordDao;
+        this.recordDao = recordDao;
         this.email = email;
         this.config = config;
     }
@@ -267,8 +267,8 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
     @Override
     protected void preRemove(User instance) {
-        if (!patientRecordDao.findByAuthor(instance).isEmpty()) {
-            throw new ValidationException("User with patient records cannot be deleted.");
+        if (!recordDao.findByAuthor(instance).isEmpty()) {
+            throw new ValidationException("User with records cannot be deleted.");
         }
     }
 }

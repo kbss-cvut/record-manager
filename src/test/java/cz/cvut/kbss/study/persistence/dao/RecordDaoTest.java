@@ -4,10 +4,11 @@ import cz.cvut.kbss.jopa.model.EntityManager;
 import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
 import cz.cvut.kbss.jopa.model.descriptors.EntityDescriptor;
 import cz.cvut.kbss.jopa.model.metamodel.EntityType;
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.*;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.qam.Answer;
 import cz.cvut.kbss.study.persistence.BaseDaoTestRunner;
 import cz.cvut.kbss.study.persistence.dao.util.QuestionSaver;
@@ -41,13 +42,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class PatientRecordDaoTest extends BaseDaoTestRunner {
+public class RecordDaoTest extends BaseDaoTestRunner {
 
     @Autowired
     private EntityManager em;
 
     @Autowired
-    private PatientRecordDao sut;
+    private RecordDao sut;
 
     @Autowired
     private UserDao userDao;
@@ -72,9 +73,9 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         Institution institutionOther = Generator.generateInstitution();
         User user1 = Generator.generateUser(institution, this.adminRoleGroup);
         User user2 = Generator.generateUser(institutionOther, this.adminRoleGroup);
-        PatientRecord record1 = Generator.generatePatientRecord(user1);
-        PatientRecord record2 = Generator.generatePatientRecord(user1);
-        PatientRecord recordOther = Generator.generatePatientRecord(user2);
+        Record record1 = Generator.generateRecord(user1);
+        Record record2 = Generator.generateRecord(user1);
+        Record recordOther = Generator.generateRecord(user2);
 
         transactional(() -> {
             institutionDao.persist(institution);
@@ -86,7 +87,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             sut.persist(recordOther);
         });
 
-        List<PatientRecordDto> records = sut.findByInstitution(institution);
+        List<RecordDto> records = sut.findByInstitution(institution);
 
         assertEquals(2, records.size());
         assertEquals(1, records.stream().filter(rs -> record1.getUri().equals(rs.getUri())).count());
@@ -99,9 +100,9 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         Institution institution2 = Generator.generateInstitution();
         User user1 = Generator.generateUser(institution1, this.adminRoleGroup);
         User user2 = Generator.generateUser(institution2, this.adminRoleGroup);
-        PatientRecord record1 = Generator.generatePatientRecord(user1);
-        PatientRecord record2 = Generator.generatePatientRecord(user1);
-        PatientRecord record3 = Generator.generatePatientRecord(user2);
+        Record record1 = Generator.generateRecord(user1);
+        Record record2 = Generator.generateRecord(user1);
+        Record record3 = Generator.generateRecord(user2);
 
         transactional(() -> {
             institutionDao.persist(institution1);
@@ -113,7 +114,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             sut.persist(record3);
         });
 
-        List<PatientRecordDto> records = sut.findAllRecords();
+        List<RecordDto> records = sut.findAllRecords();
 
         assertEquals(3, records.size());
     }
@@ -122,8 +123,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     public void getNumberOfProcessedRecords() {
         Institution institution = Generator.generateInstitution();
         User user = Generator.generateUser(institution, this.adminRoleGroup);
-        PatientRecord record1 = Generator.generatePatientRecord(user);
-        PatientRecord record2 = Generator.generatePatientRecord(user);
+        Record record1 = Generator.generateRecord(user);
+        Record record2 = Generator.generateRecord(user);
         transactional(() -> {
             institutionDao.persist(institution);
             userDao.persist(user);
@@ -141,9 +142,9 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         Institution institution = Generator.generateInstitution();
         User user1 = Generator.generateUser(institution, this.adminRoleGroup);
         User user2 = Generator.generateUser(institution, this.adminRoleGroup);
-        PatientRecord record1 = Generator.generatePatientRecord(user1);
-        PatientRecord record2 = Generator.generatePatientRecord(user1);
-        PatientRecord record3 = Generator.generatePatientRecord(user2);
+        Record record1 = Generator.generateRecord(user1);
+        Record record2 = Generator.generateRecord(user1);
+        Record record3 = Generator.generateRecord(user2);
 
         transactional(() -> {
             institutionDao.persist(institution);
@@ -154,8 +155,8 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             sut.persist(record3);
         });
 
-        List<PatientRecord> records1 = sut.findByAuthor(user1);
-        List<PatientRecord> records2 = sut.findByAuthor(user2);
+        List<Record> records1 = sut.findByAuthor(user1);
+        List<Record> records2 = sut.findByAuthor(user2);
 
         assertEquals(2, records1.size());
         assertEquals(1, records2.size());
@@ -172,12 +173,12 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             em.persist(institution);
         });
 
-        final PatientRecord record = Generator.generatePatientRecord(author);
+        final Record record = Generator.generateRecord(author);
         record.setUri(null);
 
         transactional(() -> sut.persist(record));
         assertNotNull(record.getUri());
-        final PatientRecord result = em.find(PatientRecord.class, record.getUri());
+        final Record result = em.find(Record.class, record.getUri());
         assertNotNull(result);
     }
 
@@ -196,21 +197,21 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     void persistSavesRecordWithQuestionAnswerTreeIntoSeparateContext() {
         final User author = generateAuthorWithInstitution();
-        final PatientRecord record = Generator.generatePatientRecord(author);
+        final Record record = Generator.generateRecord(author);
         record.setUri(null);
         record.setQuestion(Generator.generateQuestionAnswerTree());
 
         transactional(() -> sut.persist(record));
 
         final Descriptor descriptor = getDescriptor(record);
-        final PatientRecord result = em.find(PatientRecord.class, record.getUri(), descriptor);
+        final Record result = em.find(Record.class, record.getUri(), descriptor);
         assertNotNull(result);
         assertNotNull(result.getQuestion());
     }
 
-    private Descriptor getDescriptor(PatientRecord record) {
-        final EntityType<PatientRecord> et = em.getMetamodel().entity(PatientRecord.class);
-        final Descriptor descriptor = new EntityDescriptor(PatientRecordDao.generateRecordUriFromKey(record.getKey()));
+    private Descriptor getDescriptor(Record record) {
+        final EntityType<Record> et = em.getMetamodel().entity(Record.class);
+        final Descriptor descriptor = new EntityDescriptor(RecordDao.generateRecordUriFromKey(record.getKey()));
         descriptor.addAttributeContext(et.getAttribute("author"), null);
         descriptor.addAttributeContext(et.getAttribute("lastModifiedBy"), null);
         descriptor.addAttributeContext(et.getAttribute("institution"), null);
@@ -220,9 +221,9 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     void updateUpdatesRecordInContext() {
         final User author = generateAuthorWithInstitution();
-        final PatientRecord record = Generator.generatePatientRecord(author);
+        final Record record = Generator.generateRecord(author);
         record.setKey(IdentificationUtils.generateKey());
-        record.setUri(PatientRecordDao.generateRecordUriFromKey(record.getKey()));
+        record.setUri(RecordDao.generateRecordUriFromKey(record.getKey()));
         record.setQuestion(Generator.generateQuestionAnswerTree());
         final Descriptor descriptor = getDescriptor(record);
         transactional(() -> {
@@ -238,7 +239,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
         transactional(() -> sut.update(record));
 
-        final PatientRecord result = em.find(PatientRecord.class, record.getUri(), descriptor);
+        final Record result = em.find(Record.class, record.getUri(), descriptor);
         assertEquals(updatedName, result.getLocalName());
         final Answer resultAnswer = em.find(Answer.class, answer.getUri(), descriptor);
         assertNotNull(resultAnswer);
@@ -248,7 +249,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     void findByKeyLoadsRecordByKey() {
         final User author = generateAuthorWithInstitution();
-        final PatientRecord record = Generator.generatePatientRecord(author);
+        final Record record = Generator.generateRecord(author);
         record.setKey(IdentificationUtils.generateKey());
         record.setQuestion(Generator.generateQuestionAnswerTree());
         final Descriptor descriptor = getDescriptor(record);
@@ -257,44 +258,44 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             new QuestionSaver(descriptor).persistIfNecessary(record.getQuestion(), em);
         });
 
-        final PatientRecord result = sut.findByKey(record.getKey());
+        final Record result = sut.findByKey(record.getKey());
         assertNotNull(result);
         assertEquals(record.getUri(), result.getUri());
         assertNotNull(result.getQuestion());
     }
 
-    private void persistRecordWithIdentification(PatientRecord record) {
+    private void persistRecordWithIdentification(Record record) {
         record.setKey(IdentificationUtils.generateKey());
-        record.setUri(PatientRecordDao.generateRecordUriFromKey(record.getKey()));
+        record.setUri(RecordDao.generateRecordUriFromKey(record.getKey()));
         em.persist(record, getDescriptor(record));
     }
 
     @Test
     void findAllFullReturnsRecordsMatchingSpecifiedDatePeriod() {
         final User author = generateAuthorWithInstitution();
-        final List<PatientRecord> allRecords = generateRecordsForAuthor(author, 5);
+        final List<Record> allRecords = generateRecordsForAuthor(author, 5);
         for (int i = 0; i < allRecords.size(); i++) {
             allRecords.get(i).setDateCreated(new Date(System.currentTimeMillis() - i * Environment.MILLIS_PER_DAY));
         }
         transactional(() -> allRecords.forEach(this::persistRecordWithIdentification));
         final LocalDate minDate = LocalDate.now().minusDays(3);
         final LocalDate maxDate = LocalDate.now().minusDays(1);
-        final List<PatientRecord> expected = allRecords.stream().filter(r -> {
+        final List<Record> expected = allRecords.stream().filter(r -> {
             final Date modified = r.getLastModified() != null ? r.getLastModified() : r.getDateCreated();
             final LocalDate modifiedDate = modified.toInstant().atZone(ZoneOffset.UTC).toLocalDate();
             return !modifiedDate.isBefore(minDate) && !modifiedDate.isAfter(maxDate);
         }).toList();
 
-        final Page<PatientRecord> result =
+        final Page<Record> result =
                 sut.findAllRecordsFull(new RecordFilterParams(null, Set.of(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        Pageable.unpaged());
         assertFalse(result.isEmpty());
         assertThat(result.getContent(), containsSameEntities(expected));
     }
 
-    private List<PatientRecord> generateRecordsForAuthor(User author, int count) {
+    private List<Record> generateRecordsForAuthor(User author, int count) {
         return IntStream.range(0, count).mapToObj(i -> {
-                            final PatientRecord r = Generator.generatePatientRecord(author);
+                            final Record r = Generator.generateRecord(author);
                             if (Generator.randomBoolean()) {
                                 r.setDateCreated(new Date(System.currentTimeMillis() - 30 * i * Environment.MILLIS_PER_DAY));
                             } else {
@@ -303,7 +304,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
                             }
                             return r;
                         }).sorted(Comparator.comparing(
-                                (PatientRecord r) -> r.getLastModified() != null ? r.getLastModified() : r.getDateCreated()).reversed())
+                                (Record r) -> r.getLastModified() != null ? r.getLastModified() : r.getDateCreated()).reversed())
                         .toList();
     }
 
@@ -312,19 +313,19 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         final User authorOne = generateAuthorWithInstitution();
         final Institution institution = authorOne.getInstitution();
         final User authorTwo = generateAuthorWithInstitution();
-        final List<PatientRecord> allRecords = new ArrayList<>(generateRecordsForAuthor(authorOne, 5));
+        final List<Record> allRecords = new ArrayList<>(generateRecordsForAuthor(authorOne, 5));
         allRecords.addAll(generateRecordsForAuthor(authorTwo, 5));
         transactional(() -> allRecords.forEach(this::persistRecordWithIdentification));
         final LocalDate minDate = LocalDate.now().minusDays(31);
         final LocalDate maxDate = LocalDate.now().minusDays(1);
-        final List<PatientRecord> expected = allRecords.stream().filter(r -> {
+        final List<Record> expected = allRecords.stream().filter(r -> {
             final Date modified = r.getLastModified() != null ? r.getLastModified() : r.getDateCreated();
             final LocalDate modifiedDate = modified.toInstant().atZone(ZoneOffset.UTC).toLocalDate();
             return !modifiedDate.isBefore(minDate) && !modifiedDate.isAfter(maxDate) && r.getInstitution().getUri()
                                                                                          .equals(institution.getUri());
         }).toList();
 
-        final Page<PatientRecord> result =
+        final Page<Record> result =
                 sut.findAllRecordsFull(new RecordFilterParams(null, Set.of(institution.getKey()), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        Pageable.unpaged());
         assertFalse(result.isEmpty());
@@ -334,7 +335,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     void findAllFullReturnsRecordsMatchingSpecifiedPhase() {
         final User author = generateAuthorWithInstitution();
-        final List<PatientRecord> allRecords = generateRecordsForAuthor(author, 5);
+        final List<Record> allRecords = generateRecordsForAuthor(author, 5);
         transactional(() -> allRecords.forEach(r -> {
             r.setPhase(RecordPhase.values()[Generator.randomInt(0, RecordPhase.values().length)]);
             persistRecordWithIdentification(r);
@@ -343,7 +344,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         final RecordFilterParams filterParams = new RecordFilterParams();
         filterParams.setPhaseIds(Set.of(phase.getIri()));
 
-        final Page<PatientRecord> result = sut.findAllRecordsFull(filterParams, Pageable.unpaged());
+        final Page<Record> result = sut.findAllRecordsFull(filterParams, Pageable.unpaged());
         assertFalse(result.isEmpty());
         result.forEach(res -> assertEquals(phase, res.getPhase()));
     }
@@ -355,7 +356,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
             "http://example.org/form-template-2"
         };
         final User author = generateAuthorWithInstitution();
-        final List<PatientRecord> allRecords = generateRecordsForAuthor(author, 5);
+        final List<Record> allRecords = generateRecordsForAuthor(author, 5);
         transactional(() -> allRecords.forEach(r -> {
             r.setFormTemplate(formTemplates[Generator.randomInt(0, formTemplates.length)]);
             persistRecordWithIdentification(r);
@@ -364,7 +365,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
         final RecordFilterParams filterParams = new RecordFilterParams();
         filterParams.setFormTemplateIds(Set.of(formTemplate));
 
-        final Page<PatientRecord> result = sut.findAllRecordsFull(filterParams, Pageable.unpaged());
+        final Page<Record> result = sut.findAllRecordsFull(filterParams, Pageable.unpaged());
         assertFalse(result.isEmpty());
         result.forEach(res -> assertEquals(formTemplate, res.getFormTemplate()));
     }
@@ -373,11 +374,11 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     void findAllFullReturnsRecordsMatchingSpecifiedPage() {
         final User author = generateAuthorWithInstitution();
-        final List<PatientRecord> allRecords = generateRecordsForAuthor(author, 10);
+        final List<Record> allRecords = generateRecordsForAuthor(author, 10);
         transactional(() -> allRecords.forEach(this::persistRecordWithIdentification));
         final int pageSize = 5;
 
-        final Page<PatientRecord> result = sut.findAllRecordsFull(new RecordFilterParams(), PageRequest.of(1, pageSize));
+        final Page<Record> result = sut.findAllRecordsFull(new RecordFilterParams(), PageRequest.of(1, pageSize));
         assertFalse(result.isEmpty());
         assertEquals(pageSize, result.getNumberOfElements());
         assertThat(result.getContent(), containsSameEntities(allRecords.subList(pageSize, allRecords.size())));
@@ -386,15 +387,15 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     void findAllFullReturnsRecordsSortedAccordingToSortSpecification() {
         final User author = generateAuthorWithInstitution();
-        final List<PatientRecord> allRecords = generateRecordsForAuthor(author, 5);
+        final List<Record> allRecords = generateRecordsForAuthor(author, 5);
         transactional(() -> allRecords.forEach(this::persistRecordWithIdentification));
-        final Page<PatientRecord> result =
+        final Page<Record> result =
                 sut.findAllRecordsFull(new RecordFilterParams(), PageRequest.of(0, allRecords.size(), Sort.Direction.ASC,
                                                                                 RecordSort.SORT_DATE_PROPERTY));
         assertFalse(result.isEmpty());
         assertEquals(allRecords.size(), result.getNumberOfElements());
-        final ListIterator<PatientRecord> itExp = allRecords.listIterator(allRecords.size());
-        final ListIterator<PatientRecord> itAct = result.getContent().listIterator();
+        final ListIterator<Record> itExp = allRecords.listIterator(allRecords.size());
+        final ListIterator<Record> itAct = result.getContent().listIterator();
         while (itExp.hasPrevious() && itAct.hasNext()) {
             assertEquals(itExp.previous().getUri(), itAct.next().getUri());
         }
@@ -410,11 +411,11 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     void findAllFullReturnsPageWithTotalNumberOfMatchingRecords() {
         final User author = generateAuthorWithInstitution();
-        final List<PatientRecord> allRecords = generateRecordsForAuthor(author, 10);
+        final List<Record> allRecords = generateRecordsForAuthor(author, 10);
         transactional(() -> allRecords.forEach(this::persistRecordWithIdentification));
         final int pageSize = 5;
 
-        final Page<PatientRecord> result = sut.findAllRecordsFull(new RecordFilterParams(), PageRequest.of(1, pageSize));
+        final Page<Record> result = sut.findAllRecordsFull(new RecordFilterParams(), PageRequest.of(1, pageSize));
         assertFalse(result.isEmpty());
         assertEquals(pageSize, result.getNumberOfElements());
         assertEquals(allRecords.size(), result.getTotalElements());
@@ -424,21 +425,21 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     void findAllRecordsReturnsPageWithMatchingRecords() {
         final User author = generateAuthorWithInstitution();
         final int totalCount = 10;
-        final List<PatientRecord> allRecords = generateRecordsForAuthor(author, totalCount);
+        final List<Record> allRecords = generateRecordsForAuthor(author, totalCount);
         for (int i = 0; i < allRecords.size(); i++) {
             allRecords.get(i).setDateCreated(new Date(System.currentTimeMillis() - i * Environment.MILLIS_PER_DAY));
         }
         transactional(() -> allRecords.forEach(this::persistRecordWithIdentification));
         final LocalDate minDate = LocalDate.now().minusDays(3);
         final LocalDate maxDate = LocalDate.now().minusDays(1);
-        final List<PatientRecord> allMatching = allRecords.stream().filter(r -> {
+        final List<Record> allMatching = allRecords.stream().filter(r -> {
             final Date modified = r.getLastModified() != null ? r.getLastModified() : r.getDateCreated();
             final LocalDate modifiedDate = modified.toInstant().atZone(ZoneOffset.UTC).toLocalDate();
             return !modifiedDate.isBefore(minDate) && !modifiedDate.isAfter(maxDate);
         }).sorted(Comparator.comparing(r -> r.getLastModified() != null ? r.getLastModified() : r.getDateCreated())).toList();
         final int pageSize = 3;
 
-        final Page<PatientRecordDto> result =
+        final Page<RecordDto> result =
                 sut.findAllRecords(new RecordFilterParams(null,Set.of(), minDate, maxDate, Collections.emptySet(), Collections.emptySet()),
                                        PageRequest.of(0, pageSize, Sort.Direction.ASC, RecordSort.SORT_DATE_PROPERTY));
         assertEquals(Math.min(pageSize, allMatching.size()), result.getNumberOfElements());
@@ -451,7 +452,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
     @Test
     void persistDoesNotGenerateIdentificationWhenRecordAlreadyHasIt() {
         final User author = generateAuthorWithInstitution();
-        final PatientRecord record = Generator.generatePatientRecord(author);
+        final Record record = Generator.generateRecord(author);
         final String key = IdentificationUtils.generateKey();
         record.setKey(key);
         final URI uri = Generator.generateUri();
@@ -459,7 +460,7 @@ public class PatientRecordDaoTest extends BaseDaoTestRunner {
 
         transactional(() -> sut.persist(record));
 
-        final PatientRecord result = em.find(PatientRecord.class, uri);
+        final Record result = em.find(Record.class, uri);
         assertNotNull(result);
         assertEquals(uri, result.getUri());
         assertEquals(key, result.getKey());

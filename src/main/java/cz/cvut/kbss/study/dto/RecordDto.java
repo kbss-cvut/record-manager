@@ -7,8 +7,8 @@ import cz.cvut.kbss.study.model.util.HasOwlKey;
 import java.net.URI;
 import java.util.Date;
 
-@OWLClass(iri = Vocabulary.s_c_patient_record)
-public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
+@OWLClass(iri = Vocabulary.s_c_record)
+public class RecordDto extends AbstractEntity implements HasOwlKey {
 
     @ParticipationConstraints(nonEmpty = true)
     @OWLDataProperty(iri = Vocabulary.s_p_key)
@@ -129,7 +129,7 @@ public class PatientRecordDto extends AbstractEntity implements HasOwlKey {
 
     @Override
     public String toString() {
-        return "PatientRecordDto{" +
+        return "RecordDto{" +
                 "localName=" + localName +
                 "dateCreated=" + dateCreated +
                 ", institution=" + institution +

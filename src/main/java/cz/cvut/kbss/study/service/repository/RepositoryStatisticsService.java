@@ -1,6 +1,6 @@
 package cz.cvut.kbss.study.service.repository;
 
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.persistence.dao.RecordDao;
 import cz.cvut.kbss.study.persistence.dao.UserDao;
 import cz.cvut.kbss.study.service.StatisticsService;
 import org.springframework.stereotype.Service;
@@ -11,10 +11,10 @@ public class RepositoryStatisticsService implements StatisticsService {
 
     private final UserDao userDao;
 
-    private final PatientRecordDao recordDao;
+    private final RecordDao recordDao;
 
     public RepositoryStatisticsService(UserDao userDao,
-                                       PatientRecordDao recordDao) {
+                                       RecordDao recordDao) {
         this.userDao = userDao;
         this.recordDao = recordDao;
     }

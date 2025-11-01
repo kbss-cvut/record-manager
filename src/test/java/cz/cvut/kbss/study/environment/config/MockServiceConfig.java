@@ -4,7 +4,7 @@ import cz.cvut.kbss.study.persistence.dao.ActionHistoryDao;
 import cz.cvut.kbss.study.service.ActionHistoryService;
 import cz.cvut.kbss.study.service.ConfigReader;
 import cz.cvut.kbss.study.service.InstitutionService;
-import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.service.RecordService;
 import cz.cvut.kbss.study.service.StatisticsService;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.UserDetailsService;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 public class MockServiceConfig {
 
     @Bean
-    public PatientRecordService patientRecordService() { return mock(PatientRecordService.class); }
+    public RecordService recordService() { return mock(RecordService.class); }
 
     @Bean
     public UserService userService() {

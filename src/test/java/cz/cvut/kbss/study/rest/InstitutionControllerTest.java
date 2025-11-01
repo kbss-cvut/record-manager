@@ -1,16 +1,15 @@
 package cz.cvut.kbss.study.rest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.environment.generator.Generator;
 import cz.cvut.kbss.study.environment.util.Environment;
 import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.RoleGroup;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.InstitutionService;
-import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.service.RecordService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +43,7 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
     private InstitutionService institutionServiceMock;
 
     @Mock
-    private PatientRecordService patientRecordServiceMock;
+    private RecordService recordServiceMock;
 
     @InjectMocks
     private InstitutionController controller;
@@ -124,32 +123,6 @@ public class InstitutionControllerTest extends BaseControllerTestRunner {
 
         assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(result.getResponse().getStatus()));
         verify(institutionServiceMock).findByKey(key);
-    }
-
-    @Test
-    public void getTreatedPatientRecordsReturnsRecords() throws Exception {
-        final String key = "12345";
-        Institution institution = Generator.generateInstitution();
-        institution.setKey(key);
-
-        PatientRecordDto record1 = Generator.generatePatientRecordDto(Environment.getCurrentUser());
-        PatientRecordDto record2 = Generator.generatePatientRecordDto(Environment.getCurrentUser());
-        List<PatientRecordDto> records = new ArrayList<>();
-        records.add(record1);
-        records.add(record2);
-
-        when(institutionServiceMock.findByKey(key)).thenReturn(institution);
-        when(patientRecordServiceMock.findAll(any(RecordFilterParams.class), any(Pageable.class))).thenReturn(
-                new PageImpl<>(records));
-        final MvcResult result = mockMvc.perform(get("/institutions/" + key + "/patients/")).andReturn();
-
-        assertEquals(HttpStatus.OK, HttpStatus.valueOf(result.getResponse().getStatus()));
-        final List<PatientRecordDto> body = objectMapper.readValue(result.getResponse().getContentAsString(),
-                                                                   new TypeReference<>() {
-                                                                   });
-        assertEquals(2, body.size());
-        verify(institutionServiceMock).findByKey(key);
-        verify(patientRecordServiceMock).findAll(new RecordFilterParams(Set.of(key)), Pageable.unpaged());
     }
 
     @Test

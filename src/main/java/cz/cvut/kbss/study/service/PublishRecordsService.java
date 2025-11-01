@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.cvut.kbss.study.config.WebAppConfig;
 import cz.cvut.kbss.study.dto.RecordImportResult;
-import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
@@ -31,13 +31,13 @@ public class PublishRecordsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PublishRecordsService.class);
 
-    private final PatientRecordService recordService;
+    private final RecordService recordService;
     private final ObjectMapper objectMapper;
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
     private final ConfigReader configReader;
 
-    public PublishRecordsService(PatientRecordService recordService, SecurityUtils securityUtils, RestTemplate restTemplate, ConfigReader configReader) {
+    public PublishRecordsService(RecordService recordService, SecurityUtils securityUtils, RestTemplate restTemplate, ConfigReader configReader) {
         this.recordService = recordService;
         this.objectMapper = WebAppConfig.createJsonObjectMapper();
         this.securityUtils = securityUtils;
@@ -57,8 +57,8 @@ public class PublishRecordsService {
         filters.setPhaseIds(new HashSet<>());
         filters.getPhaseIds().add(RecordPhase.completed.getIri());
 
-        final Page<PatientRecord> result = recordService.findAllFull(filters, pageSpec);
-        List<PatientRecord> records = result.getContent();
+        final Page<Record> result = recordService.findAllFull(filters, pageSpec);
+        List<Record> records = result.getContent();
 
         ResponseEntity<RecordImportResult> responseEntity = executePublishRequest(onPublishRecordsServiceUrl, records);
 
@@ -69,7 +69,7 @@ public class PublishRecordsService {
         return importResult;
     }
 
-    protected ResponseEntity<RecordImportResult> executePublishRequest(String onPublishRecordsServiceUrl, List<PatientRecord> records){
+    protected ResponseEntity<RecordImportResult> executePublishRequest(String onPublishRecordsServiceUrl, List<Record> records){
         String recordsJson;
         try {
             recordsJson = objectMapper.writeValueAsString(records);

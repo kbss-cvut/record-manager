@@ -18,8 +18,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.Date;
 
-@OWLClass(iri = Vocabulary.s_c_patient_record)
-public class PatientRecord implements Serializable, HasOwlKey, HasUri {
+@OWLClass(iri = Vocabulary.s_c_record)
+public class Record implements Serializable, HasOwlKey, HasUri {
 
     @Id
     private URI uri;
@@ -175,7 +175,7 @@ public class PatientRecord implements Serializable, HasOwlKey, HasUri {
 
     @Override
     public String toString() {
-        return "PatientRecord{<" + uri +
+        return "Record{<" + uri +
                 ">, localName=" + localName +
                 ", dateCreated=" + dateCreated +
                 ", institution=" + institution +

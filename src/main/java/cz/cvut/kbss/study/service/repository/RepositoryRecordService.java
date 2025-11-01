@@ -1,18 +1,18 @@
 package cz.cvut.kbss.study.service.repository;
 
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
 import cz.cvut.kbss.study.exception.RecordAuthorNotFoundException;
-import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.OwlKeySupportingDao;
-import cz.cvut.kbss.study.persistence.dao.PatientRecordDao;
+import cz.cvut.kbss.study.persistence.dao.RecordDao;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
 import cz.cvut.kbss.study.security.SecurityConstants;
-import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.service.RecordService;
 import cz.cvut.kbss.study.service.UserService;
 import cz.cvut.kbss.study.service.security.SecurityUtils;
 import cz.cvut.kbss.study.util.Utils;
@@ -27,34 +27,32 @@ import java.net.URI;
 import java.util.*;
 
 @Service
-public class RepositoryPatientRecordService extends KeySupportingRepositoryService<PatientRecord>
-        implements PatientRecordService {
+public class RepositoryRecordService extends KeySupportingRepositoryService<Record>
+        implements RecordService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RepositoryPatientRecordService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RepositoryRecordService.class);
 
-    private final PatientRecordDao recordDao;
+    private final RecordDao recordDao;
 
     private final SecurityUtils securityUtils;
 
     private final UserService userService;
-    private final PatientRecordDao patientRecordDao;
 
-    public RepositoryPatientRecordService(PatientRecordDao recordDao, SecurityUtils securityUtils,
-                                          UserService userService, PatientRecordDao patientRecordDao) {
+    public RepositoryRecordService(RecordDao recordDao, SecurityUtils securityUtils,
+                                   UserService userService) {
         this.recordDao = recordDao;
         this.securityUtils = securityUtils;
         this.userService = userService;
-        this.patientRecordDao = patientRecordDao;
     }
 
     @Override
-    protected OwlKeySupportingDao<PatientRecord> getPrimaryDao() {
+    protected OwlKeySupportingDao<Record> getPrimaryDao() {
         return recordDao;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<PatientRecordDto> findAll(RecordFilterParams filters, Pageable pageSpec) {
+    public Page<RecordDto> findAll(RecordFilterParams filters, Pageable pageSpec) {
         User currentUser = securityUtils.getCurrentUser();
         boolean hasReadAllRecords = currentUser.getRoleGroup().hasRole(Role.valueOf(SecurityConstants.readAllRecords));
 
@@ -67,12 +65,12 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
 
     @Transactional(readOnly = true)
     @Override
-    public Page<PatientRecord> findAllFull(RecordFilterParams filters, Pageable pageSpec) {
+    public Page<Record> findAllFull(RecordFilterParams filters, Pageable pageSpec) {
         return recordDao.findAllRecordsFull(filters, pageSpec);
     }
 
     @Override
-    protected void prePersist(PatientRecord instance) {
+    protected void prePersist(Record instance) {
         final User author = securityUtils.getCurrentUser();
         instance.setAuthor(author);
         instance.setDateCreated(new Date());
@@ -81,7 +79,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     }
 
     @Override
-    protected void preUpdate(PatientRecord instance) {
+    protected void preUpdate(Record instance) {
         if(instance.getPhase() != RecordPhase.rejected) {
             instance.setRejectReason(null);
         }
@@ -92,13 +90,13 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
 
     @Transactional
     @Override
-    public RecordImportResult importRecords(List<PatientRecord> records) {
+    public RecordImportResult importRecords(List<Record> records) {
         Objects.requireNonNull(records);
         LOG.debug("Importing records.");
         return importRecordsImpl(records, Optional.empty());
     }
 
-    private RecordImportResult importRecordsImpl(List<PatientRecord> records, Optional<RecordPhase> targetPhase) {
+    private RecordImportResult importRecordsImpl(List<Record> records, Optional<RecordPhase> targetPhase) {
         final User author = securityUtils.getCurrentUser();
         final Date created = new Date();
         final RecordImportResult result = new RecordImportResult(records.size());
@@ -117,7 +115,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
 
     // TODO reconsider the logic for new roles
     private void setImportedRecordProvenance(User currentUser, Date now, Optional<RecordPhase> targetPhase,
-                                             PatientRecord record) {
+                                             Record record) {
 
         if(currentUser.getRoleGroup().getRoles().containsAll(List.of(Role.readAllOrganizations, Role.readAllUsers, Role.rejectRecords, Role.completeRecords))){
             targetPhase.ifPresent(record::setPhase);
@@ -137,13 +135,13 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
     @Override
     public void setPhase(Set<String> recordUris, RecordPhase targetPhase){
         for(String uri : recordUris){
-            patientRecordDao.updateStatus(URI.create(uri), targetPhase);
+            recordDao.updateStatus(URI.create(uri), targetPhase);
         }
     }
 
     @Transactional
     @Override
-    public RecordImportResult importRecords(List<PatientRecord> records, RecordPhase targetPhase) {
+    public RecordImportResult importRecords(List<Record> records, RecordPhase targetPhase) {
         Objects.requireNonNull(records);
         LOG.debug("Importing records to target phase '{}'.", targetPhase);
         return importRecordsImpl(records, Optional.ofNullable(targetPhase));
@@ -151,7 +149,7 @@ public class RepositoryPatientRecordService extends KeySupportingRepositoryServi
 
     @Override
     public Page<RawRecord> exportRecords(RecordFilterParams filters, Pageable pageSpec){
-        return patientRecordDao.findAllRecordsRaw(filters, pageSpec);
+        return recordDao.findAllRecordsRaw(filters, pageSpec);
     }
 
     @Transactional(readOnly = true)
