@@ -310,39 +310,52 @@ public class PatientRecordDao extends OwlKeySupportingDao<PatientRecord> {
     private static String constructWhereClause(RecordFilterParams filters, Map<String, Object> queryParams) {
         // Could not use Criteria API because it does not support OPTIONAL
 
-        String whereClause = "{" +
-                "?r a ?type ; " +
-                "?hasAuthor ?author ; " +
-                "?hasCreatedDate ?created . " +
-                "?author ?hasUsername ?username . " +
-                "OPTIONAL { " +
-                "?r ?hasInstitution ?institution . " +
-                "?institution ?hasKey ?institutionKey . " +
-                "} " +
-                "OPTIONAL { ?r ?hasPhase ?phase . } " +
-                "OPTIONAL { ?r ?hasFormTemplate ?formTemplate . } " +
-                "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
-                "BIND (COALESCE(?lastModified, ?created) AS ?date) ";
+        String whereClause = """
+                {
+                    ?r a ?type ;
+                       ?hasAuthor ?author ;
+                       ?hasCreatedDate ?created .
+                    ?author ?hasUsername ?username .
+                
+                    OPTIONAL { 
+                        ?r ?hasInstitution ?institution .
+                        ?institution ?hasKey ?institutionKey .
+                    }
+                
+                    OPTIONAL { ?r ?hasPhase ?phase . }
+                    OPTIONAL { ?r ?hasFormTemplate ?formTemplate . }
+                    OPTIONAL { ?r ?hasLastModified ?lastModified . }
+                
+                    BIND (COALESCE(?lastModified, ?created) AS ?date)
+                """;
+
         whereClause += mapParamsToQuery(filters, queryParams);
         whereClause += "}";
+
         return whereClause;
     }
 
     private static String constructWhereClauseWithGraphs(RecordFilterParams filters, Map<String, Object> queryParams) {
         // Could not use Criteria API because it does not support OPTIONAL
-        String whereClause = "{GRAPH ?r{" +
-                "?r a ?type ; " +
-                "?hasCreatedDate ?created ; " +
-                "?hasInstitution ?institution . " +
-                "OPTIONAL { ?r ?hasPhase ?phase . } " +
-                "OPTIONAL { ?r ?hasFormTemplate ?formTemplate . } " +
-                "OPTIONAL { ?r ?hasLastModified ?lastModified . } " +
-                "BIND (COALESCE(?lastModified, ?created) AS ?date) ";
-        whereClause += mapParamsToQuery(filters, queryParams);
-        whereClause += "}" +
-                "GRAPH ?institutionGraph{" +
-                "?institution ?hasKey ?institutionKey ." +
-                "}}";
+        String whereClause = """
+                {GRAPH ?r {
+                    ?r a ?type ;
+                       ?hasCreatedDate ?created ;
+                       ?hasInstitution ?institution .
+                
+                    OPTIONAL { ?r ?hasPhase ?phase . }
+                    OPTIONAL { ?r ?hasFormTemplate ?formTemplate . }
+                    OPTIONAL { ?r ?hasLastModified ?lastModified . }
+                
+                    BIND (COALESCE(?lastModified, ?created) AS ?date)
+                """
+                + mapParamsToQuery(filters, queryParams) +
+                """
+                        }
+                        GRAPH ?institutionGraph {
+                            ?institution ?hasKey ?institutionKey .
+                        }}
+                        """;
 
         queryParams.put("institutionGraph", URI.create(Vocabulary.s_c_institution + "s"));
 
