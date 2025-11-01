@@ -231,7 +231,7 @@ public class RecordControllerTest extends BaseControllerTestRunner {
     }
 
     @Test
-    public void createRecordWithoutInstitutionIfItIsAllowedReturnsResponseStatusBadRequest() throws Exception {
+    public void createRecordWithoutInstitutionIfItIsAllowedReturnsResponseStatusCreated() throws Exception {
         user.setInstitution(null);
 
         PatientRecord record = Generator.generatePatientRecord(user);
