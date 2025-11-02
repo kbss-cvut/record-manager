@@ -11,7 +11,7 @@ import java.util.Date;
         @EntityResult(entityClass = RawRecord.class)
 })
 )
-@OWLClass(iri = Vocabulary.s_c_patient_record)
+@OWLClass(iri = Vocabulary.s_c_record)
 public class RawRecord {
     @Id
     private URI uri;

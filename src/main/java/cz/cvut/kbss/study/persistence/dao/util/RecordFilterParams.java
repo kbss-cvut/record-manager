@@ -1,5 +1,7 @@
 package cz.cvut.kbss.study.persistence.dao.util;
 
+import cz.cvut.kbss.study.model.Record;
+
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Objects;
@@ -7,7 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Encapsulates {@link cz.cvut.kbss.study.model.PatientRecord} filtering criteria.
+ * Encapsulates {@link Record} filtering criteria.
  */
 public class RecordFilterParams {
 

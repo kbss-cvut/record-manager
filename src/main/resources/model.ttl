@@ -164,9 +164,9 @@ rm:institution rdf:type owl:Class ;
                rdfs:label "Institution"@en .
 
 
-###  http://onto.fel.cvut.cz/ontologies/record-manager/patient-record
-rm:patient-record rdf:type owl:Class ;
-                  rdfs:label "PatientRecord"@en .
+###  http://onto.fel.cvut.cz/ontologies/record-manager/record
+rm:record rdf:type owl:Class ;
+                  rdfs:label "Record"@en .
 
 
 ###  http://xmlns.com/foaf/0.1/Person

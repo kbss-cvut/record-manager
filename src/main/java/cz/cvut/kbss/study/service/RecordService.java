@@ -1,8 +1,8 @@
 package cz.cvut.kbss.study.service;
 
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.dto.RecordImportResult;
-import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.RecordPhase;
 import cz.cvut.kbss.study.model.export.RawRecord;
 import cz.cvut.kbss.study.persistence.dao.util.RecordFilterParams;
@@ -12,15 +12,15 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Set;
 
-public interface PatientRecordService extends BaseService<PatientRecord> {
+public interface RecordService extends BaseService<Record> {
 
     /**
      * Finds a record with the specified key.
      *
      * @param key Record identifier
-     * @return Matching patient record or {@code null}
+     * @return Matching record or {@code null}
      */
-    PatientRecord findByKey(String key);
+    Record findByKey(String key);
 
     /**
      * Gets records corresponding to the specified filtering, paging, and sorting criteria.
@@ -30,7 +30,7 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @return List of matching record DTOs
      * @see #findAllFull(RecordFilterParams, Pageable)
      */
-    Page<PatientRecordDto> findAll(RecordFilterParams filters, Pageable pageSpec);
+    Page<RecordDto> findAll(RecordFilterParams filters, Pageable pageSpec);
 
     /**
      * Gets records corresponding to the specified filtering, paging, and sorting criteria.
@@ -40,7 +40,7 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      * @return List of matching records
      * @see #findAll(RecordFilterParams, Pageable)
      */
-    Page<PatientRecord> findAllFull(RecordFilterParams filters, Pageable pageSpec);
+    Page<Record> findAllFull(RecordFilterParams filters, Pageable pageSpec);
 
     /**
      * Imports the specified records.
@@ -61,7 +61,7 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      *                                                                    does not exist in this application instance's
      *                                                                    repository
      */
-    RecordImportResult importRecords(List<PatientRecord> records);
+    RecordImportResult importRecords(List<Record> records);
 
     /**
      * Imports the specified records and sets them all to the specified phase.
@@ -79,7 +79,7 @@ public interface PatientRecordService extends BaseService<PatientRecord> {
      *                                                                    does not exist in this application instance's
      *                                                                    repository
      */
-    RecordImportResult importRecords(List<PatientRecord> records, RecordPhase targetPhase);
+    RecordImportResult importRecords(List<Record> records, RecordPhase targetPhase);
 
     /**
      *

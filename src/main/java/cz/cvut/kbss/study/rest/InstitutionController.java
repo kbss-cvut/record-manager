@@ -1,13 +1,13 @@
 package cz.cvut.kbss.study.rest;
 
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.model.Institution;
 import cz.cvut.kbss.study.rest.exception.BadRequestException;
 import cz.cvut.kbss.study.rest.util.RestUtils;
 import cz.cvut.kbss.study.security.SecurityConstants;
 import cz.cvut.kbss.study.service.InstitutionService;
-import cz.cvut.kbss.study.service.PatientRecordService;
+import cz.cvut.kbss.study.service.RecordService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,10 +35,10 @@ public class InstitutionController extends BaseController {
 
     private final InstitutionService institutionService;
 
-    private final PatientRecordService recordService;
+    private final RecordService recordService;
     
     public InstitutionController(InstitutionService institutionService,
-                                 PatientRecordService recordService) {
+                                 RecordService recordService) {
         this.institutionService = institutionService;
         this.recordService = recordService;
     }
@@ -64,15 +64,6 @@ public class InstitutionController extends BaseController {
             throw NotFoundException.create("Institution", key);
         }
         return result;
-    }
-
-    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllRecords + "') " +
-            "or (hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isRecordInUsersInstitution(#key))")
-    @GetMapping(value = "/{key}/patients", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PatientRecordDto> getTreatedPatientRecords(@PathVariable("key") String key) {
-        final Institution inst = findInternal(key);
-        assert inst != null;
-        return recordService.findAll(constructRecordFilter("institution", key), Pageable.unpaged()).getContent();
     }
 
     @PreAuthorize("hasAuthority('" + SecurityConstants.writeAllOrganizations + "')")
