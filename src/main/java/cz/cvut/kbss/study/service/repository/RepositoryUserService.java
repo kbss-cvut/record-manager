@@ -1,12 +1,12 @@
 package cz.cvut.kbss.study.service.repository;
 
 import cz.cvut.kbss.jopa.exceptions.EntityNotFoundException;
-import cz.cvut.kbss.study.dto.PatientRecordDto;
+import cz.cvut.kbss.study.dto.RecordDto;
 import cz.cvut.kbss.study.exception.EntityExistsException;
 import cz.cvut.kbss.study.exception.NotFoundException;
 import cz.cvut.kbss.study.exception.ValidationException;
 import cz.cvut.kbss.study.model.Institution;
-import cz.cvut.kbss.study.model.PatientRecord;
+import cz.cvut.kbss.study.model.Record;
 import cz.cvut.kbss.study.model.Role;
 import cz.cvut.kbss.study.model.User;
 import cz.cvut.kbss.study.persistence.dao.GenericDao;
@@ -241,11 +241,11 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
         if (toUpdate.getInstitution() == null) return;
 
-        Map<String, PatientRecordDto> existingInstitutionRecords = patientRecordDao.findByInstitution(toUpdate.getInstitution()).stream().collect(
-                Collectors.toMap(PatientRecordDto::getLocalName, r -> r)
+        Map<String, RecordDto> existingInstitutionRecords = recordDao.findByInstitution(toUpdate.getInstitution()).stream().collect(
+                Collectors.toMap(RecordDto::getLocalName, r -> r)
         );
-        Map<String, PatientRecord> newInstitutionRecords = patientRecordDao.findByAuthor(original).stream().collect(
-                Collectors.toMap(PatientRecord::getLocalName, r -> r)
+        Map<String, Record> newInstitutionRecords = recordDao.findByAuthor(original).stream().collect(
+                Collectors.toMap(Record::getLocalName, r -> r)
         );
 
         Map<String, List<String>> conflictingRecords = newInstitutionRecords.keySet().stream()
@@ -278,10 +278,10 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
     }
 
     protected void changePatientRecordsInstitution(User original, Institution newInstitution) {
-        List<PatientRecord> recordsToUpdate = patientRecordDao.findByAuthor(original);
-        for (PatientRecord record : recordsToUpdate) {
+        List<Record> recordsToUpdate = recordDao.findByAuthor(original);
+        for (Record record : recordsToUpdate) {
             record.setInstitution(newInstitution);
-            patientRecordDao.update(record);
+            recordDao.update(record);
         }
     }
 

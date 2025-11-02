@@ -234,7 +234,7 @@ public class RecordControllerTest extends BaseControllerTestRunner {
     public void createRecordWithoutInstitutionIfItIsAllowedReturnsResponseStatusCreated() throws Exception {
         user.setInstitution(null);
 
-        PatientRecord record = Generator.generatePatientRecord(user);
+        Record record = Generator.generateRecord(user);
 
         when(configReaderMock.getConfig(ConfigParam.RECORDS_ALLOWED_CREATION_WITHOUT_INSTITUTION))
                 .thenReturn("true");
