@@ -66,8 +66,16 @@ public enum Role {
     @Individual(iri = Vocabulary.s_i_read_statistics_role)
     readStatistics(SecurityConstants.readStatistics, Vocabulary.s_i_read_statistics_role),
 
+    @Individual(iri = Vocabulary.s_i_read_answer_feedback_role)
+    readAnswerFeedback(SecurityConstants.readAnswerFeedback, Vocabulary.s_i_read_answer_feedback_role),
+
+    @Individual(iri = Vocabulary.s_i_read_question_hint_role)
+    readQuestionHint(SecurityConstants.readQuestionHint, Vocabulary.s_i_read_question_hint_role),
+
     @Individual(iri = Vocabulary.s_i_impersonate_role)
     impersonate(SecurityConstants.impersonate, Vocabulary.s_i_impersonate_role);
+
+
 
     private final String iri;
 

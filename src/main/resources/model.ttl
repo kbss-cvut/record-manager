@@ -304,6 +304,14 @@ rm:read-statistics-role rdf:type owl:NamedIndividual, rm:role;
         rdfs:label "read statistics"@en ;
         rdfs:comment "Allows user to view statistical reports about the system’s data."@en .
 
+rm:read-answer-feedback-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "read answer feedback"@en ;
+        rdfs:comment "Allows users to view feedback for entered answers."@en .
+
+rm:read-question-hint-role rdf:type owl:NamedIndividual, rm:role;
+        rdfs:label "read question hint"@en ;
+        rdfs:comment "Allows users to reveal hint for question."@en .
+
 rm:impersonate-role rdf:type owl:NamedIndividual, rm:role;
         rdfs:label "impersonate user"@en .
 
