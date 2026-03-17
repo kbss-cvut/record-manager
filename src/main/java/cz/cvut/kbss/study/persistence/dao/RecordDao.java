@@ -173,7 +173,6 @@ public class RecordDao extends OwlKeySupportingDao<Record> {
      * @param entity The local name to be checked for uniqueness
      */
     public void requireUniqueNonEmptyLocalName(Record entity) {
-        Objects.requireNonNull(entity.getInstitution());
         if (entity.getLocalName() == null || entity.getLocalName().isEmpty()) {
             throw new ValidationException("error.record.localNameOfRecordIsEmpty",
                                           "Local name of record is empty for entity " + entity);
