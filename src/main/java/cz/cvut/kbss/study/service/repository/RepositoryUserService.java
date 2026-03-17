@@ -277,7 +277,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
         }
     }
 
-    protected void changePatientRecordsInstitution(User original, Institution newInstitution) {
+    protected void changeRecordsInstitution(User original, Institution newInstitution) {
         List<Record> recordsToUpdate = recordDao.findByAuthor(original);
         for (Record record : recordsToUpdate) {
             record.setInstitution(newInstitution);
@@ -298,7 +298,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
         if (!Objects.equals(instance.getInstitution(), original.getInstitution())) {
             validateRecordsAgainstCollisions(instance, original);
-            changePatientRecordsInstitution(original, instance.getInstitution());
+            changeRecordsInstitution(original, instance.getInstitution());
         }
 
         try {
