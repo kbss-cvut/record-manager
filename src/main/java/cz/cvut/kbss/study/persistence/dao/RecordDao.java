@@ -341,20 +341,22 @@ public class RecordDao extends OwlKeySupportingDao<Record> {
         String whereClause = """
                 {GRAPH ?r {
                     ?r a ?type ;
-                       ?hasCreatedDate ?created ;
-                       ?hasInstitution ?institution .
-                
+                       ?hasCreatedDate ?created .
+
+                    OPTIONAL { ?r ?hasInstitution ?institution . }
                     OPTIONAL { ?r ?hasPhase ?phase . }
                     OPTIONAL { ?r ?hasFormTemplate ?formTemplate . }
                     OPTIONAL { ?r ?hasLastModified ?lastModified . }
-                
+
                     BIND (COALESCE(?lastModified, ?created) AS ?date)
                 """
                 + mapParamsToQuery(filters, queryParams) +
                 """
                         }
-                        GRAPH ?institutionGraph {
-                            ?institution ?hasKey ?institutionKey .
+                        OPTIONAL {
+                            GRAPH ?institutionGraph {
+                                ?institution ?hasKey ?institutionKey .
+                            }
                         }}
                         """;
 
