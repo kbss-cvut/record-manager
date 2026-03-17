@@ -296,7 +296,7 @@ public class RepositoryUserService extends BaseRepositoryService<User> implement
 
         validatePermissionToUpdate(currentUser, instance, original);
 
-        if (instance.getInstitution() != original.getInstitution()) {
+        if (!Objects.equals(instance.getInstitution(), original.getInstitution())) {
             validateRecordsAgainstCollisions(instance, original);
             changePatientRecordsInstitution(original, instance.getInstitution());
         }
