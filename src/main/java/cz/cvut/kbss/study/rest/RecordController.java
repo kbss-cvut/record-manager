@@ -149,7 +149,8 @@ public class RecordController extends BaseController {
                 .body(new InputStreamResource(stream));
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllRecords + "') " +
+    @PreAuthorize("@securityUtils.isRecordCreatedByUser(#key) " +
+            "or hasAuthority('" + SecurityConstants.readAllRecords + "') " +
             "or (hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isRecordInUsersInstitution(#key))")
     @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Record getRecord(@PathVariable("key") String key) {

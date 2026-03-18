@@ -155,6 +155,7 @@ public class SecurityUtils {
 
     /**
      * Checks whether the current user is in same institution as the record was created.
+     * Returns false if user is not member of any institution.
      *
      * @param recordKey Record identifier
      * @return Membership status of the current user and record
@@ -162,7 +163,23 @@ public class SecurityUtils {
     public boolean isRecordInUsersInstitution(String recordKey) {
         final User user = getCurrentUser();
         final Record record = recordDao.findByKey(recordKey);
+        if (user.getInstitution() == null) {
+            return false;
+        }
         return user.getInstitution().getKey().equals(record.getInstitution().getKey());
+    }
+
+    /**
+     * Checks whether the current user is the author of the record.
+     *
+     * @param recordKey Record identifier
+     * @return Membership status of the current user and record
+     */
+    public boolean isRecordCreatedByUser(String recordKey) {
+        final User user = getCurrentUser();
+        final Record record = recordDao.findByKey(recordKey);
+
+        return record.getAuthor() != null && record.getAuthor().equals(user);
     }
 
     /**
