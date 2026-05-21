@@ -67,4 +67,8 @@ public class SecurityConstants {
 
     public static final String readStatistics = "readStatistics";
 
+    public static final String readAnswerFeedback = "readAnswerFeedback";
+
+    public static final String readQuestionHint = "readQuestionHint";
+
 }
