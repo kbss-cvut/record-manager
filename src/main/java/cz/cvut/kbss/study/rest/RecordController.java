@@ -149,7 +149,8 @@ public class RecordController extends BaseController {
                 .body(new InputStreamResource(stream));
     }
 
-    @PreAuthorize("hasAuthority('" + SecurityConstants.readAllRecords + "') " +
+    @PreAuthorize("@securityUtils.isRecordCreatedByUser(#key) " +
+            "or hasAuthority('" + SecurityConstants.readAllRecords + "') " +
             "or (hasAuthority('" + SecurityConstants.readOrganizationRecords + "') and @securityUtils.isRecordInUsersInstitution(#key))")
     @GetMapping(value = "/{key}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Record getRecord(@PathVariable("key") String key) {
@@ -168,7 +169,7 @@ public class RecordController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> createRecord(@RequestBody Record record) {
 
-        if(userService.getCurrentUser().getInstitution() == null)
+        if(configReader.getConfig(ConfigParam.RECORDS_ALLOWED_CREATION_WITHOUT_INSTITUTION).equals("false") && userService.getCurrentUser().getInstitution() == null)
             throw new ValidationException("record.save-error.user-not-assigned-to-institution",
                     "User is not assigned to any institution.");
 
