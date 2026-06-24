@@ -22,3 +22,4 @@ or the command line. For more details, see the [Configuration documentation](./d
 
 Build configuration and deployment are described in [Setup Guide](doc/setup.md).
 Development is described in [Development notes](doc/development.md).
+The form template RDF pattern and its SHACL shape are described in [Form templates](doc/form-templates.md).
