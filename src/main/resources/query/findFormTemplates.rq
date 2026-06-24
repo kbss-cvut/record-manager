@@ -1,14 +1,15 @@
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix form: <http://onto.fel.cvut.cz/ontologies/form/>
+prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+prefix dcterms: <http://purl.org/dc/terms/>
+prefix form:    <http://onto.fel.cvut.cz/ontologies/form/>
 
 CONSTRUCT {
     ?formTemplate a form:form-template .
     ?formTemplate rdfs:label ?formTemplateLabel .
-    ?formTemplate rdfs:comment ?formTemplateComment .
+    ?formTemplate dcterms:description ?formTemplateDescription .
 } WHERE {
   GRAPH ?formTemplate {
     ?formTemplate a form:form-template .
     ?formTemplate rdfs:label ?formTemplateLabel .
-    ?formTemplate rdfs:comment ?formTemplateComment .
+    ?formTemplate dcterms:description ?formTemplateDescription .
   }
 }
