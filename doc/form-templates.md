@@ -11,16 +11,17 @@ TTL files against it.
 ## Form template RDF pattern
 
 A valid form template is a named graph whose IRI is the template IRI, containing a
-resource (the same IRI) typed `form:form-template` with a label and a comment:
+resource (the same IRI) typed `form:form-template` with a label and a description:
 
 ```trig
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix form:    <http://onto.fel.cvut.cz/ontologies/form/> .
 
 <http://example.org/my-template> {
     <http://example.org/my-template> a form:form-template ;
-        rdfs:label   "My template" ;
-        rdfs:comment "Description of the template" .
+        rdfs:label          "My template" ;
+        dcterms:description "Description of the template" .
 }
 ```
 
@@ -33,10 +34,10 @@ A resource is recognized as a form template only when **all** of the following h
    same. Triples in the default graph or in a differently named graph are not seen.
 2. **It is typed `form:form-template`** (`http://onto.fel.cvut.cz/ontologies/form/form-template`).
 3. **It has an `rdfs:label`** (`http://www.w3.org/2000/01/rdf-schema#label`).
-4. **It has an `rdfs:comment`** (`http://www.w3.org/2000/01/rdf-schema#comment`).
+4. **It has a `dcterms:description`** (`http://purl.org/dc/terms/description`).
 
-The query's `WHERE` clause requires the type, label, and comment **conjunctively**, so a
-candidate **missing either the label or the comment is silently dropped** from the result
+The query's `WHERE` clause requires the type, label, and description **conjunctively**, so a
+candidate **missing either the label or the description is silently dropped** from the result
 — it does not appear even when correctly typed. The form-gen repository must also be a
 quad store (it must preserve named graphs) and expose a SPARQL endpoint that accepts a
 `query` parameter.
@@ -51,7 +52,7 @@ pyshacl -s doc/form-template-shape.ttl -f human your-templates.ttl
 ```
 
 The shape targets `form:form-template` resources and reports a violation when the
-`rdfs:label` or `rdfs:comment` is missing. Resources not typed as templates are ignored,
+`rdfs:label` or `dcterms:description` is missing. Resources not typed as templates are ignored,
 so the shape can be run against arbitrary TTL files.
 
 **Named-graph caveat:** SHACL validates the merged data graph, not graph names, so the
