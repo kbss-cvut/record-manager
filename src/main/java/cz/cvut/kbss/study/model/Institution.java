@@ -87,6 +87,19 @@ public class Institution extends AbstractEntity implements HasOwlKey {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Institution institution)) return false;
+        if (uri == null) return false;
+        return uri.equals(institution.uri);
+    }
+
+    @Override
+    public int hashCode() {
+        return uri != null ? uri.hashCode() : System.identityHashCode(this);
+    }
+
+    @Override
     public String toString() {
         return "Institution{<" + uri +
                 ">, name='" + name + '\'' +
